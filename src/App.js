@@ -5,7 +5,7 @@ const storyData = {
     start: {
         title: "The Missing Rainbow Berries",
         image: "/Images/0-BookCover.png",
-        text: "An interactive story about being a problem solver. Join Ivy the Unicorn and Oliver the Dinosaur on a sweet adventure!",
+        text: "Every summer, in the Whispering Woods, magical Rainbow Berries grow in every color. When they are ripe,  everyone celebrates with a festival full of treats.  Ivy the Unicorn wants everything to be perfect for the festival, and Oliver the Dragon just wants to have fun.  But the berries vanish, can Ivy and Oliver solve the problem and save the festival? ",
         choices: [
             { text: "Start the Adventure!", nextScene: 'scene1' }
         ]
