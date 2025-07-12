@@ -13,7 +13,7 @@ exports.handler = async function(event) {
     return { statusCode: 500, body: 'API key not configured.' };
   }
 
-  const VOICE_ID = '21m00Tcm4TlvDq8ikWAM';
+  const VOICE_ID = 'ZF6FPAbjXT4488VcRRnw';
   const API_URL = `https://api.elevenlabs.io/v1/text-to-speech/${VOICE_ID}`;
 
   const options = {
