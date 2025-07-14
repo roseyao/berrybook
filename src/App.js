@@ -1,145 +1,161 @@
 import React, { useState, useEffect, useRef } from 'react';
 
-// Story data object updated to use local image paths from the public folder.
-const storyData = {
-    start: {
-        title: "The Missing Rainbow Berries",
-        image: "/Images/0-BookCover.png",
-        text: "Every summer, in the Whispering Woods, magical Rainbow Berries grow in every color. When they are ripe,  everyone celebrates with a festival full of treats.  Ivy the Unicorn wants everything to be perfect for the festival, and Oliver the Dragon just wants to have fun.  But the berries vanish, can Ivy and Oliver solve the problem and save the festival? ",
-        choices: [
-            { text: "Start the Adventure!", nextScene: 'scene1' }
-        ]
-    },
-    scene1: {
-        title: "Discovery at the Berry Patch",
-        image: "/Images/1-Scene.png",
-        text: "\"Oh no!\" Ivy the Unicorn gasped. \"The Rainbow Berries are all gone! The festival is tomorrow!\" Oliver the Dragon bounced nearby, chasing a butterfly. \"Maybe they're playing hide and seek!\" he giggled, not really listening. Ivy stomped her hoof. \"Oliver, this is serious! Without Rainbow Berries, we can't make the special festival treats!\" \"No Berry Pie?\" Oliver suddenly stopped. \"We should do something! Should we look for clues or ask if anyone saw anything?\"",
-        choices: [
-            { text: "Look for clues", nextScene: 'scene2A' },
-            { text: "Ask forest friends", nextScene: 'scene2B' }
-        ]
-    },
-    scene2A: {
-        title: "Following Clues",
-        image: "/Images/2A-Scene.png",
-        text: "\"Look!\" Ivy pointed at something sparkly. \"A purple scale!\" They found a glittery trail leading into the Whispering Woods. The trees looked dark and scary. \"M-maybe we should get help,\" Ivy whispered nervously. \"The trail does loop-de-loops!\" Oliver got distracted by a stick. \"Wait, where did it go?\" They needed to work together to follow the trail.",
-        choices: [
-            { text: "Take a deep breath and focus", nextScene: 'scene3A' },
-            { text: "Make noise to find the way", nextScene: 'scene3B' }
-        ]
-    },
-    scene2B: {
-        title: "Asking Around",
-        image: "/Images/2B-Scene.png",
-        text: "Squirrel chittered: \"I saw a purple flash zoom by last night!\" Owl hooted: \"I heard munching when the moon was high. Someone was very hungry.\" Bunny bounced over: \"I found berry stems by the Crystal Cave!\" Ivy felt shy talking to everyone, but she tried her best. Oliver kept getting distracted and missing clues. \"So it's purple, hungry, and lives in a cave,\" Ivy said thoughtfully.",
-        choices: [
-            { text: "Go carefully to the cave", nextScene: 'scene3A' },
-            { text: "Rush to catch the thief", nextScene: 'scene3B' }
-        ]
-    },
-    scene3A: {
-        title: "The Careful Approach",
-        image: "/Images/3A.png",
-        text: "Ivy took a deep breath. \"Let's be calm and quiet.\" They crept toward the Crystal Cave. Inside, they heard soft crying. \"Hello?\" Ivy called gently. \"We're not angry.\" A tiny purple dragon crawled out, rainbow berry juice on her snout. \"Please don't be mad. I was just so hungry...\" \"Oh, you poor thing!\" Their anger melted away completely.",
-        choices: [
-            { text: "Continue", nextScene: 'scene4' }
-        ]
-    },
-    scene3B: {
-        title: "The Rushed Approach",
-        image: "/Images/3B.png",
-        text: "\"Let's hurry!\" Oliver shouted, making lots of noise. They stomped and crashed through the forest. A purple blur tried to hide! \"Wait!\" Ivy called. \"We just want to talk!\" A baby purple dragon tumbled out, berries rolling everywhere. \"Please don't hurt me! I didn't mean to be bad!\" \"Oh no, we scared her!\" Ivy felt terrible.",
-        choices: [
-            { text: "Continue", nextScene: 'scene4' }
-        ]
-    },
-    scene4: {
-        title: "Violet's Story",
-        image: "/Images/4.png",
-        text: "\"I'm Violet,\" the little dragon sniffled. \"I got lost in the big storm last week. I've been so scared and alone!\" She showed them a drawing of her family. \"Dragon babies need lots of food to keep our fire warm. I'm sorry I took your berries.\" \"Your family must be so worried!\" Ivy said. \"The festival is tomorrow though,\" Oliver remembered. What should they do first?",
-        choices: [
-            { text: "Help find Violet's family", nextScene: 'scene5A' },
-            { text: "Fix the berry problem", nextScene: 'scene5B' }
-        ]
-    },
-    scene5A: {
-        title: "Finding Family First",
-        image: "/Images/5A.png",
-        text: "\"We'll help you find your family!\" Ivy decided. \"Really? After I took your berries?\" Violet's eyes sparkled with hope. They climbed the mountain, Violet on Oliver's back. Soon, two purple shapes appeared in the sky! \"MAMA! PAPA!\" Violet cried. \"Our baby!\" The dragon parents swooped down. After happy reunions, they said, \"We must repay your kindness. Dragon fire can grow berries instantly!\"",
-        choices: [
-            { text: "Continue", nextScene: 'scene6' }
-        ]
-    },
-    scene5B: {
-        title: "Solving the Berry Problem",
-        image: "/Images/5B.png",
-        text: "\"Let's fix the berry problem first,\" Ivy decided gently. Violet showed them her stash - only half the berries were left. \"I'm so sorry.\" \"Wait!\" Ivy's horn glowed. \"Unicorn magic and dragon fire can work together! Violet, will you help?\" Working as a team, Ivy's sparkles and Violet's purple flames made new berry bushes grow instantly! \"We did it together!\" Oliver cheered. Just then two dragons swooped in yelling: “Violet!” Violet jumped with joy, “Mama, Dada!”",
-        choices: [
-            { text: "Continue", nextScene: 'scene6' }
-        ]
-    },
-    scene6: {
-        title: "The Rainbow Festival",
-        image: "/Images/6.png",
-        text: "The festival was more magical than ever! Ivy directed preparations calmly. \"That crooked banner? It's perfectly imperfect!\" Oliver stayed focused on helping. \"Look! I didn't get distracted once... well, maybe once.\" Violet lit purple lanterns with her dragon fire. \"We learned that the best solutions come when we work together,\" the friends agreed, watching the twinkling lights.",
-        choices: [
-            { text: "The End - Play Again!", nextScene: 'start' }
-        ]
-    }
+// --- Data Structure for the Library ---
+// This new structure can hold multiple books.
+const library = {
+    books: [
+        {
+            id: 'rainbow-berries',
+            title: 'The Missing Rainbow Berries',
+            coverImage: '/Images/0-BookCover.png',
+            story: {
+                start: {
+                    title: "The Missing Rainbow Berries",
+                    image: "/Images/0-Intro.png",
+                    text: "Every summer, in the Whispering Woods, magical Rainbow Berries grow in every color. When they are ripe,  everyone celebrates with a festival full of treats.  Ivy the Unicorn wants everything to be perfect for the festival, and Oliver the Dragon just wants to have fun.  But the berries vanish, can Ivy and Oliver solve the problem and save the festival? ",
+                    choices: [
+                        { text: "Start the Adventure!", nextScene: 'scene1' }
+                    ]
+                },
+                scene1: {
+                    title: "Discovery at the Berry Patch",
+                    image: "/Images/1-Scene.png",
+                    text: "\"Oh no!\" Ivy the Unicorn gasped. \"The Rainbow Berries are all gone! The festival is tomorrow!\" Oliver the Dragon bounced nearby, chasing a butterfly. \"Maybe they're playing hide and seek!\" he giggled, not really listening. Ivy stomped her hoof. \"Oliver, this is serious! Without Rainbow Berries, we can't make the special festival treats!\" \"No Berry Pie?\" Oliver suddenly stopped. \"We should do something! Should we look for clues or ask if anyone saw anything?\"",
+                    choices: [
+                        { text: "Look for clues", nextScene: 'scene2A' },
+                        { text: "Ask forest friends", nextScene: 'scene2B' }
+                    ]
+                },
+                scene2A: {
+                    title: "Following Clues",
+                    image: "/Images/2A-Scene.png",
+                    text: "\"Look!\" Ivy pointed at something sparkly. \"A purple scale!\" They found a glittery trail leading into the Whispering Woods. The trees looked dark and scary. \"M-maybe we should get help,\" Ivy whispered nervously. \"The trail does loop-de-loops!\" Oliver got distracted by a stick. \"Wait, where did it go?\" They needed to work together to follow the trail.",
+                    choices: [
+                        { text: "Take a deep breath and focus", nextScene: 'scene3A' },
+                        { text: "Make noise to find the way", nextScene: 'scene3B' }
+                    ]
+                },
+                scene2B: {
+                    title: "Asking Around",
+                    image: "/Images/2B-Scene.png",
+                    text: "Squirrel chittered: \"I saw a purple flash zoom by last night!\" Owl hooted: \"I heard munching when the moon was high. Someone was very hungry.\" Bunny bounced over: \"I found berry stems by the Crystal Cave!\" Ivy felt shy talking to everyone, but she tried her best. Oliver kept getting distracted and missing clues. \"So it's purple, hungry, and lives in a cave,\" Ivy said thoughtfully.",
+                    choices: [
+                        { text: "Go carefully to the cave", nextScene: 'scene3A' },
+                        { text: "Rush to catch the thief", nextScene: 'scene3B' }
+                    ]
+                },
+                scene3A: {
+                    title: "The Careful Approach",
+                    image: "/Images/3A.png",
+                    text: "Ivy took a deep breath. \"Let's be calm and quiet.\" They crept toward the Crystal Cave. Inside, they heard soft crying. \"Hello?\" Ivy called gently. \"We're not angry.\" A tiny purple dragon crawled out, rainbow berry juice on her snout. \"Please don't be mad. I was just so hungry...\" \"Oh, you poor thing!\" Their anger melted away completely.",
+                    choices: [
+                        { text: "Continue", nextScene: 'scene4' }
+                    ]
+                },
+                scene3B: {
+                    title: "The Rushed Approach",
+                    image: "/Images/3B.png",
+                    text: "\"Let's hurry!\" Oliver shouted, making lots of noise. They stomped and crashed through the forest. A purple blur tried to hide! \"Wait!\" Ivy called. \"We just want to talk!\" A baby purple dragon tumbled out, berries rolling everywhere. \"Please don't hurt me! I didn't mean to be bad!\" \"Oh no, we scared her!\" Ivy felt terrible.",
+                    choices: [
+                        { text: "Continue", nextScene: 'scene4' }
+                    ]
+                },
+                scene4: {
+                    title: "Violet's Story",
+                    image: "/Images/4.png",
+                    text: "\"I'm Violet,\" the little dragon sniffled. \"I got lost in the big storm last week. I've been so scared and alone!\" She showed them a drawing of her family. \"Dragon babies need lots of food to keep our fire warm. I'm sorry I took your berries.\" \"Your family must be so worried!\" Ivy said. \"The festival is tomorrow though,\" Oliver remembered. What should they do first?",
+                    choices: [
+                        { text: "Help find Violet's family", nextScene: 'scene5A' },
+                        { text: "Fix the berry problem", nextScene: 'scene5B' }
+                    ]
+                },
+                scene5A: {
+                    title: "Finding Family First",
+                    image: "/Images/5A.png",
+                    text: "\"We'll help you find your family!\" Ivy decided. \"Really? After I took your berries?\" Violet's eyes sparkled with hope. They climbed the mountain, Violet on Oliver's back. Soon, two purple shapes appeared in the sky! \"MAMA! PAPA!\" Violet cried. \"Our baby!\" The dragon parents swooped down. After happy reunions, they said, \"We must repay your kindness. Dragon fire can grow berries instantly!\"",
+                    choices: [
+                        { text: "Continue", nextScene: 'scene6' }
+                    ]
+                },
+                scene5B: {
+                    title: "Solving the Berry Problem",
+                    image: "/Images/5B.png",
+                    text: "\"Let's fix the berry problem first,\" Ivy decided gently. Violet showed them her stash - only half the berries were left. \"I'm so sorry.\" \"Wait!\" Ivy's horn glowed. \"Unicorn magic and dragon fire can work together! Violet, will you help?\" Working as a team, Ivy's sparkles and Violet's purple flames made new berry bushes grow instantly! \"We did it together!\" Oliver cheered. Just then two dragons swooped in yelling: “Violet!” Violet jumped with joy, “Mama, Dada!”",
+                    choices: [
+                        { text: "Continue", nextScene: 'scene6' }
+                    ]
+                },
+                scene6: {
+                    title: "The Rainbow Festival",
+                    image: "/Images/6.png",
+                    text: "The festival was more magical than ever! Ivy directed preparations calmly. \"That crooked banner? It's perfectly imperfect!\" Oliver stayed focused on helping. \"Look! I didn't get distracted once... well, maybe once.\" Violet lit purple lanterns with her dragon fire. \"We learned that the best solutions come when we work together,\" the friends agreed, watching the twinkling lights.",
+                    choices: [
+                        { text: "The End - Play Again!", nextScene: 'start' }
+                    ]
+                }
+            }
+        },
+        // You can add another book object here in the future!
+    ]
 };
 
 // --- UI Components ---
 
 const SoundIcon = ({ isLoading, isPlaying }) => (
     <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="mr-2">
-        {isLoading ? (
-            <path d="M21.5 2v6h-6M2.5 22v-6h6M2 12h2a8 8 0 0 1 16 0h2" className="animate-spin origin-center" />
-        ) : isPlaying ? (
-            <rect x="6" y="6" width="12" height="12"></rect>
-        ) : (
-            <polygon points="5 3 19 12 5 21 5 3"></polygon>
-        )}
+        {isLoading ? <path d="M21.5 2v6h-6M2.5 22v-6h6M2 12h2a8 8 0 0 1 16 0h2" className="animate-spin origin-center" /> : isPlaying ? <rect x="6" y="6" width="12" height="12"></rect> : <polygon points="5 3 19 12 5 21 5 3"></polygon>}
     </svg>
 );
 
 const ErrorMessage = ({ message }) => {
     if (!message) return null;
-    return (
-        <div className="p-3 my-4 bg-red-100 border border-red-300 text-red-800 rounded-lg text-sm">
-            <strong>Error:</strong> {message}
-        </div>
-    );
+    return <div className="p-3 my-4 bg-red-100 border border-red-300 text-red-800 rounded-lg text-sm"><strong>Error:</strong> {message}</div>;
 };
 
-// The main App component
-export default function App() {
+// --- New Component for the Bookshelf ---
+const BookSelection = ({ books, onSelectBook }) => (
+    <div className="p-8">
+        <h1 className="text-4xl font-bold text-center text-slate-800 mb-8">Choose a Story</h1>
+        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+            {books.map(book => (
+                <div key={book.id} className="cursor-pointer group" onClick={() => onSelectBook(book.id)}>
+                    <div className="rounded-lg overflow-hidden shadow-lg group-hover:shadow-2xl transition-shadow duration-300">
+                        <img src={book.coverImage} alt={book.title} className="w-full h-auto object-cover" />
+                    </div>
+                    <h2 className="mt-4 text-center text-lg font-semibold text-slate-700 group-hover:text-purple-600">{book.title}</h2>
+                </div>
+            ))}
+        </div>
+    </div>
+);
+
+// --- New Component for Viewing a Single Story ---
+const StoryViewer = ({ book, onExit }) => {
     const [currentScene, setCurrentScene] = useState('start');
     const [isLoading, setIsLoading] = useState(false);
     const [isPlaying, setIsPlaying] = useState(false);
     const [errorMessage, setErrorMessage] = useState('');
     const audioRef = useRef(null);
 
+    const storyData = book.story;
+    const scene = storyData[currentScene];
+
     const stopPlayback = () => {
         const audio = audioRef.current;
         if (audio) {
             audio.pause();
-            if (audio.src && audio.src.startsWith('blob:')) {
-                URL.revokeObjectURL(audio.src);
-            }
+            if (audio.src && audio.src.startsWith('blob:')) URL.revokeObjectURL(audio.src);
             audio.src = '';
-            audio.oncanplaythrough = null;
-            audio.onended = null;
-            audio.onerror = null;
         }
         setIsPlaying(false);
         setIsLoading(false);
     };
-    
+
     useEffect(() => {
-        return () => {
-            stopPlayback();
-        };
-    }, [currentScene]);
+        // Reset to the start scene when the book changes
+        setCurrentScene('start');
+        return () => stopPlayback();
+    }, [book]);
 
     const handleReadAloud = async (textToRead) => {
         setErrorMessage('');
@@ -147,37 +163,22 @@ export default function App() {
             stopPlayback();
             return;
         }
-
         setIsLoading(true);
-
         try {
-            // Call our own Netlify Function endpoint
             const response = await fetch('/.netlify/functions/generate-audio', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ text: textToRead }),
             });
-
-            if (!response.ok) {
-                const errorText = await response.text();
-                throw new Error(errorText || `Request failed with status ${response.status}`);
-            }
-
+            if (!response.ok) throw new Error(await response.text() || `Request failed with status ${response.status}`);
             const data = await response.json();
-            
-            // Decode the Base64 string back to binary data
             const audioBytes = atob(data.audio);
             const audioBuffer = new Uint8Array(audioBytes.length);
-            for (let i = 0; i < audioBytes.length; i++) {
-                audioBuffer[i] = audioBytes.charCodeAt(i);
-            }
-            
+            for (let i = 0; i < audioBytes.length; i++) audioBuffer[i] = audioBytes.charCodeAt(i);
             const audioBlob = new Blob([audioBuffer], { type: 'audio/mpeg' });
             const audioUrl = URL.createObjectURL(audioBlob);
-            
             const audio = audioRef.current;
             audio.src = audioUrl;
-
             audio.oncanplaythrough = async () => {
                 try {
                     await audio.play();
@@ -188,14 +189,11 @@ export default function App() {
                     stopPlayback();
                 }
             };
-            
             audio.onended = () => stopPlayback();
-            
-            audio.onerror = (e) => {
+            audio.onerror = () => {
                 setErrorMessage('An error occurred while trying to play the audio.');
                 stopPlayback();
             };
-
         } catch (error) {
             setErrorMessage(error.message || "An unknown error occurred.");
             setIsLoading(false);
@@ -208,57 +206,64 @@ export default function App() {
         if (storyData[nextScene]) {
             setCurrentScene(nextScene);
         } else {
-            console.error(`Scene "${nextScene}" not found!`);
             setCurrentScene('start');
         }
     };
 
-    const scene = storyData[currentScene];
+    return (
+        <div>
+            <div className="w-full">
+                <img src={scene.image} alt={scene.title} className="w-full h-auto" onError={(e) => { e.target.onerror = null; e.target.src = 'https://placehold.co/600x400/fecaca/9ca3af?text=Image+Not+Found'; }} />
+            </div>
+            <div className="p-6 md:p-8">
+                <div className="flex justify-between items-start mb-4">
+                    <h1 className="text-2xl md:text-3xl font-bold text-slate-800 text-left flex-1 mr-4">{scene.title}</h1>
+                    <button onClick={() => handleReadAloud(scene.text)} disabled={isLoading} className={`flex items-center justify-center px-4 py-2 rounded-full text-sm font-semibold transition-colors duration-300 ${isPlaying ? 'bg-red-500 text-white' : 'bg-blue-500 text-white hover:bg-blue-600'} ${isLoading ? 'bg-slate-400 cursor-not-allowed' : ''} focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500`}>
+                        <SoundIcon isLoading={isLoading} isPlaying={isPlaying} />
+                        {isLoading ? 'Loading...' : isPlaying ? 'Stop' : 'Read'}
+                    </button>
+                </div>
+                <ErrorMessage message={errorMessage} />
+                <p className="text-slate-600 text-base md:text-lg leading-relaxed my-6 text-center">{scene.text}</p>
+                <div className="flex flex-col items-center space-y-4">
+                    {scene.choices.map((choice, index) => (
+                        <button key={index} onClick={() => handleChoice(choice.nextScene)} className="w-full max-w-xs bg-purple-500 hover:bg-purple-600 text-white font-bold py-3 px-6 rounded-full shadow-lg transform hover:scale-105 transition-all duration-300 ease-in-out focus:outline-none focus:ring-4 focus:ring-purple-300">
+                            {choice.text}
+                        </button>
+                    ))}
+                    {/* Add a button to go back to the library */}
+                    <button onClick={onExit} className="mt-4 text-sm text-slate-500 hover:text-purple-600">
+                        &larr; Back to Library
+                    </button>
+                </div>
+            </div>
+            <audio ref={audioRef} />
+        </div>
+    );
+};
+
+// --- Main App Component ---
+export default function App() {
+    const [selectedBookId, setSelectedBookId] = useState(null);
+
+    const handleSelectBook = (bookId) => {
+        setSelectedBookId(bookId);
+    };
+
+    const handleExitBook = () => {
+        setSelectedBookId(null);
+    };
+
+    const selectedBook = selectedBookId ? library.books.find(b => b.id === selectedBookId) : null;
 
     return (
         <div className="bg-slate-100 font-sans min-h-screen flex items-center justify-center p-4">
             <div className="bg-white w-full max-w-4xl rounded-2xl shadow-2xl overflow-hidden transform transition-all duration-500 ease-in-out">
-                <div className="w-full">
-                    <img 
-                        src={scene.image} 
-                        alt={scene.title}
-                        className="w-full h-auto"
-                        onError={(e) => { e.target.onerror = null; e.target.src='https://placehold.co/600x400/fecaca/9ca3af?text=Image+Not+Found'; }}
-                    />
-                </div>
-                <div className="p-6 md:p-8">
-                    <div className="flex justify-between items-start mb-4">
-                        <h1 className="text-2xl md:text-3xl font-bold text-slate-800 text-left flex-1 mr-4">{scene.title}</h1>
-                        <button
-                            onClick={() => handleReadAloud(scene.text)}
-                            disabled={isLoading}
-                            className={`flex items-center justify-center px-4 py-2 rounded-full text-sm font-semibold transition-colors duration-300 ${isPlaying ? 'bg-red-500 text-white' : 'bg-blue-500 text-white hover:bg-blue-600'} ${isLoading ? 'bg-slate-400 cursor-not-allowed' : ''} focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500`}
-                            aria-label={isPlaying ? "Stop reading" : "Read story aloud"}
-                        >
-                            <SoundIcon isLoading={isLoading} isPlaying={isPlaying} />
-                            {isLoading ? 'Loading...' : isPlaying ? 'Stop' : 'Read'}
-                        </button>
-                    </div>
-                    
-                    <ErrorMessage message={errorMessage} />
-
-                    <p className="text-slate-600 text-base md:text-lg leading-relaxed my-6 text-center">
-                        {scene.text}
-                    </p>
-
-                    <div className="flex flex-col items-center space-y-4">
-                        {scene.choices.map((choice, index) => (
-                            <button
-                                key={index}
-                                onClick={() => handleChoice(choice.nextScene)}
-                                className="w-full max-w-xs bg-purple-500 hover:bg-purple-600 text-white font-bold py-3 px-6 rounded-full shadow-lg transform hover:scale-105 transition-all duration-300 ease-in-out focus:outline-none focus:ring-4 focus:ring-purple-300"
-                            >
-                                {choice.text}
-                            </button>
-                        ))}
-                    </div>
-                </div>
-                <audio ref={audioRef} />
+                {selectedBook ? (
+                    <StoryViewer book={selectedBook} onExit={handleExitBook} />
+                ) : (
+                    <BookSelection books={library.books} onSelectBook={handleSelectBook} />
+                )}
             </div>
         </div>
     );
