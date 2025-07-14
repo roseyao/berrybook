@@ -105,7 +105,7 @@ const library = {
                     image: "/Images/book2/0-intro.png", 
                     text: "The Starlight Flowers that grant wishes only bloom once a year - tonight! But baby Shimmer accidentally made them invisible while playing with magic she's too young to control. Ivy and Oliver must work together (without fighting!) to find the flowers before midnight, all while taking care of an energetic baby unicorn who copies everything they do.",
                     choices: [
-                        { text: "Start Adventure", nextScene: 'scene1' },
+                        { text: "Start Adventure", nextScene: 'scene1' }
                     ]
                 }
                 scene1: {
