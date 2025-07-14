@@ -195,7 +195,164 @@ const ErrorMessage = ({ message }) => {
 };
 
 // --- New Component for the Bookshelf ---
-const BookSelection = ({ books, onSelectBook }) => (
-    <div className="p-8">
-        <h1 className="text-4xl font-bold text-center text-slate-800 mb-8">Choose a Story</h1>
-        <div className="g
+const BookSelection = ({ books, onSelectBook }) => {
+    // This console.log will help us debug.
+    // It will show the contents of the 'books' array in your browser's developer console.
+    console.log("Books being sent to the bookshelf:", books);
+
+    return (
+        <div className="p-8">
+            <h1 className="text-4xl font-bold text-center text-slate-800 mb-8">Choose a Story</h1>
+            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+                {books.map(book => (
+                    <div key={book.id} className="cursor-pointer group" onClick={() => onSelectBook(book.id)}>
+                        <div className="rounded-lg overflow-hidden shadow-lg group-hover:shadow-2xl transition-shadow duration-300">
+                            <img src={book.coverImage} alt={book.title} className="w-full h-auto object-cover" />
+                        </div>
+                        <h2 className="mt-4 text-center text-lg font-semibold text-slate-700 group-hover:text-purple-600">{book.title}</h2>
+                    </div>
+                ))}
+            </div>
+        </div>
+    );
+};
+
+// --- New Component for Viewing a Single Story ---
+const StoryViewer = ({ book, onExit }) => {
+    const [currentScene, setCurrentScene] = useState('start');
+    const [isLoading, setIsLoading] = useState(false);
+    const [isPlaying, setIsPlaying] = useState(false);
+    const [errorMessage, setErrorMessage] = useState('');
+    const audioRef = useRef(null);
+
+    const storyData = book.story;
+    const scene = storyData[currentScene];
+
+    const stopPlayback = () => {
+        const audio = audioRef.current;
+        if (audio) {
+            audio.pause();
+            if (audio.src && audio.src.startsWith('blob:')) URL.revokeObjectURL(audio.src);
+            audio.src = '';
+        }
+        setIsPlaying(false);
+        setIsLoading(false);
+    };
+
+    useEffect(() => {
+        // Reset to the start scene when the book changes
+        setCurrentScene('start');
+        return () => stopPlayback();
+    }, [book]);
+
+    const handleReadAloud = async (textToRead) => {
+        setErrorMessage('');
+        if (isPlaying || isLoading) {
+            stopPlayback();
+            return;
+        }
+        setIsLoading(true);
+        try {
+            const response = await fetch('/.netlify/functions/generate-audio', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ text: textToRead }),
+            });
+            if (!response.ok) throw new Error(await response.text() || `Request failed with status ${response.status}`);
+            const data = await response.json();
+            const audioBytes = atob(data.audio);
+            const audioBuffer = new Uint8Array(audioBytes.length);
+            for (let i = 0; i < audioBytes.length; i++) audioBuffer[i] = audioBytes.charCodeAt(i);
+            const audioBlob = new Blob([audioBuffer], { type: 'audio/mpeg' });
+            const audioUrl = URL.createObjectURL(audioBlob);
+            const audio = audioRef.current;
+            audio.src = audioUrl;
+            audio.oncanplaythrough = async () => {
+                try {
+                    await audio.play();
+                    setIsLoading(false);
+                    setIsPlaying(true);
+                } catch (playError) {
+                    setErrorMessage(`Playback failed: ${playError.message}.`);
+                    stopPlayback();
+                }
+            };
+            audio.onended = () => stopPlayback();
+            audio.onerror = () => {
+                setErrorMessage('An error occurred while trying to play the audio.');
+                stopPlayback();
+            };
+        } catch (error) {
+            setErrorMessage(error.message || "An unknown error occurred.");
+            setIsLoading(false);
+        }
+    };
+
+    const handleChoice = (nextScene) => {
+        stopPlayback();
+        setErrorMessage('');
+        if (storyData[nextScene]) {
+            setCurrentScene(nextScene);
+        } else {
+            setCurrentScene('start');
+        }
+    };
+
+    return (
+        <div>
+            <div className="w-full">
+                <img src={scene.image} alt={scene.title} className="w-full h-auto" onError={(e) => { e.target.onerror = null; e.target.src = 'https://placehold.co/600x400/fecaca/9ca3af?text=Image+Not+Found'; }} />
+            </div>
+            <div className="p-6 md:p-8">
+                <div className="flex justify-between items-start mb-4">
+                    <h1 className="text-2xl md:text-3xl font-bold text-slate-800 text-left flex-1 mr-4">{scene.title}</h1>
+                    <button onClick={() => handleReadAloud(scene.text)} disabled={isLoading} className={`flex items-center justify-center px-4 py-2 rounded-full text-sm font-semibold transition-colors duration-300 ${isPlaying ? 'bg-red-500 text-white' : 'bg-blue-500 text-white hover:bg-blue-600'} ${isLoading ? 'bg-slate-400 cursor-not-allowed' : ''} focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500`}>
+                        <SoundIcon isLoading={isLoading} isPlaying={isPlaying} />
+                        {isLoading ? 'Loading...' : isPlaying ? 'Stop' : 'Read'}
+                    </button>
+                </div>
+                <ErrorMessage message={errorMessage} />
+                <p className="text-slate-600 text-base md:text-lg leading-relaxed my-6 text-center">{scene.text}</p>
+                <div className="flex flex-col items-center space-y-4">
+                    {scene.choices.map((choice, index) => (
+                        <button key={index} onClick={() => handleChoice(choice.nextScene)} className="w-full max-w-xs bg-purple-500 hover:bg-purple-600 text-white font-bold py-3 px-6 rounded-full shadow-lg transform hover:scale-105 transition-all duration-300 ease-in-out focus:outline-none focus:ring-4 focus:ring-purple-300">
+                            {choice.text}
+                        </button>
+                    ))}
+                    {/* Add a button to go back to the library */}
+                    <button onClick={onExit} className="mt-4 text-sm text-slate-500 hover:text-purple-600">
+                        &larr; Back to Library
+                    </button>
+                </div>
+            </div>
+            <audio ref={audioRef} />
+        </div>
+    );
+};
+
+// --- Main App Component ---
+export default function App() {
+    const [selectedBookId, setSelectedBookId] = useState(null);
+
+    const handleSelectBook = (bookId) => {
+        setSelectedBookId(bookId);
+    };
+
+    const handleExitBook = () => {
+        setSelectedBookId(null);
+    };
+
+    const selectedBook = selectedBookId ? library.books.find(b => b.id === selectedBookId) : null;
+
+    return (
+        <div className="bg-slate-100 font-sans min-h-screen flex items-center justify-center p-4">
+            <div className="bg-white w-full max-w-4xl rounded-2xl shadow-2xl overflow-hidden transform transition-all duration-500 ease-in-out">
+                {selectedBook ? (
+                    <StoryViewer book={selectedBook} onExit={handleExitBook} />
+                ) : (
+                    <BookSelection books={library.books} onSelectBook={handleSelectBook} />
+                )}
+            </div>
+        </div>
+    );
+}
