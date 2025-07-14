@@ -102,12 +102,12 @@ const library = {
             story: {
                 start: {
                     title: "The Invisible Starlight Flowers",
-                    image: "/Images/book2/0-intro.png", 
+                    image: '/Images/book2/0-intro.png',
                     text: "The Starlight Flowers that grant wishes only bloom once a year - tonight! But baby Shimmer accidentally made them invisible while playing with magic she's too young to control. Ivy and Oliver must work together (without fighting!) to find the flowers before midnight, all while taking care of an energetic baby unicorn who copies everything they do.",
                     choices: [
                         { text: "Start Adventure", nextScene: 'scene1' }
                     ]
-                }
+                },
                 scene1: {
                     title: "The Baby Unicorn Arrives",
                     image: "/Images/book2/1.png",
@@ -232,6 +232,8 @@ const StoryViewer = ({ book, onExit }) => {
     const [isPlaying, setIsPlaying] = useState(false);
     const [errorMessage, setErrorMessage] = useState('');
     const audioRef = useRef(null);
+    // This ref will act as a flag to prevent a race condition.
+    const hasPlaybackEnded = useRef(false);
 
     const storyData = book.story;
     const scene = storyData[currentScene];
@@ -259,7 +261,11 @@ const StoryViewer = ({ book, onExit }) => {
             stopPlayback();
             return;
         }
+        
+        // Reset the flag at the start of a new playback attempt
+        hasPlaybackEnded.current = false;
         setIsLoading(true);
+
         try {
             const response = await fetch('/.netlify/functions/generate-audio', {
                 method: 'POST',
@@ -275,6 +281,7 @@ const StoryViewer = ({ book, onExit }) => {
             const audioUrl = URL.createObjectURL(audioBlob);
             const audio = audioRef.current;
             audio.src = audioUrl;
+
             audio.oncanplaythrough = async () => {
                 try {
                     await audio.play();
@@ -285,9 +292,20 @@ const StoryViewer = ({ book, onExit }) => {
                     stopPlayback();
                 }
             };
-            audio.onended = () => stopPlayback();
+
+            audio.onended = () => {
+                // Set the flag to true when playback finishes successfully
+                hasPlaybackEnded.current = true;
+                stopPlayback();
+            };
+
             audio.onerror = () => {
-                setErrorMessage('An error occurred while trying to play the audio.');
+                // Only show an error if the playback hasn't already ended successfully.
+                if (!hasPlaybackEnded.current) {
+                    console.error("Audio playback error detected.");
+                    setErrorMessage('An error occurred while trying to play the audio.');
+                }
+                // Always stop playback on error to clean up state.
                 stopPlayback();
             };
         } catch (error) {
