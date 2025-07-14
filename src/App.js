@@ -101,6 +101,14 @@ const library = {
             coverImage: '/Images/book2/0-cover.png',
             story: {
                 start: {
+                    title: "The Invisible Starlight Flowers",
+                    image: "/Images/book2/0-intro.png", 
+                    text: "The Starlight Flowers that grant wishes only bloom once a year - tonight! But baby Shimmer accidentally made them invisible while playing with magic she's too young to control. Ivy and Oliver must work together (without fighting!) to find the flowers before midnight, all while taking care of an energetic baby unicorn who copies everything they do.",
+                    choices: [
+                        { text: "Start Adventure", nextScene: 'scene1' },
+                    ]
+                }
+                scene1: {
                     title: "The Baby Unicorn Arrives",
                     image: "/Images/book2/1.png",
                     text: "\"Cousin Ivy! Cousin Ivy!\" A tiny white unicorn with a silver mane bounced into the meadow, sparkles flying everywhere. \"Shimmer!\" Ivy smiled. \"Oliver and I are going to find the Starlight Flowers tonight!\" \"My grandpa told me dragon stories about those flowers,\" Oliver said excitedly. \"They only appear when the Dragon Star aligns with—\" \"I help! I help!\" Shimmer bounced, accidentally shooting sparkles that made the nearby flowers turn invisible. \"Oopsie!\" \"Oh no!\" Ivy gasped. \"The flowers! Oliver, do your dragon stories say anything about invisible flowers?\" Oliver thought hard. \"Actually... yes! We need to work together on this one!\"",
