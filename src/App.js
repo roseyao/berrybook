@@ -204,10 +204,6 @@ const ErrorMessage = ({ message }) => {
 
 // --- New Component for the Bookshelf ---
 const BookSelection = ({ books, onSelectBook }) => {
-    // This console.log will help us debug.
-    // It will show the contents of the 'books' array in your browser's developer console.
-    console.log("Books being sent to the bookshelf:", books);
-
     return (
         <div className="p-8">
             <h1 className="text-4xl font-bold text-center text-slate-800 mb-8">Choose a Story</h1>
@@ -232,7 +228,6 @@ const StoryViewer = ({ book, onExit }) => {
     const [isPlaying, setIsPlaying] = useState(false);
     const [errorMessage, setErrorMessage] = useState('');
     const audioRef = useRef(null);
-    // This ref will act as a flag to prevent a race condition.
     const hasPlaybackEnded = useRef(false);
 
     const storyData = book.story;
@@ -243,6 +238,10 @@ const StoryViewer = ({ book, onExit }) => {
         if (audio) {
             audio.pause();
             if (audio.src && audio.src.startsWith('blob:')) URL.revokeObjectURL(audio.src);
+            // Detach event listeners to prevent them from firing on stale objects
+            audio.oncanplaythrough = null;
+            audio.onended = null;
+            audio.onerror = null;
             audio.src = '';
         }
         setIsPlaying(false);
@@ -262,7 +261,6 @@ const StoryViewer = ({ book, onExit }) => {
             return;
         }
         
-        // Reset the flag at the start of a new playback attempt
         hasPlaybackEnded.current = false;
         setIsLoading(true);
 
@@ -294,18 +292,21 @@ const StoryViewer = ({ book, onExit }) => {
             };
 
             audio.onended = () => {
-                // Set the flag to true when playback finishes successfully
                 hasPlaybackEnded.current = true;
                 stopPlayback();
             };
 
-            audio.onerror = () => {
-                // Only show an error if the playback hasn't already ended successfully.
-                if (!hasPlaybackEnded.current) {
-                    console.error("Audio playback error detected.");
-                    setErrorMessage('An error occurred while trying to play the audio.');
+            audio.onerror = (e) => {
+                // This is the key change: we check the error code.
+                // A "MEDIA_ERR_ABORTED" error is common when the user stops playback or navigates away.
+                // We don't want to show an error message for this user-initiated action.
+                if (e.target.error && e.target.error.code !== e.target.error.MEDIA_ERR_ABORTED) {
+                     if (!hasPlaybackEnded.current) {
+                        console.error("Audio playback error:", e.target.error);
+                        setErrorMessage('An error occurred while trying to play the audio.');
+                    }
                 }
-                // Always stop playback on error to clean up state.
+                // We still call stopPlayback to ensure a clean state, but without setting an error for aborts.
                 stopPlayback();
             };
         } catch (error) {
