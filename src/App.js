@@ -228,7 +228,7 @@ const StoryViewer = ({ book, onExit }) => {
     const [isPlaying, setIsPlaying] = useState(false);
     const [errorMessage, setErrorMessage] = useState('');
     const audioRef = useRef(null);
-    const hasPlaybackEnded = useRef(false);
+    const userStoppedPlayback = useRef(false);
 
     const storyData = book.story;
     const scene = storyData[currentScene];
@@ -238,7 +238,6 @@ const StoryViewer = ({ book, onExit }) => {
         if (audio) {
             audio.pause();
             if (audio.src && audio.src.startsWith('blob:')) URL.revokeObjectURL(audio.src);
-            // Detach event listeners to prevent them from firing on stale objects
             audio.oncanplaythrough = null;
             audio.onended = null;
             audio.onerror = null;
@@ -249,7 +248,6 @@ const StoryViewer = ({ book, onExit }) => {
     };
 
     useEffect(() => {
-        // Reset to the start scene when the book changes
         setCurrentScene('start');
         return () => stopPlayback();
     }, [book]);
@@ -257,11 +255,12 @@ const StoryViewer = ({ book, onExit }) => {
     const handleReadAloud = async (textToRead) => {
         setErrorMessage('');
         if (isPlaying || isLoading) {
+            userStoppedPlayback.current = true;
             stopPlayback();
             return;
         }
         
-        hasPlaybackEnded.current = false;
+        userStoppedPlayback.current = false;
         setIsLoading(true);
 
         try {
@@ -292,21 +291,16 @@ const StoryViewer = ({ book, onExit }) => {
             };
 
             audio.onended = () => {
-                hasPlaybackEnded.current = true;
                 stopPlayback();
             };
 
             audio.onerror = (e) => {
-                // This is the key change: we check the error code.
-                // A "MEDIA_ERR_ABORTED" error is common when the user stops playback or navigates away.
-                // We don't want to show an error message for this user-initiated action.
-                if (e.target.error && e.target.error.code !== e.target.error.MEDIA_ERR_ABORTED) {
-                     if (!hasPlaybackEnded.current) {
-                        console.error("Audio playback error:", e.target.error);
-                        setErrorMessage('An error occurred while trying to play the audio.');
-                    }
+                if (userStoppedPlayback.current) {
+                    userStoppedPlayback.current = false; // Reset flag
+                    return; // Don't show an error if the user stopped it.
                 }
-                // We still call stopPlayback to ensure a clean state, but without setting an error for aborts.
+                console.error("Audio playback error:", e.target.error);
+                setErrorMessage('An error occurred while trying to play the audio.');
                 stopPlayback();
             };
         } catch (error) {
