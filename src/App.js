@@ -195,7 +195,7 @@ const library = {
                     title: "The Laundry Day Disaster",
                     image: "/Images/book3/0-intro.png",
                      text: "The village\'s magical laundry dryer has started eating everyone\'s clothes! Socks, shirts, and even Ivy\'s favorite purple ribbon have vanished. But when Ivy and Oliver investigate, they discover the dryer isn\'t mean - it\'s just VERY hungry and lonely. Can they find a way to help their new appliance friend while saving everyone\'s wardrobe?",
-                     { text: "Start Adventure", nextScene: 'scene1' },
+                     { text: "Start Adventure", nextScene: 'scene1' }
                     ]
                 },
                 scene1: {
