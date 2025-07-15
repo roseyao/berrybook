@@ -314,7 +314,10 @@ const BookSelection = ({ books, onSelectBook }) => {
 
 // --- New Component for Viewing a Single Story ---
 const StoryViewer = ({ book, onExit }) => {
-    const [currentScene, setCurrentScene] = useState('start');
+    const [currentScene, setCurrentScene] = useState(() => {
+        // On initial load, try to get the saved scene for this specific book
+        return localStorage.getItem(`storybook-scene-${book.id}`) || 'start';
+    });
     const [isLoading, setIsLoading] = useState(false);
     const [isPlaying, setIsPlaying] = useState(false);
     const [errorMessage, setErrorMessage] = useState('');
@@ -339,9 +342,9 @@ const StoryViewer = ({ book, onExit }) => {
     };
 
     useEffect(() => {
-        setCurrentScene('start');
+        // When the component unmounts (e.g., exiting book), clean up audio
         return () => stopPlayback();
-    }, [book]);
+    }, []);
 
     const handleReadAloud = async (textToRead) => {
         setErrorMessage('');
@@ -404,8 +407,12 @@ const StoryViewer = ({ book, onExit }) => {
         stopPlayback();
         setErrorMessage('');
         if (storyData[nextScene]) {
+            // Save the new scene to localStorage for this book
+            localStorage.setItem(`storybook-scene-${book.id}`, nextScene);
             setCurrentScene(nextScene);
         } else {
+            // If the scene doesn't exist, it's an error or the end. Go back to start.
+            localStorage.removeItem(`storybook-scene-${book.id}`);
             setCurrentScene('start');
         }
     };
@@ -444,13 +451,23 @@ const StoryViewer = ({ book, onExit }) => {
 
 // --- Main App Component ---
 export default function App() {
-    const [selectedBookId, setSelectedBookId] = useState(null);
+    // On initial load, try to get the last selected book ID from localStorage
+    const [selectedBookId, setSelectedBookId] = useState(() => {
+        return localStorage.getItem('storybook-selectedBookId') || null;
+    });
 
     const handleSelectBook = (bookId) => {
+        // When a book is selected, save its ID to localStorage
+        localStorage.setItem('storybook-selectedBookId', bookId);
         setSelectedBookId(bookId);
     };
 
     const handleExitBook = () => {
+        // When exiting, clear the saved book and scene for that book
+        if (selectedBookId) {
+            localStorage.removeItem(`storybook-scene-${selectedBookId}`);
+        }
+        localStorage.removeItem('storybook-selectedBookId');
         setSelectedBookId(null);
     };
 
