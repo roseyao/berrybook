@@ -560,7 +560,7 @@ const library = {
                     image: "/Images/book7/0-intro.png",
                     text: "When Ivy and Oliver get new closets built in their tree house, they discover the closets are MAGICAL PORTALS! But when Shimmer toddles into Ivy's closet and Violet flies into Oliver's closet, they disappear into different magical worlds! Now Ivy and Oliver must journey through their own closets to rescue their little friends - but the closet worlds reflect their personalities in the wildest ways!",
                     choices: [
-                        { text: "Continue", nextScene: 'scene1' }
+                        { text: "Start Adventure", nextScene: 'scene1' }
                     ]
                 },
                 scene1: {
@@ -568,8 +568,8 @@ const library = {
                     image: "/Images/book7/1.png",
                     text: "\"Your new closets are special,\" said Carpenter Beaver, wiping his brow. \"Made from Wishing Wood - very rare!\" Ivy's closet was painted purple with silver stars. Oliver's was green with orange flames. They looked perfectly normal... until the doors were closed. A soft humming came from inside. \"Did you hear that?\" Ivy asked. Just then, Shimmer toddled in. \"Pretty!\" she squealed, running toward Ivy's closet. And Violet flapped through the window. \"Ooh, warm!\" she chirped, diving toward Oliver's closet. \"WAIT!\" Ivy and Oliver shouted. But both little ones vanished inside. The closet doors slammed shut and wouldn't open!",
                     choices: [
-                        { text: "Ivy goes after Shimmer", nextScene: 'scene2A' },
-                        { text: "Oliver goes after Violet", nextScene: 'scene2B' }
+                        { text: "Follow Ivy into her closet", nextScene: 'scene2A' },
+                        { text: "Follow Oliver into his closet", nextScene: 'scene2B' }
                     ]
                 },
                 scene2A: {
@@ -577,8 +577,7 @@ const library = {
                     image: "/Images/book7/2A.png",
                     text: "Ivy yanked open her closet door and gasped. Instead of clothes, there was a swirling portal! \"Shimmer needs me!\" She jumped through. She landed in a world of crystal puzzles and building challenges - but everything had an \"INSTANT SOLVE\" button. Press it, and castles built themselves. Tap it, and puzzles solved instantly. No thinking, no trying, no effort needed! \"Shimmer?\" Ivy called. \"Where are you?\" She heard frustrated crying. There was Shimmer, stuck in a crystal maze with no instant button! \"Can't get out!\" Shimmer wailed. \"Too hard!\" Crystal Guides appeared. \"Why struggle? Use instant solution!\" \"But there IS no button for this!\" Ivy said. \"Then give up. If it's hard, it's not worth doing,\" they chimed. Ivy felt uncomfortable. That didn't sound right...",
                     choices: [
-                        { text: "Stop Shimmer's chaos", nextScene: 'scene3A' },
-                        { text: "Join the chaos", nextScene: 'scene3B' }
+                        { text: "Try to solve the maze", nextScene: 'scene3A' },
                     ]
                 },
                 scene2B: {
@@ -586,8 +585,7 @@ const library = {
                     image: "/Images/book7/2B.png",
                     text: "Oliver burst through his closet portal and found himself in a dragon's paradise of INSTANT rewards! \"CONGRATULATIONS!\" signs flashed everywhere. \"YOU WIN!\" before he even played. Treasure poured from the sky just for showing up. Every game gave prizes immediately - no waiting, no earning, just constant rewards! \"VIOLET!\" he roared, distracted by the raining gold. \"Help!\" came a tiny voice. Violet was trapped on a platform surrounded by \"instant win\" games. \"I can't get down! The only bridge appears if you save 5 golden coins, but everyone keeps spending them right away!\" Oliver looked at his hand. One golden coin! \"Just need 5?\" Oliver counted on his claws. \"One... two... three... four... FIVE!\" A shiny toy dragon appeared. \"Trade your coin for this! NOW!\" \"But I only have one,\" Oliver said. \"I need... more.\" The Game Dragons laughed. \"Why wait? Shiny toy NOW! Saving is boring!\"",
                     choices: [
-                        { text: "Make everything smaller", nextScene: 'scene3A' },
-                        { text: "Help Violet be brave", nextScene: 'scene3B' }
+                        { text: "Save coins for Violet", nextScene: 'scene3B' }
                     ]
                 },
                 scene3A: {
