@@ -6,6 +6,19 @@ exports.handler = async function(event) {
     return { statusCode: 405, body: 'Method Not Allowed' };
   }
 
+  const allowed = new Set([
+    process.env.URL,
+    process.env.DEPLOY_PRIME_URL,
+    ...(process.env.ALLOWED_ORIGINS || '').split(',').map(s => s.trim()).filter(Boolean),
+  ].filter(Boolean));
+  const origin = (event.headers && (event.headers.origin || event.headers.Origin)) || '';
+  if (!allowed.has(origin)) {
+    return { statusCode: 403, body: JSON.stringify({ error: 'Forbidden' }) };
+  }
+  if ((event.body || '').length > 4096) {
+    return { statusCode: 413, body: JSON.stringify({ error: 'Payload too large' }) };
+  }
+
   const { text } = JSON.parse(event.body);
   const apiKey = process.env.ELEVENLABS_API_KEY;
 
