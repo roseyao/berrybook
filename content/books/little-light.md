@@ -128,10 +128,10 @@ Children's book watercolor illustration, two gentle moments in one: in the doorw
 **image:** `/Images/book8/3B.png`
 
 ### Text
-The house felt big and quiet without Mom and Dad. At bedtime, Oliver's little flame burned very, very small. "What if Mom's so busy with the baby that she forgets all about me?"
-"She won't," whispered Ivy, though her own eyes were a little watery. "Two whole days is just SO long."
-Grandma Quinn tucked them in and held them tight. "Your mom and dad could never, EVER forget you. Their hearts just grew a little bigger — big enough to hold one more."
-She kissed their foreheads. "Two sleeps, and your whole family comes home." Oliver let out a long breath, and snuggled down to dream of his baby sister.
+The house felt big and quiet without Mom and Dad. At bedtime, Ivy's chin wobbled and she felt very sad and homesick. "I miss Mom SO much," she said in a small voice. "Two whole days is forever!"
+This time it was Oliver who scooted close. "It's okay to be sad, Ivy. I miss her too." He gave her his bravest smile.
+Grandma Quinn tucked them both in and held them tight. "Your mom and dad could never, EVER forget you. Their hearts just grew a little bigger — big enough to hold one more."
+She kissed their foreheads. "Two sleeps, and your whole family comes home." Ivy let out a long breath and snuggled close to her brother.
 
 ### Image Prompt
 Children's book watercolor illustration: a dim, quiet bedroom at night. Oliver the dragon under the covers with a very tiny, faint flame, looking worried and missing his mom. Ivy the unicorn beside him with slightly watery eyes. Grandma Quinn, a silvery older unicorn glowing with warmth, tucking them in and hugging them tightly. Soft moonlight through the window, deeply tender and comforting. *(refs: ivy.png, oliver.png; Grandma Quinn unicorn)*

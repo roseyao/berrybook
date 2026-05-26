@@ -74,7 +74,7 @@ Ivy & Oliver's family. Featured in *The New Little Light* (book 8); Mom and Gran
 
 ### Dad — Dragon
 **Reference image:** _TBD — generate._
-**Visual:** big, friendly adult dragon, warm bronzed-green scales (distinct from Oliver's bright emerald), kind eyes, easy smile. **Marker:** a single pair of techy over-ear **headphones** worn around his neck. The cozy, capable parent who cooks dinner and gives steady hugs.
+**Visual:** big, friendly adult dragon, warm bronzed-green scales (distinct from Oliver's bright emerald), kind eyes, easy smile. **Marker:** none (recognizable by his deeper bronzed-green scales and tall, soft-bodied adult build). The cozy, capable parent who cooks dinner and gives steady hugs.
 **Voice & role:** steady, playful, warm, and a bit of a tech nerd (loves computers/AI; Oliver takes after him). Comforts with a dragon's twist — *"love isn't a treasure pile that runs out when you share it; it grows."*
 
 ### Grandma Quinn — Older Unicorn

@@ -690,7 +690,7 @@ const library = {
                 scene3B: {
                     title: "Missing Mom",
                     image: "/Images/book8/3B.png",
-                    text: "The house felt big and quiet without Mom and Dad. At bedtime, Oliver's little flame burned very, very small. \"What if Mom's so busy with the baby that she forgets all about me?\" \"She won't,\" whispered Ivy, though her own eyes were a little watery. \"Two whole days is just SO long.\" Grandma Quinn tucked them in and held them tight. \"Your mom and dad could never, EVER forget you. Their hearts just grew a little bigger — big enough to hold one more.\" She kissed their foreheads. \"Two sleeps, and your whole family comes home.\" Oliver let out a long breath, and snuggled down to dream of his baby sister.",
+                    text: "The house felt big and quiet without Mom and Dad. At bedtime, Ivy's chin wobbled and she felt very sad and homesick. \"I miss Mom SO much,\" she said in a small voice. \"Two whole days is forever!\" This time it was Oliver who scooted close. \"It's okay to be sad, Ivy. I miss her too.\" He gave her his bravest smile. Grandma Quinn tucked them both in and held them tight. \"Your mom and dad could never, EVER forget you. Their hearts just grew a little bigger — big enough to hold one more.\" She kissed their foreheads. \"Two sleeps, and your whole family comes home.\" Ivy let out a long breath and snuggled close to her brother.",
                     choices: [
                         { text: "Continue", nextScene: 'scene4' }
                     ]
