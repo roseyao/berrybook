@@ -5,7 +5,7 @@
 // Google Gemini TTS. Returns { audio: <base64>, mimeType }.
 //
 // Env vars: ELEVENLABS_API_KEY (primary), GEMINI_API_KEY (fallback),
-// optional GEMINI_TTS_VOICE (default "Leda").
+// optional GEMINI_TTS_VOICE (default "Aoede").
 
 const ELEVENLABS_VOICE_ID = 'ZF6FPAbjXT4488VcRRnw';
 const GEMINI_TTS_MODEL = 'gemini-2.5-flash-preview-tts';
@@ -63,7 +63,7 @@ function pcmToWav(pcm, sampleRate) {
 async function tryGeminiTts(text) {
   const apiKey = process.env.GEMINI_API_KEY;
   if (!apiKey) return null;
-  const voice = process.env.GEMINI_TTS_VOICE || 'Leda';
+  const voice = process.env.GEMINI_TTS_VOICE || 'Aoede';
   try {
     const resp = await fetch(
       `https://generativelanguage.googleapis.com/v1beta/models/${GEMINI_TTS_MODEL}:generateContent?key=${apiKey}`,
