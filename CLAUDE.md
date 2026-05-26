@@ -57,7 +57,7 @@ node scripts/generate-art.mjs scenes            # all scenes
 
 ## Gemini prompt rules (learned the hard way — follow these)
 - **Only name and attach the characters present in a scene**, and add *"only the named characters appear — no duplicates, no extra background characters."* Listing/attaching absent characters makes the model insert them.
-- **Unicorns are four-legged animals:** always say *"four-legged unicorn, horse-like muzzle and hooves, exactly four legs, never humanoid, no human face/hands/body."* They render wrong otherwise.
+- **Unicorns are four-legged animals:** always say *"four-legged unicorn, horse-like muzzle and hooves, exactly four legs, never humanoid, no human face/hands/body."* They render wrong otherwise. Front legs **end in hooves, never hands**, and unicorns have **no arms** — they don't hug/hold with an arm (they nuzzle, or just stand on four hooves). Reclining/seated poses make the front hooves look like hands and hide the legs → pose them as a **resting horse** (legs folded, hooves visible) or drape a **blanket over the legs**.
 - **Clothing on a unicorn = a draped SHAWL/WRAP over the back.** The word **"dress"** turns Mom into a human-faced anthro every time. (Grandma's shawl works fine.)
 - **"Elderly grandma" alone → a human granny.** Say *"elderly four-legged unicorn, NOT a human."*
 - **Seated/couch poses mangle unicorn legs** → drape a blanket over the legs, or stage group/finale scenes **under bed covers** (hides anatomy entirely — see scene 6).
