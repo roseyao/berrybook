@@ -66,6 +66,15 @@ node scripts/generate-art.mjs scenes            # all scenes
 - **Covers** come out portrait (~832×1248). Make the composition **top-loaded** (title + family grouped high) and **crop the top square** to 1024×1024 (PIL), keeping the title — every other book's cover has its title baked in. The chooser also shows the title as text below the image.
 - Every generation is a dice roll — **view each image and re-roll** the ones with extra limbs/characters or off-model traits.
 
+## Working with the image model (mindset)
+Consistency came ~80% from constraints + composition, ~20% from the references. Internalize:
+- **Refs anchor *look*, not *behavior*.** They keep colors/markings on-model; they do nothing for pose, anatomy, or proportion — those are separate fights.
+- **Art-direct around weaknesses; don't out-prompt them.** When a pose keeps failing (held baby, seated unicorn → human legs), change the *staging*: blanket over the legs, family under bed covers, baby swaddled in a basket. A composition fix beats another "NOT human" clause.
+- **Words carry priors.** "Dress" → human biped; "elderly grandma" → human granny; "comforting arm" → human arm. Use vocabulary congruent with the body plan (shawl, muzzle, hooves, "resting horse").
+- **Every render is a dice roll, and re-rolls regress.** Review every image; change **one variable at a time**; and **never delete a guard after it passes once** — the next roll will exploit it (a stray baby, wings on Grandma, an extra leg all came back this way).
+- **Use code for precision, the model for creativity.** Aspect ratio, exact framing, proportion charts → post-process deterministically (e.g. crop). Don't ask the model for pixel-exact anything.
+- **Real-audience QA is gold.** Kids catch identity/anatomy violations instantly ("why does Mom have hands?"). Show a near-final pass to the actual reader before calling it done.
+
 ## Conventions / don'ts
 - Keep book data in `src/App.js` (no CMS); match the existing formatting and the `/Images/` (capital I) path convention.
 - Don't commit secrets — there are none in this repo (Gemini key lives in `../games/.env.local`). `.env`, `node_modules`, `build/` are gitignored.
