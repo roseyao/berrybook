@@ -647,7 +647,7 @@ const library = {
                 start: {
                     title: "A Baby Is Coming",
                     image: "/Images/book8/0-intro.png",
-                    text: "\"Big news!\" Mom smiled, resting her hooves on her round tummy. \"Soon, you two are going to have a baby sister.\" \"A real little sister? In OUR family?\" Ivy's whole face lit up. \"A... baby?\" Oliver's bounce went a little wobbly. \"Will she cry a lot? Will she take my stuff?\" Mom laughed softly, then yawned a big yawn. \"So many questions, sweet boy. And yes — Mommy's extra tired. Growing a baby is big work. That's why I need so many naps now.\" Ivy gently patted the tummy. Oliver pressed his ear against it, just a little nervous. \"Helloooo in there...\" Two big kids. One tiny sister on the way. Everything was about to change.",
+                    text: "\"Big news!\" Mom smiled, resting her hooves on her round tummy. \"Soon, you two are going to have a baby sister.\" \"A real little sister? In OUR family?\" Ivy's whole face lit up. \"A... baby?\" Oliver's bounce went a little wobbly. \"Will she cry a lot? Will she take my stuff?\" Mom laughed softly, then yawned a big yawn. \"So many questions, sweet boy. And yes — Mom's extra tired. Growing a baby is big work. That's why I need so many naps now.\" Ivy gently patted the tummy. Oliver pressed his ear against it, just a little nervous. \"Helloooo in there...\" Two big kids. One tiny sister on the way. Everything was about to change.",
                     choices: [
                         { text: "Start the Adventure!", nextScene: 'scene1' }
                     ]
@@ -776,6 +776,32 @@ const StoryViewer = ({ book, onExit }) => {
     const [errorMessage, setErrorMessage] = useState('');
     const audioRef = useRef(null);
     const userStoppedPlayback = useRef(false);
+    // Cache of text -> Promise<objectURL>, so each scene's audio is fetched once
+    // (background prefetch + replays become instant).
+    const audioCache = useRef(new Map());
+
+    // Fetch (or reuse) TTS audio for some text; resolves to a playable object URL.
+    const fetchAudio = (text) => {
+        const cache = audioCache.current;
+        if (cache.has(text)) return cache.get(text);
+        const p = (async () => {
+            const response = await fetch('/.netlify/functions/generate-audio', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ text }),
+            });
+            if (!response.ok) throw new Error(await response.text() || `Request failed with status ${response.status}`);
+            const data = await response.json();
+            const bytes = atob(data.audio);
+            const buf = new Uint8Array(bytes.length);
+            for (let i = 0; i < bytes.length; i++) buf[i] = bytes.charCodeAt(i);
+            const blob = new Blob([buf], { type: data.mimeType || 'audio/mpeg' });
+            return URL.createObjectURL(blob);
+        })();
+        p.catch(() => cache.delete(text)); // on failure, allow a later retry
+        cache.set(text, p);
+        return p;
+    };
 
     const storyData = book.story;
     const scene = storyData[currentScene];
@@ -784,7 +810,6 @@ const StoryViewer = ({ book, onExit }) => {
         const audio = audioRef.current;
         if (audio) {
             audio.pause();
-            if (audio.src && audio.src.startsWith('blob:')) URL.revokeObjectURL(audio.src);
             audio.oncanplaythrough = null;
             audio.onended = null;
             audio.onerror = null;
@@ -794,9 +819,29 @@ const StoryViewer = ({ book, onExit }) => {
         setIsLoading(false);
     };
 
+    // Prefetch the current scene + the scenes its choices lead to, so the next Read is instant.
     useEffect(() => {
-        // When the component unmounts (e.g., exiting book), clean up audio
-        return () => stopPlayback();
+        if (!scene) return;
+        const texts = [scene.text];
+        (scene.choices || []).forEach((c) => {
+            const next = storyData[c.nextScene];
+            if (next && next.text) texts.push(next.text);
+        });
+        texts.forEach((t) => t && fetchAudio(t).catch(() => {}));
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [currentScene]);
+
+    useEffect(() => {
+        const cache = audioCache.current;
+        // On unmount (e.g. exiting the book), stop audio and free all cached object URLs.
+        return () => {
+            stopPlayback();
+            cache.forEach((p) => Promise.resolve(p).then((url) => {
+                if (typeof url === 'string' && url.startsWith('blob:')) URL.revokeObjectURL(url);
+            }).catch(() => {}));
+            cache.clear();
+        };
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 
     const handleReadAloud = async (textToRead) => {
@@ -811,18 +856,7 @@ const StoryViewer = ({ book, onExit }) => {
         setIsLoading(true);
 
         try {
-            const response = await fetch('/.netlify/functions/generate-audio', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ text: textToRead }),
-            });
-            if (!response.ok) throw new Error(await response.text() || `Request failed with status ${response.status}`);
-            const data = await response.json();
-            const audioBytes = atob(data.audio);
-            const audioBuffer = new Uint8Array(audioBytes.length);
-            for (let i = 0; i < audioBytes.length; i++) audioBuffer[i] = audioBytes.charCodeAt(i);
-            const audioBlob = new Blob([audioBuffer], { type: data.mimeType || 'audio/mpeg' });
-            const audioUrl = URL.createObjectURL(audioBlob);
+            const audioUrl = await fetchAudio(textToRead); // instant if prefetched/cached
             const audio = audioRef.current;
             audio.src = audioUrl;
 
