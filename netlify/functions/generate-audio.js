@@ -1,7 +1,104 @@
 // netlify/functions/generate-audio.js
+//
+// Text-to-speech for the read-aloud button.
+// Primary: ElevenLabs. Fallback (e.g. when ElevenLabs runs out of credits):
+// Google Gemini TTS. Returns { audio: <base64>, mimeType }.
+//
+// Env vars: ELEVENLABS_API_KEY (primary), GEMINI_API_KEY (fallback),
+// optional GEMINI_TTS_VOICE (default "Leda").
 
-exports.handler = async function(event) {
-  // We only accept POST requests
+const ELEVENLABS_VOICE_ID = 'ZF6FPAbjXT4488VcRRnw';
+const GEMINI_TTS_MODEL = 'gemini-2.5-flash-preview-tts';
+
+// Try ElevenLabs. Returns { audio, mimeType } or null on any failure.
+async function tryElevenLabs(text) {
+  const apiKey = process.env.ELEVENLABS_API_KEY;
+  if (!apiKey) return null;
+  try {
+    const resp = await fetch(`https://api.elevenlabs.io/v1/text-to-speech/${ELEVENLABS_VOICE_ID}`, {
+      method: 'POST',
+      headers: { Accept: 'audio/mpeg', 'Content-Type': 'application/json', 'xi-api-key': apiKey },
+      body: JSON.stringify({
+        text,
+        model_id: 'eleven_flash_v2_5',
+        voice_settings: { stability: 0.5, similarity_boost: 0.75 },
+      }),
+    });
+    if (!resp.ok) {
+      // Out of credits / quota / rate limit / etc. — let the caller fall back.
+      console.warn(`ElevenLabs failed (${resp.status}): ${(await resp.text()).slice(0, 200)}`);
+      return null;
+    }
+    const buf = Buffer.from(await resp.arrayBuffer());
+    return { audio: buf.toString('base64'), mimeType: 'audio/mpeg' };
+  } catch (err) {
+    console.warn('ElevenLabs error:', err.message);
+    return null;
+  }
+}
+
+// Wrap raw little-endian 16-bit mono PCM in a WAV container so browsers can play it.
+function pcmToWav(pcm, sampleRate) {
+  const channels = 1, bitsPerSample = 16;
+  const blockAlign = (channels * bitsPerSample) / 8;
+  const byteRate = sampleRate * blockAlign;
+  const header = Buffer.alloc(44);
+  header.write('RIFF', 0);
+  header.writeUInt32LE(36 + pcm.length, 4);
+  header.write('WAVE', 8);
+  header.write('fmt ', 12);
+  header.writeUInt32LE(16, 16);
+  header.writeUInt16LE(1, 20); // PCM
+  header.writeUInt16LE(channels, 22);
+  header.writeUInt32LE(sampleRate, 24);
+  header.writeUInt32LE(byteRate, 28);
+  header.writeUInt16LE(blockAlign, 32);
+  header.writeUInt16LE(bitsPerSample, 34);
+  header.write('data', 36);
+  header.writeUInt32LE(pcm.length, 40);
+  return Buffer.concat([header, pcm]);
+}
+
+// Try Gemini TTS. Returns { audio, mimeType } or null on failure.
+async function tryGeminiTts(text) {
+  const apiKey = process.env.GEMINI_API_KEY;
+  if (!apiKey) return null;
+  const voice = process.env.GEMINI_TTS_VOICE || 'Leda';
+  try {
+    const resp = await fetch(
+      `https://generativelanguage.googleapis.com/v1beta/models/${GEMINI_TTS_MODEL}:generateContent?key=${apiKey}`,
+      {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          contents: [{ parts: [{ text }] }],
+          generationConfig: {
+            responseModalities: ['AUDIO'],
+            speechConfig: { voiceConfig: { prebuiltVoiceConfig: { voiceName: voice } } },
+          },
+        }),
+      }
+    );
+    if (!resp.ok) {
+      console.warn(`Gemini TTS failed (${resp.status}): ${(await resp.text()).slice(0, 200)}`);
+      return null;
+    }
+    const data = await resp.json();
+    const part = (data?.candidates?.[0]?.content?.parts || []).find(p => p.inlineData);
+    if (!part) {
+      console.warn('Gemini TTS: no audio in response');
+      return null;
+    }
+    const pcm = Buffer.from(part.inlineData.data, 'base64');
+    const rate = parseInt((part.inlineData.mimeType || '').match(/rate=(\d+)/)?.[1] || '24000', 10);
+    return { audio: pcmToWav(pcm, rate).toString('base64'), mimeType: 'audio/wav' };
+  } catch (err) {
+    console.warn('Gemini TTS error:', err.message);
+    return null;
+  }
+}
+
+exports.handler = async function (event) {
   if (event.httpMethod !== 'POST') {
     return { statusCode: 405, body: 'Method Not Allowed' };
   }
@@ -19,60 +116,28 @@ exports.handler = async function(event) {
     return { statusCode: 413, body: JSON.stringify({ error: 'Payload too large' }) };
   }
 
-  const { text } = JSON.parse(event.body);
-  const apiKey = process.env.ELEVENLABS_API_KEY;
-
-  if (!apiKey) {
-    return { statusCode: 500, body: 'API key not configured.' };
-  }
-
-  const VOICE_ID = 'ZF6FPAbjXT4488VcRRnw';
-  const API_URL = `https://api.elevenlabs.io/v1/text-to-speech/${VOICE_ID}`;
-
-  const options = {
-    method: 'POST',
-    headers: {
-      'Accept': 'audio/mpeg',
-      'Content-Type': 'application/json',
-      'xi-api-key': apiKey,
-    },
-    body: JSON.stringify({
-      text: text,
-      model_id: 'eleven_flash_v2_5',
-      voice_settings: {
-        stability: 0.5,
-        similarity_boost: 0.75,
-      },
-    }),
-  };
-
+  let text;
   try {
-    const response = await fetch(API_URL, options);
+    ({ text } = JSON.parse(event.body || '{}'));
+  } catch {
+    return { statusCode: 400, body: JSON.stringify({ error: 'Invalid JSON' }) };
+  }
+  if (!text) return { statusCode: 400, body: JSON.stringify({ error: 'Missing text' }) };
 
-    if (!response.ok) {
-      const errorBody = await response.text();
-      return {
-        statusCode: response.status,
-        body: `ElevenLabs API error: ${errorBody}`,
-      };
-    }
+  // Primary, then fallback.
+  const result = (await tryElevenLabs(text)) || (await tryGeminiTts(text));
 
-    // Get the audio data as a buffer and encode it to Base64
-    const audioBuffer = await response.arrayBuffer();
-    const audioBase64 = Buffer.from(audioBuffer).toString('base64');
-
-    // Return the Base64 audio data to the front-end
+  if (!result) {
     return {
-      statusCode: 200,
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ audio: audioBase64 }),
-      isBase64Encoded: false // Body is a JSON string, not the raw base64
-    };
-
-  } catch (error) {
-    return {
-      statusCode: 500,
-      body: JSON.stringify({ error: error.message }),
+      statusCode: 502,
+      body: JSON.stringify({ error: 'Text-to-speech unavailable (ElevenLabs and Gemini both failed or are not configured).' }),
     };
   }
+
+  return {
+    statusCode: 200,
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ audio: result.audio, mimeType: result.mimeType }),
+    isBase64Encoded: false,
+  };
 };

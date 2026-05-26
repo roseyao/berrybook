@@ -821,7 +821,7 @@ const StoryViewer = ({ book, onExit }) => {
             const audioBytes = atob(data.audio);
             const audioBuffer = new Uint8Array(audioBytes.length);
             for (let i = 0; i < audioBytes.length; i++) audioBuffer[i] = audioBytes.charCodeAt(i);
-            const audioBlob = new Blob([audioBuffer], { type: 'audio/mpeg' });
+            const audioBlob = new Blob([audioBuffer], { type: data.mimeType || 'audio/mpeg' });
             const audioUrl = URL.createObjectURL(audioBlob);
             const audio = audioRef.current;
             audio.src = audioUrl;

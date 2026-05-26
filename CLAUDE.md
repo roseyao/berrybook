@@ -8,7 +8,7 @@ Netlify. Each book is a "choose-a-path" story with one illustration + audio per 
 ## Where things live
 - **Book data:** `src/App.js` → the `library.books` array. Each book is one object (see schema below).
 - **Illustrations:** `public/images/book<N>/` (served at `/Images/book<N>/...` — note the capital `I`, matching the existing books).
-- **Audio:** automatic — `netlify/functions/generate-audio.js` reads each scene's `text` via ElevenLabs on demand. **New books need zero audio work.**
+- **Audio:** automatic — `netlify/functions/generate-audio.js` reads each scene's `text` on demand via **ElevenLabs**, falling back to **Gemini TTS** if ElevenLabs fails or runs out of credits (returns `{audio, mimeType}`; Gemini PCM is wrapped to WAV). Set `ELEVENLABS_API_KEY` and/or `GEMINI_API_KEY` in Netlify env (optional `GEMINI_TTS_VOICE`, default `Leda`). **New books need zero audio work.**
 - **Authoring kit (`content/`):**
   - `AUTHORING.md` — the full step-by-step recipe for a new book.
   - `characters.md` — canonical recurring cast (voices + looks + reference images). **Update this when a character recurs.**
