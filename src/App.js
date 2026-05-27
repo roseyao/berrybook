@@ -975,8 +975,22 @@ const StoryViewer = ({ book, onExit }) => {
     );
 };
 
+// Warm the TTS function (and its upstream connection) with a tiny throwaway
+// request so the one-time cold start happens while the reader is still on the
+// library screen, instead of stalling their first "Read".
+const warmTts = () => {
+    fetch('/.netlify/functions/generate-audio', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ text: 'Hi' }),
+    }).catch(() => {});
+};
+
 // --- Main App Component ---
 export default function App() {
+    // Kick off the warm-up once, as early as possible.
+    useEffect(() => { warmTts(); }, []);
+
     // On initial load, try to get the last selected book ID from localStorage
     const [selectedBookId, setSelectedBookId] = useState(() => {
         return localStorage.getItem('storybook-selectedBookId') || null;
