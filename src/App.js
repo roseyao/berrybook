@@ -765,6 +765,27 @@ const BookSelection = ({ books, onSelectBook }) => {
     );
 };
 
+// Split scene text into small speakable chunks (roughly sentence-sized, keeping
+// trailing quotes/brackets attached). Reading is generated and played chunk by
+// chunk so the first words start fast instead of waiting on the whole scene.
+const splitIntoChunks = (text) => {
+    const sentences = ((text || '').match(/\S[^.!?]*[.!?]+["'”’)\]]*|\S[^.!?]*$/g) || [])
+        .map((s) => s.trim())
+        .filter(Boolean);
+    if (sentences.length <= 1) return [(text || '').trim()].filter(Boolean);
+
+    const chunks = [];
+    for (const s of sentences) {
+        const last = chunks[chunks.length - 1];
+        // Keep the first chunk short so the very first audio returns quickly;
+        // pack the rest to avoid firing lots of tiny TTS requests.
+        const cap = chunks.length <= 1 ? 90 : 220;
+        if (!last || (last + ' ' + s).length > cap) chunks.push(s);
+        else chunks[chunks.length - 1] = last + ' ' + s;
+    }
+    return chunks;
+};
+
 // --- New Component for Viewing a Single Story ---
 const StoryViewer = ({ book, onExit }) => {
     const [currentScene, setCurrentScene] = useState(() => {
@@ -819,15 +840,16 @@ const StoryViewer = ({ book, onExit }) => {
         setIsLoading(false);
     };
 
-    // Prefetch the current scene + the scenes its choices lead to, so the next Read is instant.
+    // Prefetch so Read starts fast: every chunk of the current scene (gapless
+    // playback) and just the first chunk of each choice target (fast next read).
     useEffect(() => {
         if (!scene) return;
-        const texts = [scene.text];
+        splitIntoChunks(scene.text).forEach((c) => fetchAudio(c).catch(() => {}));
         (scene.choices || []).forEach((c) => {
             const next = storyData[c.nextScene];
-            if (next && next.text) texts.push(next.text);
+            const [first] = next && next.text ? splitIntoChunks(next.text) : [];
+            if (first) fetchAudio(first).catch(() => {});
         });
-        texts.forEach((t) => t && fetchAudio(t).catch(() => {}));
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [currentScene]);
 
@@ -855,11 +877,28 @@ const StoryViewer = ({ book, onExit }) => {
         userStoppedPlayback.current = false;
         setIsLoading(true);
 
-        try {
-            const audioUrl = await fetchAudio(textToRead); // instant if prefetched/cached
-            const audio = audioRef.current;
-            audio.src = audioUrl;
+        const chunks = splitIntoChunks(textToRead);
+        if (!chunks.length) { setIsLoading(false); return; }
+        const audio = audioRef.current;
 
+        // Play one chunk, then chain to the next when it ends so the scene reads
+        // straight through while later chunks are still being fetched.
+        const playFrom = async (i) => {
+            let audioUrl;
+            try {
+                audioUrl = await fetchAudio(chunks[i]); // instant if prefetched/cached
+            } catch (error) {
+                if (userStoppedPlayback.current) return;
+                setErrorMessage(error.message || "An unknown error occurred.");
+                stopPlayback();
+                return;
+            }
+            if (userStoppedPlayback.current) return; // stopped while fetching
+
+            // Warm the next chunk so the hand-off is seamless.
+            if (chunks[i + 1]) fetchAudio(chunks[i + 1]).catch(() => {});
+
+            audio.src = audioUrl;
             audio.oncanplaythrough = async () => {
                 try {
                     await audio.play();
@@ -872,7 +911,8 @@ const StoryViewer = ({ book, onExit }) => {
             };
 
             audio.onended = () => {
-                stopPlayback();
+                if (i + 1 < chunks.length) playFrom(i + 1);
+                else stopPlayback();
             };
 
             audio.onerror = (e) => {
@@ -884,10 +924,9 @@ const StoryViewer = ({ book, onExit }) => {
                 setErrorMessage('An error occurred while trying to play the audio.');
                 stopPlayback();
             };
-        } catch (error) {
-            setErrorMessage(error.message || "An unknown error occurred.");
-            setIsLoading(false);
-        }
+        };
+
+        playFrom(0);
     };
 
     const handleChoice = (nextScene) => {
