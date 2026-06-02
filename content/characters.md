@@ -82,10 +82,11 @@ Ivy & Oliver's family. Featured in *The New Little Light* (book 8); Mom and Gran
 **Visual:** kind older unicorn, silvery mane, small glasses, a warm shawl.
 **Voice & role:** wise, gentle, comforting; the steady caretaker (minds the kids during the hospital stay, bakes, validates big feelings — *"it's alright to feel unsure"*).
 
-### Baby Sister — Newborn Unicorn ("the new little light")
-**Reference image:** _TBD — generate; **must be distinct from Shimmer**._
+### Hazel — Baby Sister, Newborn Unicorn ("the new little light")
+**Reference image:** `content/characters/refs/baby-sister.png` (the canonical baby pink unicorn — distinct from Shimmer).
 **Visual:** tiny newborn unicorn, **soft pink coat**, deeper rose-pink mane & tail, a tiny **horn-nub that glows warm gold like a nightlight**, big innocent eyes, chubby/wobbly, trails soft golden sparkles when happy (glow dims when sleeping), often swaddled. **No flower** (that's Shimmer's marker; this baby reads as the *pink* one with a golden glow).
-**Voice & role:** a baby — cries, sleeps, sparkles, gives first smiles, calms to her family's voices. Name TBD.
+**Voice & role:** a baby — cries, sleeps, sparkles, gives first smiles, calms to her family's voices.
+**Name:** canonized as **Hazel** in book 9 (*The Family Rhythm Tree*). Book 8 (*The New Little Light*) was written name-free so its existing text still reads fine.
 
 ---
 
