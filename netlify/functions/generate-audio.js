@@ -135,26 +135,24 @@ exports.handler = async function (event) {
   const origin = trim((event.headers && (event.headers.origin || event.headers.Origin)) || '');
 
   let originOK = explicit.has(origin);
-  if (!originOK && origin && process.env.URL) {
+  if (!originOK && origin) {
     try {
-      const siteHost = new URL(process.env.URL).hostname;
       const reqHost = new URL(origin).hostname;
-      originOK = reqHost === siteHost || reqHost.endsWith(`--${siteHost}`);
+      // Hosts to match against: (1) the canonical site URL host (custom
+      // domain in production), and (2) the netlify-app slug host
+      // ("<SITE_NAME>.netlify.app"), which is what deploy previews and
+      // branch deploys actually use. For each, also accept
+      // "<anything>--<host>" variants (deploy previews / per-commit hashes).
+      const hosts = [];
+      if (process.env.URL) {
+        try { hosts.push(new URL(process.env.URL).hostname); } catch {}
+      }
+      if (process.env.SITE_NAME) hosts.push(`${process.env.SITE_NAME}.netlify.app`);
+      originOK = hosts.some((h) => reqHost === h || reqHost.endsWith(`--${h}`));
     } catch { /* malformed URL → leave originOK false */ }
   }
   if (!originOK) {
-    return {
-      statusCode: 403,
-      body: JSON.stringify({
-        error: 'Forbidden',
-        // Debug aid — what the function saw vs. what it expected.
-        debug: {
-          origin,
-          siteUrl: process.env.URL || null,
-          allowed: [...explicit],
-        },
-      }),
-    };
+    return { statusCode: 403, body: JSON.stringify({ error: 'Forbidden' }) };
   }
   if ((event.body || '').length > 4096) {
     return { statusCode: 413, body: JSON.stringify({ error: 'Payload too large' }) };
