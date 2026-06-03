@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useMemo } from 'react';
 // --- Library: each book lives in src/books/<id>/index.js, validated on import.
 import { books } from './books';
 const library = { books };
@@ -34,6 +34,49 @@ const BookSelection = ({ books, onSelectBook }) => {
             </div>
         </div>
     );
+};
+
+// --- Word-highlighting helpers (used by phase 3 read-aloud) ---
+
+// Tokenize displayed text into render tokens. Words get a globally-numbered
+// `idx` so the playing chunk's alignment can highlight them by index.
+// Whitespace is emitted verbatim so layout stays identical.
+const tokenizeForDisplay = (text) => {
+    const tokens = [];
+    let idx = 0;
+    for (const part of (text || '').split(/(\s+)/)) {
+        if (!part) continue;
+        if (/^\s+$/.test(part)) tokens.push({ type: 'ws', text: part });
+        else tokens.push({ type: 'word', text: part, idx: idx++ });
+    }
+    return tokens;
+};
+
+// Given an ElevenLabs alignment's `chars` array, build an index from each
+// character position to its word position within the chunk. Whitespace
+// characters map to -1.
+const charToWordMap = (chars) => {
+    const out = new Array(chars.length);
+    let w = -1;
+    let inWord = false;
+    for (let i = 0; i < chars.length; i++) {
+        if (/\s/.test(chars[i])) { inWord = false; out[i] = -1; }
+        else { if (!inWord) { w++; inWord = true; } out[i] = w; }
+    }
+    return out;
+};
+
+const countWords = (s) => ((s || '').match(/\S+/g) || []).length;
+
+// Binary search: highest index in `arr` whose value is <= `t` (or -1).
+const highestLE = (arr, t) => {
+    let lo = 0, hi = arr.length - 1, best = -1;
+    while (lo <= hi) {
+        const mid = (lo + hi) >> 1;
+        if (arr[mid] <= t) { best = mid; lo = mid + 1; }
+        else hi = mid - 1;
+    }
+    return best;
 };
 
 // Split scene text into small speakable chunks (roughly sentence-sized, keeping
@@ -98,13 +141,21 @@ const StoryViewer = ({ book, onExit }) => {
     const [isLoading, setIsLoading] = useState(false);
     const [isPlaying, setIsPlaying] = useState(false);
     const [errorMessage, setErrorMessage] = useState('');
+    // Highlighted-word index during read-aloud (null when nothing's playing).
+    const [activeWord, setActiveWord] = useState(null);
     const audioRef = useRef(null);
     const userStoppedPlayback = useRef(false);
-    // Cache of text -> Promise<objectURL>, so each scene's audio is fetched once
-    // (background prefetch + replays become instant).
+    // requestAnimationFrame handle for the word-tracking loop.
+    const rafRef = useRef(null);
+    // Ref attached to the currently-active word span so we can scroll it into view.
+    const activeWordRef = useRef(null);
+    // Cache of text -> Promise<{ url, alignment? }>. Each scene's audio is
+    // fetched once (background prefetch + replays become instant); alignment
+    // comes back from ElevenLabs and drives per-word highlighting.
     const audioCache = useRef(new Map());
 
-    // Fetch (or reuse) TTS audio for some text; resolves to a playable object URL.
+    // Fetch (or reuse) TTS audio for some text. Resolves to
+    // { url, alignment? } where alignment has { chars, starts, ends }.
     const fetchAudio = (text) => {
         const cache = audioCache.current;
         if (cache.has(text)) return cache.get(text);
@@ -120,7 +171,7 @@ const StoryViewer = ({ book, onExit }) => {
             const buf = new Uint8Array(bytes.length);
             for (let i = 0; i < bytes.length; i++) buf[i] = bytes.charCodeAt(i);
             const blob = new Blob([buf], { type: data.mimeType || 'audio/mpeg' });
-            return URL.createObjectURL(blob);
+            return { url: URL.createObjectURL(blob), alignment: data.alignment || null };
         })();
         p.catch(() => cache.delete(text)); // on failure, allow a later retry
         cache.set(text, p);
@@ -129,6 +180,14 @@ const StoryViewer = ({ book, onExit }) => {
 
     const scenes = book.scenes;
     const scene = scenes[currentScene];
+
+    // Stop the per-frame loop that updates the active word.
+    const stopWordTracking = () => {
+        if (rafRef.current) {
+            cancelAnimationFrame(rafRef.current);
+            rafRef.current = null;
+        }
+    };
 
     const stopPlayback = () => {
         const audio = audioRef.current;
@@ -139,6 +198,8 @@ const StoryViewer = ({ book, onExit }) => {
             audio.onerror = null;
             audio.src = '';
         }
+        stopWordTracking();
+        setActiveWord(null);
         setIsPlaying(false);
         setIsLoading(false);
     };
@@ -161,8 +222,8 @@ const StoryViewer = ({ book, onExit }) => {
         // On unmount (e.g. exiting the book), stop audio and free all cached object URLs.
         return () => {
             stopPlayback();
-            cache.forEach((p) => Promise.resolve(p).then((url) => {
-                if (typeof url === 'string' && url.startsWith('blob:')) URL.revokeObjectURL(url);
+            cache.forEach((p) => Promise.resolve(p).then((v) => {
+                if (v?.url?.startsWith('blob:')) URL.revokeObjectURL(v.url);
             }).catch(() => {}));
             cache.clear();
         };
@@ -184,12 +245,39 @@ const StoryViewer = ({ book, onExit }) => {
         if (!chunks.length) { setIsLoading(false); return; }
         const audio = audioRef.current;
 
+        // Word offset of each chunk's first word within the full scene text.
+        // Lets the per-chunk char→word index in the chunk translate to a global
+        // word index for highlighting.
+        const chunkWordStarts = [];
+        let acc = 0;
+        for (const c of chunks) { chunkWordStarts.push(acc); acc += countWords(c); }
+
+        // Drive activeWord from audio.currentTime via rAF. No-op when alignment
+        // is missing (Gemini fallback), in which case the chunk just plays
+        // without highlighting.
+        const startWordTracking = (alignment, chunkOffset) => {
+            stopWordTracking();
+            if (!alignment) { setActiveWord(null); return; }
+            const c2w = charToWordMap(alignment.chars);
+            const starts = alignment.starts;
+            const tick = () => {
+                const a = audioRef.current;
+                if (!a || a.paused) { rafRef.current = null; return; }
+                const charIdx = highestLE(starts, a.currentTime);
+                const wInChunk = charIdx >= 0 ? c2w[charIdx] : -1;
+                const next = wInChunk >= 0 ? chunkOffset + wInChunk : null;
+                setActiveWord((prev) => (prev === next ? prev : next));
+                rafRef.current = requestAnimationFrame(tick);
+            };
+            rafRef.current = requestAnimationFrame(tick);
+        };
+
         // Play one chunk, then chain to the next when it ends so the scene reads
         // straight through while later chunks are still being fetched.
         const playFrom = async (i) => {
-            let audioUrl;
+            let entry;
             try {
-                audioUrl = await fetchAudio(chunks[i]); // instant if prefetched/cached
+                entry = await fetchAudio(chunks[i]); // instant if prefetched/cached
             } catch (error) {
                 if (userStoppedPlayback.current) return;
                 setErrorMessage(error.message || "An unknown error occurred.");
@@ -201,12 +289,13 @@ const StoryViewer = ({ book, onExit }) => {
             // Warm the next chunk so the hand-off is seamless.
             if (chunks[i + 1]) fetchAudio(chunks[i + 1]).catch(() => {});
 
-            audio.src = audioUrl;
+            audio.src = entry.url;
             audio.oncanplaythrough = async () => {
                 try {
                     await audio.play();
                     setIsLoading(false);
                     setIsPlaying(true);
+                    startWordTracking(entry.alignment, chunkWordStarts[i]);
                 } catch (playError) {
                     setErrorMessage(`Playback failed: ${playError.message}.`);
                     stopPlayback();
@@ -214,6 +303,7 @@ const StoryViewer = ({ book, onExit }) => {
             };
 
             audio.onended = () => {
+                stopWordTracking();
                 if (i + 1 < chunks.length) playFrom(i + 1);
                 else stopPlayback();
             };
@@ -231,6 +321,18 @@ const StoryViewer = ({ book, onExit }) => {
 
         playFrom(0);
     };
+
+    // Tokens for the displayed scene text — memoized so we don't re-tokenize
+    // on every activeWord change.
+    const displayTokens = useMemo(() => tokenizeForDisplay(scene.text), [scene.text]);
+
+    // Keep the active word in view (scrolls page in portrait, scrolls the text
+    // panel in landscape since it has its own overflow-y-auto container).
+    useEffect(() => {
+        if (activeWord != null && activeWordRef.current) {
+            activeWordRef.current.scrollIntoView({ behavior: 'smooth', block: 'center', inline: 'nearest' });
+        }
+    }, [activeWord]);
 
     const handleChoice = (nextSceneId) => {
         stopPlayback();
@@ -261,7 +363,21 @@ const StoryViewer = ({ book, onExit }) => {
                     </button>
                 </div>
                 <ErrorMessage message={errorMessage} />
-                <p className="text-slate-600 text-base md:text-lg leading-relaxed my-6 text-center">{scene.text}</p>
+                <p className="text-slate-700 text-base md:text-lg leading-relaxed my-6">
+                    {displayTokens.map((tok, i) => {
+                        if (tok.type === 'ws') return <span key={i}>{tok.text}</span>;
+                        const isActive = tok.idx === activeWord;
+                        return (
+                            <span
+                                key={i}
+                                ref={isActive ? activeWordRef : null}
+                                className={isActive ? 'bg-yellow-200 rounded-md px-0.5 transition-colors' : 'transition-colors'}
+                            >
+                                {tok.text}
+                            </span>
+                        );
+                    })}
+                </p>
                 <div className="flex flex-col items-center space-y-4">
                     {scene.choices.map((choice, index) => (
                         <button key={index} onClick={() => handleChoice(choice.next)} className="w-full max-w-xs bg-purple-500 hover:bg-purple-600 text-white font-bold py-3 px-6 rounded-full shadow-lg transform hover:scale-105 transition-all duration-300 ease-in-out focus:outline-none focus:ring-4 focus:ring-purple-300">

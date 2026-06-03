@@ -1,8 +1,9 @@
 // netlify/functions/generate-audio.js
 //
 // Text-to-speech for the read-aloud button.
-// Primary: ElevenLabs. Fallback (e.g. when ElevenLabs runs out of credits):
-// Google Gemini TTS. Returns { audio: <base64>, mimeType }.
+// Primary: ElevenLabs (with per-character timing for word highlighting).
+// Fallback: Google Gemini TTS (no timing — client renders without highlight).
+// Returns { audio: <base64>, mimeType, alignment? }.
 //
 // Env vars: ELEVENLABS_API_KEY (primary), GEMINI_API_KEY (fallback),
 // optional GEMINI_TTS_VOICE (default "Aoede").
@@ -10,27 +11,42 @@
 const ELEVENLABS_VOICE_ID = 'ZF6FPAbjXT4488VcRRnw';
 const GEMINI_TTS_MODEL = 'gemini-2.5-flash-preview-tts';
 
-// Try ElevenLabs. Returns { audio, mimeType } or null on any failure.
+// Try ElevenLabs with character-level alignment. Returns
+// { audio, mimeType, alignment: { chars, starts, ends } } or null on failure.
 async function tryElevenLabs(text) {
   const apiKey = process.env.ELEVENLABS_API_KEY;
   if (!apiKey) return null;
   try {
-    const resp = await fetch(`https://api.elevenlabs.io/v1/text-to-speech/${ELEVENLABS_VOICE_ID}`, {
-      method: 'POST',
-      headers: { Accept: 'audio/mpeg', 'Content-Type': 'application/json', 'xi-api-key': apiKey },
-      body: JSON.stringify({
-        text,
-        model_id: 'eleven_flash_v2_5',
-        voice_settings: { stability: 0.5, similarity_boost: 0.75 },
-      }),
-    });
+    const resp = await fetch(
+      `https://api.elevenlabs.io/v1/text-to-speech/${ELEVENLABS_VOICE_ID}/with-timestamps`,
+      {
+        method: 'POST',
+        headers: { Accept: 'application/json', 'Content-Type': 'application/json', 'xi-api-key': apiKey },
+        body: JSON.stringify({
+          text,
+          model_id: 'eleven_flash_v2_5',
+          voice_settings: { stability: 0.5, similarity_boost: 0.75 },
+        }),
+      }
+    );
     if (!resp.ok) {
       // Out of credits / quota / rate limit / etc. — let the caller fall back.
       console.warn(`ElevenLabs failed (${resp.status}): ${(await resp.text()).slice(0, 200)}`);
       return null;
     }
-    const buf = Buffer.from(await resp.arrayBuffer());
-    return { audio: buf.toString('base64'), mimeType: 'audio/mpeg' };
+    const data = await resp.json();
+    if (!data?.audio_base64) {
+      console.warn('ElevenLabs: no audio_base64 in response');
+      return null;
+    }
+    // Prefer normalized_alignment when present — it matches the model's own
+    // textual output (apostrophes, ellipses normalized) better than the raw
+    // alignment for highlighting.
+    const a = data.normalized_alignment || data.alignment || null;
+    const alignment = a
+      ? { chars: a.characters, starts: a.character_start_times_seconds, ends: a.character_end_times_seconds }
+      : undefined;
+    return { audio: data.audio_base64, mimeType: 'audio/mpeg', alignment };
   } catch (err) {
     console.warn('ElevenLabs error:', err.message);
     return null;
@@ -137,7 +153,11 @@ exports.handler = async function (event) {
   return {
     statusCode: 200,
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ audio: result.audio, mimeType: result.mimeType }),
+    body: JSON.stringify({
+      audio: result.audio,
+      mimeType: result.mimeType,
+      ...(result.alignment ? { alignment: result.alignment } : {}),
+    }),
     isBase64Encoded: false,
   };
 };
