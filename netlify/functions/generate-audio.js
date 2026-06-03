@@ -25,7 +25,9 @@ async function tryElevenLabs(text) {
         body: JSON.stringify({
           text,
           model_id: 'eleven_flash_v2_5',
-          voice_settings: { stability: 0.5, similarity_boost: 0.75 },
+          // speed 1.0 is the Flash v2.5 default and reads briskly; 0.9 is a
+          // noticeably calmer pace, easier to follow with word highlighting.
+          voice_settings: { stability: 0.5, similarity_boost: 0.75, speed: 0.9 },
         }),
       }
     );
