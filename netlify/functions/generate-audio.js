@@ -119,19 +119,30 @@ exports.handler = async function (event) {
     return { statusCode: 405, body: 'Method Not Allowed' };
   }
 
-  // Normalize trailing slashes so a stray "/" doesn't flip a request to 403.
+  // Origin gate. Accept:
+  //  - The site's canonical URL (Netlify's URL env var, or any custom
+  //    ALLOWED_ORIGINS the operator adds).
+  //  - Any Netlify subdomain of THIS site — both the bare host (e.g.
+  //    relaxed-begonia.netlify.app) and any deploy/branch variant
+  //    ("<anything>--<host>.netlify.app"). This covers deploy previews,
+  //    branch deploys, and the per-commit DEPLOY_URL without us having to
+  //    track each env var.
   const trim = (u) => (u || '').replace(/\/$/, '');
-  // Netlify provides three URLs for any build: the canonical site URL, the
-  // stable deploy-preview/branch URL, and the per-commit unique URL. Allow
-  // all three so a reader can hit Read from any of them.
-  const allowed = new Set([
+  const explicit = new Set([
     process.env.URL,
-    process.env.DEPLOY_PRIME_URL,
-    process.env.DEPLOY_URL,
     ...(process.env.ALLOWED_ORIGINS || '').split(',').map(s => s.trim()).filter(Boolean),
   ].filter(Boolean).map(trim));
   const origin = trim((event.headers && (event.headers.origin || event.headers.Origin)) || '');
-  if (!allowed.has(origin)) {
+
+  let originOK = explicit.has(origin);
+  if (!originOK && origin && process.env.URL) {
+    try {
+      const siteHost = new URL(process.env.URL).hostname;
+      const reqHost = new URL(origin).hostname;
+      originOK = reqHost === siteHost || reqHost.endsWith(`--${siteHost}`);
+    } catch { /* malformed URL → leave originOK false */ }
+  }
+  if (!originOK) {
     return { statusCode: 403, body: JSON.stringify({ error: 'Forbidden' }) };
   }
   if ((event.body || '').length > 4096) {
