@@ -119,12 +119,18 @@ exports.handler = async function (event) {
     return { statusCode: 405, body: 'Method Not Allowed' };
   }
 
+  // Normalize trailing slashes so a stray "/" doesn't flip a request to 403.
+  const trim = (u) => (u || '').replace(/\/$/, '');
+  // Netlify provides three URLs for any build: the canonical site URL, the
+  // stable deploy-preview/branch URL, and the per-commit unique URL. Allow
+  // all three so a reader can hit Read from any of them.
   const allowed = new Set([
     process.env.URL,
     process.env.DEPLOY_PRIME_URL,
+    process.env.DEPLOY_URL,
     ...(process.env.ALLOWED_ORIGINS || '').split(',').map(s => s.trim()).filter(Boolean),
-  ].filter(Boolean));
-  const origin = (event.headers && (event.headers.origin || event.headers.Origin)) || '';
+  ].filter(Boolean).map(trim));
+  const origin = trim((event.headers && (event.headers.origin || event.headers.Origin)) || '');
   if (!allowed.has(origin)) {
     return { statusCode: 403, body: JSON.stringify({ error: 'Forbidden' }) };
   }
