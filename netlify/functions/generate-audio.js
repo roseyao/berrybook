@@ -1,8 +1,9 @@
 // netlify/functions/generate-audio.js
 //
 // Text-to-speech for the read-aloud button.
-// Primary: ElevenLabs. Fallback (e.g. when ElevenLabs runs out of credits):
-// Google Gemini TTS. Returns { audio: <base64>, mimeType }.
+// Primary: ElevenLabs (with per-character timing for word highlighting).
+// Fallback: Google Gemini TTS (no timing — client renders without highlight).
+// Returns { audio: <base64>, mimeType, alignment? }.
 //
 // Env vars: ELEVENLABS_API_KEY (primary), GEMINI_API_KEY (fallback),
 // optional GEMINI_TTS_VOICE (default "Aoede").
@@ -10,27 +11,44 @@
 const ELEVENLABS_VOICE_ID = 'ZF6FPAbjXT4488VcRRnw';
 const GEMINI_TTS_MODEL = 'gemini-2.5-flash-preview-tts';
 
-// Try ElevenLabs. Returns { audio, mimeType } or null on any failure.
+// Try ElevenLabs with character-level alignment. Returns
+// { audio, mimeType, alignment: { chars, starts, ends } } or null on failure.
 async function tryElevenLabs(text) {
   const apiKey = process.env.ELEVENLABS_API_KEY;
   if (!apiKey) return null;
   try {
-    const resp = await fetch(`https://api.elevenlabs.io/v1/text-to-speech/${ELEVENLABS_VOICE_ID}`, {
-      method: 'POST',
-      headers: { Accept: 'audio/mpeg', 'Content-Type': 'application/json', 'xi-api-key': apiKey },
-      body: JSON.stringify({
-        text,
-        model_id: 'eleven_flash_v2_5',
-        voice_settings: { stability: 0.5, similarity_boost: 0.75 },
-      }),
-    });
+    const resp = await fetch(
+      `https://api.elevenlabs.io/v1/text-to-speech/${ELEVENLABS_VOICE_ID}/with-timestamps`,
+      {
+        method: 'POST',
+        headers: { Accept: 'application/json', 'Content-Type': 'application/json', 'xi-api-key': apiKey },
+        body: JSON.stringify({
+          text,
+          model_id: 'eleven_flash_v2_5',
+          // speed 1.0 is the Flash v2.5 default and reads briskly; 0.9 is a
+          // noticeably calmer pace, easier to follow with word highlighting.
+          voice_settings: { stability: 0.5, similarity_boost: 0.75, speed: 0.9 },
+        }),
+      }
+    );
     if (!resp.ok) {
       // Out of credits / quota / rate limit / etc. — let the caller fall back.
       console.warn(`ElevenLabs failed (${resp.status}): ${(await resp.text()).slice(0, 200)}`);
       return null;
     }
-    const buf = Buffer.from(await resp.arrayBuffer());
-    return { audio: buf.toString('base64'), mimeType: 'audio/mpeg' };
+    const data = await resp.json();
+    if (!data?.audio_base64) {
+      console.warn('ElevenLabs: no audio_base64 in response');
+      return null;
+    }
+    // Prefer normalized_alignment when present — it matches the model's own
+    // textual output (apostrophes, ellipses normalized) better than the raw
+    // alignment for highlighting.
+    const a = data.normalized_alignment || data.alignment || null;
+    const alignment = a
+      ? { chars: a.characters, starts: a.character_start_times_seconds, ends: a.character_end_times_seconds }
+      : undefined;
+    return { audio: data.audio_base64, mimeType: 'audio/mpeg', alignment };
   } catch (err) {
     console.warn('ElevenLabs error:', err.message);
     return null;
@@ -103,13 +121,39 @@ exports.handler = async function (event) {
     return { statusCode: 405, body: 'Method Not Allowed' };
   }
 
-  const allowed = new Set([
+  // Origin gate. Accept:
+  //  - The site's canonical URL (Netlify's URL env var, or any custom
+  //    ALLOWED_ORIGINS the operator adds).
+  //  - Any Netlify subdomain of THIS site — both the bare host (e.g.
+  //    relaxed-begonia.netlify.app) and any deploy/branch variant
+  //    ("<anything>--<host>.netlify.app"). This covers deploy previews,
+  //    branch deploys, and the per-commit DEPLOY_URL without us having to
+  //    track each env var.
+  const trim = (u) => (u || '').replace(/\/$/, '');
+  const explicit = new Set([
     process.env.URL,
-    process.env.DEPLOY_PRIME_URL,
     ...(process.env.ALLOWED_ORIGINS || '').split(',').map(s => s.trim()).filter(Boolean),
-  ].filter(Boolean));
-  const origin = (event.headers && (event.headers.origin || event.headers.Origin)) || '';
-  if (!allowed.has(origin)) {
+  ].filter(Boolean).map(trim));
+  const origin = trim((event.headers && (event.headers.origin || event.headers.Origin)) || '');
+
+  let originOK = explicit.has(origin);
+  if (!originOK && origin) {
+    try {
+      const reqHost = new URL(origin).hostname;
+      // Hosts to match against: (1) the canonical site URL host (custom
+      // domain in production), and (2) the netlify-app slug host
+      // ("<SITE_NAME>.netlify.app"), which is what deploy previews and
+      // branch deploys actually use. For each, also accept
+      // "<anything>--<host>" variants (deploy previews / per-commit hashes).
+      const hosts = [];
+      if (process.env.URL) {
+        try { hosts.push(new URL(process.env.URL).hostname); } catch {}
+      }
+      if (process.env.SITE_NAME) hosts.push(`${process.env.SITE_NAME}.netlify.app`);
+      originOK = hosts.some((h) => reqHost === h || reqHost.endsWith(`--${h}`));
+    } catch { /* malformed URL → leave originOK false */ }
+  }
+  if (!originOK) {
     return { statusCode: 403, body: JSON.stringify({ error: 'Forbidden' }) };
   }
   if ((event.body || '').length > 4096) {
@@ -137,7 +181,11 @@ exports.handler = async function (event) {
   return {
     statusCode: 200,
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ audio: result.audio, mimeType: result.mimeType }),
+    body: JSON.stringify({
+      audio: result.audio,
+      mimeType: result.mimeType,
+      ...(result.alignment ? { alignment: result.alignment } : {}),
+    }),
     isBase64Encoded: false,
   };
 };

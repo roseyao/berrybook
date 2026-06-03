@@ -1,0 +1,173 @@
+// Pre-record TTS audio + per-character alignment for every scene in every
+// book, saving to `public/audio/<book-id>/<scene-id>.{mp3,json}`. At runtime
+// the client tries those static files first (instant + no API cost) and only
+// falls back to the live Netlify function if they're missing.
+//
+// Usage:
+//   node scripts/record-audio.mjs                      # all books, skip cached
+//   node scripts/record-audio.mjs --force              # rerun everything
+//   node scripts/record-audio.mjs --book=little-light  # one book only
+//   node scripts/record-audio.mjs --force --book=...   # combine
+//
+// Auth: ELEVENLABS_API_KEY env. If missing, falls back to
+// `netlify env:get ELEVENLABS_API_KEY` (assumes `netlify link` ran in this dir).
+//
+// Voice / speed settings must MATCH netlify/functions/generate-audio.js so
+// that pre-recorded audio sounds identical to the live fallback.
+
+import fs from 'node:fs/promises';
+import path from 'node:path';
+import { fileURLToPath, pathToFileURL } from 'node:url';
+import { execSync } from 'node:child_process';
+
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
+const REPO = path.resolve(__dirname, '..');
+const PUBLIC_AUDIO = path.join(REPO, 'public/audio');
+const BOOKS_DIR = path.join(REPO, 'src/books');
+
+const ELEVENLABS_VOICE_ID = 'ZF6FPAbjXT4488VcRRnw';
+const MODEL_ID = 'eleven_flash_v2_5';
+const VOICE_SETTINGS = { stability: 0.5, similarity_boost: 0.75, speed: 0.9 };
+
+const args = process.argv.slice(2);
+const FORCE = args.includes('--force');
+const onlyArg = args.find((a) => a.startsWith('--book='));
+const ONLY_BOOK = onlyArg ? onlyArg.slice('--book='.length) : null;
+
+async function loadApiKey() {
+  // 1) Shell env (works for `export ELEVENLABS_API_KEY=... && node ...`).
+  if (process.env.ELEVENLABS_API_KEY) return process.env.ELEVENLABS_API_KEY;
+  // 2) 1Password CLI (user's preferred secret store).
+  try {
+    const v = execSync(
+      `op read 'op://Private/elevenlabs_api_key/credential'`,
+      { encoding: 'utf8', stdio: ['ignore', 'pipe', 'ignore'] }
+    ).trim();
+    if (v) return v;
+  } catch { /* op not authed or item missing */ }
+  // 3) Netlify env (only if a non-masked dev-context value is set).
+  try {
+    const out = execSync('netlify env:get ELEVENLABS_API_KEY --json', { encoding: 'utf8' });
+    const v = JSON.parse(out).ELEVENLABS_API_KEY;
+    if (v && !v.startsWith('*') && !v.startsWith('No value')) return v;
+  } catch { /* fall through */ }
+  throw new Error(
+    'No ELEVENLABS_API_KEY available. Try one of:\n' +
+    '  - export ELEVENLABS_API_KEY=... && node scripts/record-audio.mjs\n' +
+    '  - op signin (if you keep the key in 1Password as elevenlabs_api_key)\n' +
+    '  - set the key on the linked Netlify site dev context'
+  );
+}
+
+async function callElevenLabs(text, apiKey) {
+  const url = `https://api.elevenlabs.io/v1/text-to-speech/${ELEVENLABS_VOICE_ID}/with-timestamps`;
+  const resp = await fetch(url, {
+    method: 'POST',
+    headers: {
+      Accept: 'application/json',
+      'Content-Type': 'application/json',
+      'xi-api-key': apiKey,
+    },
+    body: JSON.stringify({ text, model_id: MODEL_ID, voice_settings: VOICE_SETTINGS }),
+  });
+  if (!resp.ok) {
+    const body = (await resp.text()).slice(0, 300);
+    throw new Error(`ElevenLabs ${resp.status}: ${body}`);
+  }
+  const data = await resp.json();
+  if (!data.audio_base64) throw new Error('ElevenLabs: missing audio_base64');
+  const a = data.normalized_alignment || data.alignment;
+  if (!a) throw new Error('ElevenLabs: missing alignment');
+  return {
+    audioBase64: data.audio_base64,
+    alignment: {
+      chars: a.characters,
+      starts: a.character_start_times_seconds,
+      ends: a.character_end_times_seconds,
+    },
+  };
+}
+
+async function loadBook(bookDir) {
+  const file = path.join(BOOKS_DIR, bookDir, 'index.js');
+  const mod = await import(pathToFileURL(file).href);
+  return mod.default;
+}
+
+async function recordScene({ bookId, sceneId, text, apiKey }) {
+  const dir = path.join(PUBLIC_AUDIO, bookId);
+  await fs.mkdir(dir, { recursive: true });
+  const mp3 = path.join(dir, `${sceneId}.mp3`);
+  const json = path.join(dir, `${sceneId}.json`);
+  const meta = path.join(dir, `${sceneId}.meta.json`);
+
+  // Cache invalidation by SHA-1 of (text + voice/model settings). If meta
+  // matches, skip; otherwise re-record.
+  const sig = await textSignature(text);
+  if (!FORCE) {
+    try {
+      const prev = JSON.parse(await fs.readFile(meta, 'utf8'));
+      if (prev.sig === sig) {
+        await fs.access(mp3);
+        await fs.access(json);
+        process.stdout.write(`    skip  ${sceneId} (cached)\n`);
+        return { skipped: true };
+      }
+    } catch { /* missing or stale, fall through */ }
+  }
+
+  process.stdout.write(`    fetch ${sceneId} ... `);
+  const t0 = Date.now();
+  const { audioBase64, alignment } = await callElevenLabs(text, apiKey);
+  await fs.writeFile(mp3, Buffer.from(audioBase64, 'base64'));
+  await fs.writeFile(json, JSON.stringify(alignment));
+  await fs.writeFile(meta, JSON.stringify({ sig, model: MODEL_ID, voice: ELEVENLABS_VOICE_ID, settings: VOICE_SETTINGS, recordedAt: new Date().toISOString() }));
+  process.stdout.write(`ok (${((Date.now() - t0) / 1000).toFixed(1)}s)\n`);
+  return { recorded: true };
+}
+
+async function textSignature(text) {
+  const crypto = await import('node:crypto');
+  return crypto.createHash('sha1')
+    .update(MODEL_ID + '|' + JSON.stringify(VOICE_SETTINGS) + '|' + text)
+    .digest('hex')
+    .slice(0, 12);
+}
+
+async function main() {
+  const apiKey = await loadApiKey();
+  const all = (await fs.readdir(BOOKS_DIR, { withFileTypes: true }))
+    .filter((d) => d.isDirectory())
+    .map((d) => d.name);
+
+  const bookDirs = ONLY_BOOK ? all.filter((d) => d === ONLY_BOOK) : all;
+  if (!bookDirs.length) {
+    console.error(`No matching book dir under ${BOOKS_DIR}` + (ONLY_BOOK ? ` (looking for "${ONLY_BOOK}")` : ''));
+    process.exit(1);
+  }
+
+  let recorded = 0, skipped = 0;
+  for (const bd of bookDirs) {
+    let book;
+    try {
+      book = await loadBook(bd);
+    } catch (e) {
+      console.error(`  skip ${bd}: ${e.message}`);
+      continue;
+    }
+    console.log(`\n  ${book.id} — ${book.title}`);
+    for (const [sceneId, scene] of Object.entries(book.scenes)) {
+      try {
+        const r = await recordScene({ bookId: book.id, sceneId, text: scene.text, apiKey });
+        if (r.recorded) recorded++; else skipped++;
+        // small delay to be polite to the API
+        if (r.recorded) await new Promise((r) => setTimeout(r, 250));
+      } catch (e) {
+        console.error(`    FAIL  ${sceneId}: ${e.message}`);
+      }
+    }
+  }
+  console.log(`\nDone. ${recorded} recorded, ${skipped} cached.`);
+}
+
+main().catch((e) => { console.error(e); process.exit(1); });

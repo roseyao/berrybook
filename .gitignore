@@ -7,3 +7,6 @@ build/
 .env.*.local
 .netlify/
 package-lock.json
+deno.lock
+# Pre-crop backups left by the image-crop script (local-only safety net)
+public/images/**/*.portrait.png
