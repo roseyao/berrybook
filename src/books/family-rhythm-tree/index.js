@@ -25,8 +25,8 @@ const book = {
             image: "/Images/book9/2A.png",
             text: "\"Why did you go quiet?\" Ivy asked the tree. The tree hummed softly and showed them something new — a tiny, soft, round pink note floating gently among the others. Bloop. \"That's Hazel's note!\" Ivy said. But the notes weren't playing in order anymore. Mom's three notes kept playing at strange times — sometimes in the middle of the night. Dad's notes rushed and hurried. Ivy's sparkly note felt smaller. Oliver's flame note kept popping out of turn. \"Everything is jumbled!\" Oliver frowned. The tree hummed back warmly: \"New rhythms take time. But listen carefully… do the love notes sound different?\" They listened hard. And no — the love notes were exactly the same. Strong and steady and sure.",
             choices: [
-                { text: "Oliver stomps off feeling angry", next: 'scene3A' },
-                { text: "Ivy tries to fix the song", next: 'scene3B' }
+                { text: "Oliver stomps off feeling angry first", next: 'scene3A' },
+                { text: "Ivy tries to fix the song first", next: 'scene3B' }
             ]
         },
         scene2B: {
@@ -34,8 +34,8 @@ const book = {
             image: "/Images/book9/2B.png",
             text: "Inside the cottage, Mom sat in the big chair with a tiny pink bundle. \"Come meet Hazel,\" Mom said softly. Baby Hazel was impossibly small. Her little pink horn was barely a nub. She made the tiniest sounds. \"She's so little,\" Ivy whispered, feeling something big and warm in her chest. \"Can I breathe a tiny flame near her?\" Oliver asked hopefully. \"Just a very tiny one,\" Dad said. Oliver breathed the gentlest flame he'd ever made. Hazel's eyes flickered open, looking right at him. \"She saw me!\" Oliver gasped. But that night, when Hazel cried and everything changed, a big feeling started growing in Oliver's tummy that he couldn't name.",
             choices: [
-                { text: "Oliver wanders off feeling something big", next: 'scene3A' },
-                { text: "Ivy decides to be the perfect helper", next: 'scene3B' }
+                { text: "Oliver wanders off feeling something big first", next: 'scene3A' },
+                { text: "Ivy decides to be the perfect helper first", next: 'scene3B' }
             ]
         },
         scene3A: {
@@ -43,13 +43,29 @@ const book = {
             image: "/Images/book9/3A.png",
             text: "By day three, Oliver was having the WORST day. He threw his breakfast. He said NO to everything. He knocked over Ivy's block tower on purpose. \"OLIVER!\" everyone said. But inside Oliver, something kept growing bigger and bigger, like a balloon about to pop. He went to the Rhythm Tree and hit it with a stick. The tree didn't get angry. Instead, it played just his note — warm and steady and bright. Pop! \"That's my note,\" Oliver said, surprised. \"It's still there.\" The tree played it again and again, just for him. Oliver sat down against the trunk and finally let the balloon feeling out quietly: \"I miss Mom. Even when she's right there, I miss her.\" The tree played something new — his note and Mom's note together, intertwined and beautiful.",
             choices: [
-                { text: "Continue", next: 'scene4' }
+                { text: "Continue", next: 'scene3B-2' }
             ]
         },
         scene3B: {
             title: "Ivy's Shrinking Note",
             image: "/Images/book9/3B.png",
             text: "Ivy decided to be SO good that everything would feel normal again. She helped with laundry. She spoke in whispers. She never complained. She made sure to take up as little space as possible. \"What a wonderful helper!\" everyone said. But the Rhythm Tree noticed something. Ivy's sparkly note had gone very very small, like it was trying not to take up space. One afternoon, while Mom napped with Hazel, Ivy crept to the tree alone. \"I'm fine,\" she told it. The tree played her note back. Ting! Full and bright and clear. \"I said I'm FINE,\" Ivy repeated. Ting! Warm and patient and waiting. Ivy's lip wobbled. \"I love Hazel. I really do. But I also miss how it used to be sometimes. Is that bad?\" The tree answered by playing all five notes together — and Ivy's note was just as bright and clear as ever. \"My note didn't get smaller,\" she realized. \"I just stopped playing it.\"",
+            choices: [
+                { text: "Continue", next: 'scene3A-2' }
+            ]
+        },
+        'scene3B-2': {
+            title: "Ivy's Shrinking Note",
+            image: "/Images/book9/3B.png",
+            text: "Meanwhile, Ivy had decided to be SO good that everything would feel normal again. She helped with laundry. She spoke in whispers. She never complained. She made sure to take up as little space as possible. \"What a wonderful helper!\" everyone said. But the Rhythm Tree noticed something. Ivy's sparkly note had gone very very small, like it was trying not to take up space. One afternoon, while Mom napped with Hazel, Ivy crept to the tree alone. \"I'm fine,\" she told it. The tree played her note back. Ting! Full and bright and clear. \"I said I'm FINE,\" Ivy repeated. Ting! Warm and patient and waiting. Ivy's lip wobbled. \"I love Hazel. I really do. But I also miss how it used to be sometimes. Is that bad?\" The tree answered by playing all five notes together — and Ivy's note was just as bright and clear as ever. \"My note didn't get smaller,\" she realized. \"I just stopped playing it.\"",
+            choices: [
+                { text: "Continue", next: 'scene4' }
+            ]
+        },
+        'scene3A-2': {
+            title: "Oliver's Big Balloon",
+            image: "/Images/book9/3A.png",
+            text: "Meanwhile, by day three, Oliver was having the WORST day. He threw his breakfast. He said NO to everything. He knocked over Ivy's block tower on purpose. \"OLIVER!\" everyone said. But inside Oliver, something kept growing bigger and bigger, like a balloon about to pop. He went to the Rhythm Tree and hit it with a stick. The tree didn't get angry. Instead, it played just his note — warm and steady and bright. Pop! \"That's my note,\" Oliver said, surprised. \"It's still there.\" The tree played it again and again, just for him. Oliver sat down against the trunk and finally let the balloon feeling out quietly: \"I miss Mom. Even when she's right there, I miss her.\" The tree played something new — his note and Mom's note together, intertwined and beautiful.",
             choices: [
                 { text: "Continue", next: 'scene4' }
             ]
