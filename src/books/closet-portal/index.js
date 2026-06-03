@@ -4,80 +4,137 @@ const book = {
     coverImage: '/Images/book7/0-cover.png',
     scenes: {
         start: {
-            title: "The Wishing Wood Closets",
+            title: "The Closet Portal Adventure",
             image: "/Images/book7/0-intro.png",
-            text: "Carpenter Beaver had built Ivy and Oliver brand new closets. \"Made from Wishing Wood,\" he said with a wink. \"Very rare. Take good care of them.\" Ivy's was painted purple with silver stars. Oliver's was green with orange flames. They looked perfectly normal… until the doors closed. A soft humming came from inside both of them. \"Did you HEAR that?\" Ivy whispered. Just then, two little visitors came running in — and the adventure of the day was about to begin.",
+            text: "When Ivy and Oliver get new closets built in their tree house, they discover the closets are MAGICAL PORTALS! But when Shimmer toddles into Ivy's closet and Violet flies into Oliver's closet, they disappear into different magical worlds! Now Ivy and Oliver must journey through their own closets to rescue their little friends - but the closet worlds reflect their personalities in the wildest ways!",
             choices: [
-                { text: "Start the Adventure!", next: 'setup' }
+                { text: "Start Adventure", next: 'scene1' }
             ]
         },
-        setup: {
-            title: "Two Little Visitors",
+        scene1: {
+            title: "The New Closets Arrive",
             image: "/Images/book7/1.png",
-            text: "\"Pretty!\" squealed Shimmer, the tiny baby unicorn, bouncing toward Ivy's sparkly purple closet. At the same moment, Violet the little dragon flapped through the window. \"Ooh, WARM!\" she chirped, diving toward Oliver's flame-green closet. \"WAIT!\" Ivy and Oliver shouted together. But both little ones vanished inside, and the doors slammed shut behind them. Ivy and Oliver tugged. Pulled. Pushed. The doors wouldn't budge — but the humming got louder, almost like the closets were waiting. \"We have to go IN,\" Ivy realized. \"Which one first?\"",
+            text: "\"Your new closets are special,\" said Carpenter Beaver, wiping his brow. \"Made from Wishing Wood - very rare!\" Ivy's closet was painted purple with silver stars. Oliver's was green with orange flames. They looked perfectly normal... until the doors were closed. A soft humming came from inside. \"Did you hear that?\" Ivy asked. Just then, Shimmer toddled in. \"Pretty!\" she squealed, running toward Ivy's closet. And Violet flapped through the window. \"Ooh, warm!\" she chirped, diving toward Oliver's closet. \"WAIT!\" Ivy and Oliver shouted. But both little ones vanished inside. The closet doors slammed shut and wouldn't open!",
             choices: [
-                { text: "Go through Ivy's closet first", next: 'ivy-closet' },
-                { text: "Go through Oliver's closet first", next: 'oliver-closet' }
+                { text: "Follow Ivy into her closet first", next: 'ivy-first-arrive' },
+                { text: "Follow Oliver into his closet first", next: 'oliver-first-arrive' }
             ]
         },
 
-        // --- Ivy-first path ---
-        'ivy-closet': {
-            title: "Ivy's Crystal Kingdom",
+        // ===== PATH A: Ivy's closet first =====
+        'ivy-first-arrive': {
+            title: "Ivy's Perfect Crystal Kingdom",
             image: "/Images/book7/2A.png",
-            text: "Ivy yanked open her closet — and instead of clothes there was a swirling purple portal! She and Oliver jumped through. They landed in a world of crystal puzzles… but every puzzle had a giant glowing \"INSTANT SOLVE\" button. Press it: the puzzle finished itself. Tap it: castles built themselves. No thinking, no trying. \"Where's Shimmer?\" Ivy called. They followed the sound of frustrated crying — and found her stuck inside a crystal maze with no INSTANT SOLVE button anywhere. \"Can't get out!\" Shimmer wailed. \"TOO HARD!\" The Crystal Guides chimed: \"If it's hard, just QUIT.\" Ivy stomped her hoof. \"No. We can think this through.\" Slowly, patiently, she and Oliver studied the patterns with Shimmer. Star, moon, sun… \"What comes next?\" they coached. Step by step, dead end after dead end, they made it through. Shimmer bounced out, beaming. \"Hard but WE DID IT!\"",
+            text: "Ivy yanked open her closet door and gasped. Instead of clothes, there was a swirling portal! \"Shimmer needs me!\" She jumped through. She landed in a world of crystal puzzles and building challenges - but everything had an \"INSTANT SOLVE\" button. Press it, and castles built themselves. Tap it, and puzzles solved instantly. No thinking, no trying, no effort needed! \"Shimmer?\" Ivy called. \"Where are you?\" She heard frustrated crying. There was Shimmer, stuck in a crystal maze with no instant button! \"Can't get out!\" Shimmer wailed. \"Too hard!\" Crystal Guides appeared. \"Why struggle? Use instant solution!\" \"But there IS no button for this!\" Ivy said. \"Then give up. If it's hard, it's not worth doing,\" they chimed. Ivy felt uncomfortable. That didn't sound right...",
             choices: [
-                { text: "Continue", next: 'bridge-then-oliver' }
+                { text: "Try to solve the maze", next: 'ivy-first-solve' }
             ]
         },
-        'bridge-then-oliver': {
-            title: "One Down, One to Go",
-            image: "/Images/book7/4.png",
-            text: "WHOOSH! Ivy and Oliver tumbled back into the bedroom with Shimmer between them, giggling and dizzy. \"Real solving FEELS good,\" Ivy said, still buzzing. \"Even though it took FOREVER.\" \"Especially because it took forever,\" Oliver agreed. Then they heard it: hummmmm. Oliver's green closet was glowing, the door rattling gently. Violet was still in there. \"My turn,\" Oliver said, his voice braver than he expected. \"Let's go get her.\"",
-            choices: [
-                { text: "Into Oliver's closet", next: 'oliver-second' }
-            ]
-        },
-        'oliver-second': {
-            title: "Oliver's Game Land",
-            image: "/Images/book7/3B.png",
-            text: "Oliver burst through his portal — and INSTANT REWARDS rained from the sky! \"YOU WIN!\" signs flashed before he'd even played. \"VIOLET!\" Oliver called. \"Help!\" came a tiny voice. Violet was stuck on a high platform. The only bridge over only appeared if someone collected FIVE golden coins — but the Game Dragons kept offering shiny toys for every coin won. \"Trade ONE coin for this SPARKLY TOY now!\" \"No,\" Oliver said, remembering Ivy's slow careful maze. \"I'm saving for Violet.\" He played a game and won a coin. \"One!\" Another. \"Two!\" By coin four the Game Dragons offered the COOLEST bubble-breathing toy dragon. Oliver's claws shook. He wanted it SO MUCH. But… \"One more for Violet.\" When coin five clicked into his pile, the bridge appeared. Violet flew straight into his arms. \"You WAITED!\" she cried. \"Even with the bubble dragon!\"",
-            choices: [
-                { text: "Continue", next: 'ending' }
-            ]
-        },
-
-        // --- Oliver-first path ---
-        'oliver-closet': {
-            title: "Oliver's Game Land",
-            image: "/Images/book7/2B.png",
-            text: "Oliver yanked open his closet — and instead of toys there was a swirling green-and-orange portal! He and Ivy jumped through. INSTANT REWARDS rained from the sky! \"YOU WIN!\" signs flashed before they'd even played. Treasure piled up just for showing up. \"VIOLET!\" Oliver called. \"Help!\" came a tiny voice. Violet was trapped on a high platform. The bridge over only appeared if someone collected FIVE golden coins — but the Game Dragons kept offering shiny toys for every single coin won. \"Trade ONE coin for this SPARKLY TOY now!\" \"No,\" Oliver said firmly. \"I'm saving for Violet.\" He played a game, won a coin. \"One!\" Another. \"Two!\" By coin four the Game Dragons offered the BEST toy — a bubble-breathing dragon. Oliver's claws SHOOK. But… \"One more for Violet.\" When the fifth coin clinked, the bridge appeared. Violet flew straight into his arms. \"You WAITED!\" she cried. \"Even with the bubble dragon!\"",
-            choices: [
-                { text: "Continue", next: 'bridge-then-ivy' }
-            ]
-        },
-        'bridge-then-ivy': {
-            title: "One Down, One to Go",
-            image: "/Images/book7/4.png",
-            text: "WHOOSH! Oliver and Ivy tumbled back into the bedroom with Violet flapping between them. \"Saving FEELS good,\" Oliver said, still buzzing. \"Even though I really wanted that bubble dragon.\" \"Especially because of the bubble dragon,\" Ivy agreed. Then they heard it: hummmmm. Ivy's purple closet was glowing, the door rattling gently. Shimmer was still in there. \"My turn,\" Ivy said. \"Let's go get her.\"",
-            choices: [
-                { text: "Into Ivy's closet", next: 'ivy-second' }
-            ]
-        },
-        'ivy-second': {
-            title: "Ivy's Crystal Kingdom",
+        'ivy-first-solve': {
+            title: "Ivy Solves It Slowly",
             image: "/Images/book7/3A.png",
-            text: "Ivy and Oliver leapt through the purple portal. They landed in a world of crystal puzzles — but every puzzle had a giant \"INSTANT SOLVE\" button. \"Where's Shimmer?\" Ivy called. They found her stuck in a crystal maze. \"Can't get out! TOO HARD!\" she wailed. The Crystal Guides chimed: \"If it's hard, just QUIT.\" \"No,\" Ivy said, remembering how Oliver had patiently saved every coin. \"Hard is okay. Hard is HOW.\" She and Oliver studied the patterns with Shimmer. Star, moon, sun… \"What comes next?\" they coached. Step by step, dead end after dead end, they worked their way through. Shimmer bounced out, beaming. \"Hard but WE DID IT!\"",
+            text: "\"No instant button means it's impossible,\" the Crystal Guides insisted. \"No,\" Ivy said firmly. \"It means we need to THINK.\" She studied the maze. It was complex, with sliding walls and pattern locks. Her fingers itched for an easy solution, but there wasn't one. \"Come on, Shimmer. Let's work through this together. First, what do you see?\" \"Scary walls!\" Shimmer whimpered. \"Look closer. See? The walls have patterns. Star, moon, sun. What comes next?\" \"Um... star again?\" \"Yes! You're getting it!\" Ivy guided patiently. Each step took time. Some paths were dead ends. They had to backtrack, try again. The Crystal Guides watched in confusion. \"But you're... struggling. Why not quit?\" \"Because,\" Ivy said, helping Shimmer through another patient attempt, \"the best things take effort. Real solving isn't instant.\" After many tries, they solved it! Shimmer bounced out, beaming. \"We did it! Hard but WE DID IT!\"",
             choices: [
-                { text: "Continue", next: 'ending' }
+                { text: "Continue", next: 'bridge-after-ivy' }
+            ]
+        },
+        'bridge-after-ivy': {
+            title: "One Closet to Go",
+            image: "/Images/book7/4.png",
+            text: "WHOOSH! Ivy tumbled back into the bedroom with Shimmer in her arms, both still buzzing from the maze. Shimmer immediately curled up for a nap. But the bedroom wasn't quiet — Oliver's green closet was still glowing, still humming. Violet was in there. Ivy looked at Oliver. \"Your turn now.\" Oliver took a deep breath. \"Together?\" \"Together,\" Ivy said.",
+            choices: [
+                { text: "Into Oliver's closet", next: 'oliver-second-arrive' }
+            ]
+        },
+        'oliver-second-arrive': {
+            title: "Oliver's Dragon Game Land",
+            image: "/Images/book7/2B.png",
+            text: "Oliver burst through his closet portal and found himself in a dragon's paradise of INSTANT rewards! \"CONGRATULATIONS!\" signs flashed everywhere. \"YOU WIN!\" before he even played. Treasure poured from the sky just for showing up. Every game gave prizes immediately - no waiting, no earning, just constant rewards! \"VIOLET!\" he roared, distracted by the raining gold. \"Help!\" came a tiny voice. Violet was trapped on a platform surrounded by \"instant win\" games. \"I can't get down! The only bridge appears if you save 5 golden coins, but everyone keeps spending them right away!\" Oliver looked at his hand. One golden coin! \"Just need 5?\" Oliver counted on his claws. \"One... two... three... four... FIVE!\" A shiny toy dragon appeared. \"Trade your coin for this! NOW!\" \"But I only have one,\" Oliver said. \"I need... more.\" The Game Dragons laughed. \"Why wait? Shiny toy NOW! Saving is boring!\"",
+            choices: [
+                { text: "Save coins for Violet", next: 'oliver-second-save' }
+            ]
+        },
+        'oliver-second-save': {
+            title: "Oliver Learns to Wait",
+            image: "/Images/book7/3B.png",
+            text: "Oliver almost traded his coin for the toy - then stopped. \"But Violet needs 5 coins...\" \"Don't wait!\" a Game Dragon tempted. \"Shiny toy NOW!\" Oliver squeezed his coin. The toy was SO cool. But Violet looked SO scared. \"How do I get more coins?\" he asked. \"Win games! Here's one coin!\" They gave him another. Now he had 2! \"Two!\" Oliver counted proudly. A sparkly ball appeared. \"Trade 2 coins for this!\" \"No... need 5 for Violet.\" He played another game. \"Three!\" A light-up sword appeared. \"Only 3 coins!\" Oliver looked at Violet. \"Sorry sword. Still need more.\" He won another coin. \"Four! Almost there!\" The BEST toy appeared - a dragon that breathed bubbles! \"Trade 4 coins NOW!\" Oliver's hands shook. He wanted it SO MUCH. But... \"One more for Violet.\" When he got 5 coins, the bridge appeared! Violet flew into his arms! \"You waited for me!\" she cried. \"Even with the bubble dragon!\"",
+            choices: [
+                { text: "Continue", next: 'scene4' }
             ]
         },
 
-        // --- Shared ending ---
-        ending: {
-            title: "The Right Closets",
+        // ===== PATH B: Oliver's closet first =====
+        'oliver-first-arrive': {
+            title: "Oliver's Dragon Game Land",
+            image: "/Images/book7/2B.png",
+            text: "Oliver burst through his closet portal and found himself in a dragon's paradise of INSTANT rewards! \"CONGRATULATIONS!\" signs flashed everywhere. \"YOU WIN!\" before he even played. Treasure poured from the sky just for showing up. Every game gave prizes immediately - no waiting, no earning, just constant rewards! \"VIOLET!\" he roared, distracted by the raining gold. \"Help!\" came a tiny voice. Violet was trapped on a platform surrounded by \"instant win\" games. \"I can't get down! The only bridge appears if you save 5 golden coins, but everyone keeps spending them right away!\" Oliver looked at his hand. One golden coin! \"Just need 5?\" Oliver counted on his claws. \"One... two... three... four... FIVE!\" A shiny toy dragon appeared. \"Trade your coin for this! NOW!\" \"But I only have one,\" Oliver said. \"I need... more.\" The Game Dragons laughed. \"Why wait? Shiny toy NOW! Saving is boring!\"",
+            choices: [
+                { text: "Save coins for Violet", next: 'oliver-first-save' }
+            ]
+        },
+        'oliver-first-save': {
+            title: "Oliver Learns to Wait",
+            image: "/Images/book7/3B.png",
+            text: "Oliver almost traded his coin for the toy - then stopped. \"But Violet needs 5 coins...\" \"Don't wait!\" a Game Dragon tempted. \"Shiny toy NOW!\" Oliver squeezed his coin. The toy was SO cool. But Violet looked SO scared. \"How do I get more coins?\" he asked. \"Win games! Here's one coin!\" They gave him another. Now he had 2! \"Two!\" Oliver counted proudly. A sparkly ball appeared. \"Trade 2 coins for this!\" \"No... need 5 for Violet.\" He played another game. \"Three!\" A light-up sword appeared. \"Only 3 coins!\" Oliver looked at Violet. \"Sorry sword. Still need more.\" He won another coin. \"Four! Almost there!\" The BEST toy appeared - a dragon that breathed bubbles! \"Trade 4 coins NOW!\" Oliver's hands shook. He wanted it SO MUCH. But... \"One more for Violet.\" When he got 5 coins, the bridge appeared! Violet flew into his arms! \"You waited for me!\" she cried. \"Even with the bubble dragon!\"",
+            choices: [
+                { text: "Continue", next: 'bridge-after-oliver' }
+            ]
+        },
+        'bridge-after-oliver': {
+            title: "One Closet to Go",
+            image: "/Images/book7/4.png",
+            text: "WHOOSH! Oliver tumbled back into the bedroom with Violet flapping happily beside him. Violet immediately found a sunny spot on the windowsill. But the bedroom wasn't quiet — Ivy's purple closet was still glowing, still humming. Shimmer was in there. Oliver looked at Ivy. \"Your turn now.\" Ivy took a deep breath. \"Together?\" \"Together,\" Oliver said.",
+            choices: [
+                { text: "Into Ivy's closet", next: 'ivy-second-arrive' }
+            ]
+        },
+        'ivy-second-arrive': {
+            title: "Ivy's Perfect Crystal Kingdom",
+            image: "/Images/book7/2A.png",
+            text: "Ivy yanked open her closet door and gasped. Instead of clothes, there was a swirling portal! \"Shimmer needs me!\" She jumped through. She landed in a world of crystal puzzles and building challenges - but everything had an \"INSTANT SOLVE\" button. Press it, and castles built themselves. Tap it, and puzzles solved instantly. No thinking, no trying, no effort needed! \"Shimmer?\" Ivy called. \"Where are you?\" She heard frustrated crying. There was Shimmer, stuck in a crystal maze with no instant button! \"Can't get out!\" Shimmer wailed. \"Too hard!\" Crystal Guides appeared. \"Why struggle? Use instant solution!\" \"But there IS no button for this!\" Ivy said. \"Then give up. If it's hard, it's not worth doing,\" they chimed. Ivy felt uncomfortable. That didn't sound right...",
+            choices: [
+                { text: "Try to solve the maze", next: 'ivy-second-solve' }
+            ]
+        },
+        'ivy-second-solve': {
+            title: "Ivy Solves It Slowly",
+            image: "/Images/book7/3A.png",
+            text: "\"No instant button means it's impossible,\" the Crystal Guides insisted. \"No,\" Ivy said firmly. \"It means we need to THINK.\" She studied the maze. It was complex, with sliding walls and pattern locks. Her fingers itched for an easy solution, but there wasn't one. \"Come on, Shimmer. Let's work through this together. First, what do you see?\" \"Scary walls!\" Shimmer whimpered. \"Look closer. See? The walls have patterns. Star, moon, sun. What comes next?\" \"Um... star again?\" \"Yes! You're getting it!\" Ivy guided patiently. Each step took time. Some paths were dead ends. They had to backtrack, try again. The Crystal Guides watched in confusion. \"But you're... struggling. Why not quit?\" \"Because,\" Ivy said, helping Shimmer through another patient attempt, \"the best things take effort. Real solving isn't instant.\" After many tries, they solved it! Shimmer bounced out, beaming. \"We did it! Hard but WE DID IT!\"",
+            choices: [
+                { text: "Continue", next: 'scene4' }
+            ]
+        },
+
+        // ===== Shared continuation =====
+        scene4: {
+            title: "The Closet Crossover",
+            image: "/Images/book7/4.png",
+            text: "Back in their room, Ivy and Oliver had both rescued their little ones - and Shimmer and Violet were curled up together, sound asleep. But Ivy and Oliver weren't alone either! A reformed Crystal Guide had followed Ivy out, wanting to learn about \"effort and patience.\" A Game Dragon had hitched along with Oliver, amazed by \"the power of waiting.\" \"Our closets are connected somehow,\" they realized. \"My world was full of instant solutions,\" Ivy said, still thinking. \"No one wanted to try if it was hard.\" \"And mine was all instant rewards!\" Oliver said. \"No one saved for anything important!\" Their mom called: \"Kids! I bought ice cream for dessert, but if you eat it now, we won't have any for movie night tomorrow!\" Old Oliver would have wanted it NOW. But he looked at Violet and remembered waiting for 5 coins. \"Let's save it for movie night,\" he said, surprising everyone. \"It'll be more special tomorrow.\" Ivy smiled. \"And I'll practice my piano now, even though it's not instantly fun.\" The Crystal Guide and Game Dragon exchanged notes: \"Delayed gratification... makes rewards sweeter?\"",
+            choices: [
+                { text: "Keep the portals secret", next: 'scene5A' },
+                { text: "Share with friends", next: 'scene5B' }
+            ]
+        },
+        scene5A: {
+            title: "The Secret Club",
+            image: "/Images/book7/5A.png",
+            text: "\"This should be our secret,\" Ivy whispered. \"Our special place!\" They made a pact with Shimmer and Violet - the Closet Portal Club! Every week they'd explore together. They discovered: A Backwards World where you walked on ceilings, A Bubble World where everything bounced, A Music World where every step made a note. \"Best secret ever!\" Violet giggled, now brave enough for any adventure. \"Closet club! Closet club!\" Shimmer chanted. Their new closets weren't just for clothes - they were doorways to infinite adventures!",
+            choices: [
+                { text: "Continue", next: 'scene6' }
+            ]
+        },
+        scene5B: {
+            title: "The Portal Playdate",
+            image: "/Images/book7/5B.png",
+            text: "\"Let's invite everyone!\" Oliver said excitedly. Soon their room was full of friends, each discovering their perfect closet world: Bunny found Garden World with infinite carrots, Squirrel discovered Acorn Palace, Even Mayor Badger found Organized Office World! The closets created a portal for each visitor based on their dreams! \"This is amazing!\" everyone cheered. But the best part was when portals mixed - Bunny's gardens grew in Dragon Land, Oliver's games appeared in Crystal Kingdom. Everyone's worlds became richer by sharing!",
+            choices: [
+                { text: "Continue", next: 'scene6' }
+            ]
+        },
+        scene6: {
+            title: "The Perfect Closets",
             image: "/Images/book7/6.png",
-            text: "Back in the bedroom, both little ones were safe and the closets had gone quiet. That evening, Carpenter Beaver came back to check on his work. \"How are the closets?\" he asked, eyes twinkling. \"Mine taught me you can't INSTANT-SOLVE the hard stuff,\" Ivy said. \"Sometimes you just have to TRY.\" \"And mine taught me that waiting is hard,\" Oliver added, \"but it's how you get the things that matter.\" Beaver nodded slowly. \"Wishing Wood is sneaky like that. It gives you what you NEED, not what you ASK FOR.\" That night at dinner, Mom set the ice cream on the table. \"We could eat it now,\" she said, \"or save it for movie night tomorrow.\" Oliver took a deep breath. \"Save it. It'll be more special.\" Ivy looked at her piano. \"And I'll practice now, even though it's hard.\" Their closets hummed once, very softly, and went still. The best treasures, it turned out, were the ones worth waiting for — and the ones worth working for.",
+            text: "That night, Carpenter Beaver returned to check on his work. \"How are the closets?\" he asked with a knowing wink. \"They showed us what we needed to learn,\" Ivy said, organizing her closet properly. \"Mine taught me that instant and easy isn't always better.\" \"And mine showed me that waiting makes things more special,\" Oliver added. \"I saved 5 whole coins for Violet! One, two, three, four, FIVE!\" The Game Dragon had given Oliver a special coin jar with numbers on it. \"For your world. When you want something NOW, count how many you need to save!\" Violet nodded. \"Oliver didn't buy the bubble dragon even though he REALLY wanted it!\" \"That must have been hard,\" Beaver said. \"SO hard,\" Oliver admitted, still counting on his claws. \"But saving Violet was better than any toy!\" As they fell asleep, their closets hummed softly. Through Oliver's portal, Dragon Game Land was transforming - dragons were learning to count and save coins instead of spending them right away. Because the best treasures - like helping friends - are worth waiting for, even if you can only count to five!",
             choices: [
                 { text: "The End", next: 'start' }
             ]
