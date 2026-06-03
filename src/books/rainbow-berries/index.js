@@ -4,9 +4,9 @@ const book = {
     coverImage: '/Images/book1/0-cover.png',
     scenes: {
         start: {
-            title: "The Missing Rainbow Berries",
+            title: "The Berry Festival",
             image: "/Images/book1/0-intro.png",
-            text: "Every summer, in the Whispering Woods, magical Rainbow Berries grow in every color. When they are ripe,  everyone celebrates with a festival full of treats.  Ivy the Unicorn wants everything to be perfect for the festival, and Oliver the Dragon just wants to have fun.  But the berries vanish, can Ivy and Oliver solve the problem and save the festival? ",
+            text: "Every summer in the Whispering Woods, magical Rainbow Berries grew in every color you could imagine — and the whole village threw a giant festival full of berry treats. \"Tomorrow's the BIG day!\" Ivy the unicorn beamed, already arranging tiny berry-shaped lanterns in perfectly straight rows. \"I cannot WAIT to taste-test the pies!\" Oliver the dragon added, bouncing on his tail. \"Pies, jams, juice, jellies, JUICE again — all of it!\" Ivy laughed. \"You're doing the taste-testing for everyone, huh?\" \"Someone has to,\" Oliver said seriously. They headed off toward the Rainbow Berry patch to bring back the first basket. And the moment they got there… something was very, very wrong.",
             choices: [
                 { text: "Start the Adventure!", next: 'scene1' }
             ]

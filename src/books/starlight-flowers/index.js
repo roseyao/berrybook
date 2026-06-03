@@ -4,11 +4,11 @@ const book = {
     coverImage: '/Images/book2/0-cover.png',
     scenes: {
         start: {
-            title: "The Invisible Starlight Flowers",
+            title: "The Night the Flowers Bloom",
             image: '/Images/book2/0-intro.png',
-            text: "The Starlight Flowers that grant wishes only bloom once a year - tonight! But baby Shimmer accidentally made them invisible while playing with magic she's too young to control. Ivy and Oliver must work together (without fighting!) to find the flowers before midnight, all while taking care of an energetic baby unicorn who copies everything they do.",
+            text: "Once a year — and only once a year — the magical Starlight Flowers bloomed. And whoever found one got to make a real, true WISH. \"And tonight is the night!\" Ivy whispered to Oliver, practically glowing with excitement. \"I've been planning my wish for MONTHS.\" \"I haven't picked mine yet,\" Oliver admitted. \"Maybe… RAINBOW dragon-fire? Or pancakes that float?\" Just then, a tiny voice piped up from behind a flower: \"COUSIN IVY! COUSIN IVY!\" Out bounced their littlest cousin — Shimmer, the baby unicorn, sparkles flying everywhere she stepped. \"I help! I HELP!\" she squealed. The trouble was: Shimmer was still learning to control her magic.",
             choices: [
-                { text: "Start Adventure", next: 'scene1' }
+                { text: "Start the Adventure!", next: 'scene1' }
             ]
         },
         scene1: {
