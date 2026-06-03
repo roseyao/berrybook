@@ -143,7 +143,18 @@ exports.handler = async function (event) {
     } catch { /* malformed URL → leave originOK false */ }
   }
   if (!originOK) {
-    return { statusCode: 403, body: JSON.stringify({ error: 'Forbidden' }) };
+    return {
+      statusCode: 403,
+      body: JSON.stringify({
+        error: 'Forbidden',
+        // Debug aid — what the function saw vs. what it expected.
+        debug: {
+          origin,
+          siteUrl: process.env.URL || null,
+          allowed: [...explicit],
+        },
+      }),
+    };
   }
   if ((event.body || '').length > 4096) {
     return { statusCode: 413, body: JSON.stringify({ error: 'Payload too large' }) };
