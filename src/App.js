@@ -237,25 +237,16 @@ const StoryViewer = ({ book, onExit }) => {
             stopPlayback();
             return;
         }
-        
+
         userStoppedPlayback.current = false;
         setIsLoading(true);
 
-        const chunks = splitIntoChunks(textToRead);
-        if (!chunks.length) { setIsLoading(false); return; }
         const audio = audioRef.current;
 
-        // Word offset of each chunk's first word within the full scene text.
-        // Lets the per-chunk char→word index in the chunk translate to a global
-        // word index for highlighting.
-        const chunkWordStarts = [];
-        let acc = 0;
-        for (const c of chunks) { chunkWordStarts.push(acc); acc += countWords(c); }
-
         // Drive activeWord from audio.currentTime via rAF. No-op when alignment
-        // is missing (Gemini fallback), in which case the chunk just plays
-        // without highlighting.
-        const startWordTracking = (alignment, chunkOffset) => {
+        // is missing (Gemini fallback), in which case audio plays without
+        // highlighting.
+        const startWordTracking = (alignment, wordOffset) => {
             stopWordTracking();
             if (!alignment) { setActiveWord(null); return; }
             const c2w = charToWordMap(alignment.chars);
@@ -264,13 +255,58 @@ const StoryViewer = ({ book, onExit }) => {
                 const a = audioRef.current;
                 if (!a || a.paused) { rafRef.current = null; return; }
                 const charIdx = highestLE(starts, a.currentTime);
-                const wInChunk = charIdx >= 0 ? c2w[charIdx] : -1;
-                const next = wInChunk >= 0 ? chunkOffset + wInChunk : null;
+                const wInRange = charIdx >= 0 ? c2w[charIdx] : -1;
+                const next = wInRange >= 0 ? wordOffset + wInRange : null;
                 setActiveWord((prev) => (prev === next ? prev : next));
                 rafRef.current = requestAnimationFrame(tick);
             };
             rafRef.current = requestAnimationFrame(tick);
         };
+
+        // FAST PATH: try the pre-recorded scene file (saved by
+        // scripts/record-audio.mjs to /audio/<book>/<scene>.{mp3,json}).
+        // Static fetch is ~50ms; no chunking needed.
+        try {
+            const audioUrl = `/audio/${book.id}/${currentScene}.mp3`;
+            const alignUrl = `/audio/${book.id}/${currentScene}.json`;
+            const [headResp, alignResp] = await Promise.all([
+                fetch(audioUrl, { method: 'HEAD' }),
+                fetch(alignUrl),
+            ]);
+            if (headResp.ok && alignResp.ok && !userStoppedPlayback.current) {
+                const alignment = await alignResp.json();
+                audio.src = audioUrl;
+                audio.oncanplaythrough = async () => {
+                    try {
+                        await audio.play();
+                        setIsLoading(false);
+                        setIsPlaying(true);
+                        startWordTracking(alignment, 0);
+                    } catch (playError) {
+                        setErrorMessage(`Playback failed: ${playError.message}.`);
+                        stopPlayback();
+                    }
+                };
+                audio.onended = () => { stopWordTracking(); stopPlayback(); };
+                audio.onerror = () => {
+                    if (userStoppedPlayback.current) { userStoppedPlayback.current = false; return; }
+                    setErrorMessage('An error occurred while trying to play the audio.');
+                    stopPlayback();
+                };
+                return;
+            }
+        } catch { /* fall through to live chunked path */ }
+        if (userStoppedPlayback.current) return;
+
+        // SLOW PATH: live TTS via Netlify function, chunked so first audio
+        // starts before the rest is ready.
+        const chunks = splitIntoChunks(textToRead);
+        if (!chunks.length) { setIsLoading(false); return; }
+
+        // Word offset of each chunk's first word within the full scene text.
+        const chunkWordStarts = [];
+        let acc = 0;
+        for (const c of chunks) { chunkWordStarts.push(acc); acc += countWords(c); }
 
         // Play one chunk, then chain to the next when it ends so the scene reads
         // straight through while later chunks are still being fetched.
