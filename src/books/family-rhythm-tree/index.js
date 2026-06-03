@@ -4,9 +4,9 @@ const book = {
     coverImage: '/Images/book9/0-cover.png',
     scenes: {
         start: {
-            title: "Every Family Has a Song",
+            title: "A New Note Tonight",
             image: "/Images/book9/0-intro.png",
-            text: "Every family has a song. Some families sing theirs in the car. Some hum theirs at bedtime. Ivy and Oliver's family was lucky — theirs lived in their backyard. In the corner of their cottage garden stood the most magical tree in the whole village: the Rhythm Tree. Ancient and wise, its branches always hummed with their family's song — a colored note for every heart at home. Hum-hum-hum… da-da… ting… pop! \"That's Mom, Dad, me, and Oliver,\" Ivy explained proudly. \"POP is the best part,\" Oliver added, doing his bounciest flame-note dance. Just then Mom stepped onto the porch with a tired, happy smile. \"Big news, you two. Tonight, your baby sister is coming home. Her name is Hazel.\" Ivy gasped. Oliver's tail did a tiny worried wiggle. \"Will the tree know her note?\" Ivy whispered. Mom smiled. \"Trees this old? They always do.\"",
+            text: "In the corner of Ivy and Oliver's cottage garden stood the most magical tree in the whole village — the Rhythm Tree. Its branches always hummed with their family's song: three warm notes for Mom, two for Dad, one sparkly note for Ivy, and one bouncy flame-pop for Oliver. Hum-hum-hum… da-da… ting… POP! \"I love our song,\" Ivy said. \"POP is the best part,\" Oliver agreed, doing his bounciest flame-note dance. Just then Mom stepped onto the porch with a tired, happy smile. \"Big news, you two. Tonight, your baby sister is coming home. Her name is Hazel.\" Ivy gasped. Oliver's tail did a tiny worried wiggle. \"Will the tree know her note?\" Ivy whispered. Mom smiled. \"Trees this old? They always do.\"",
             choices: [
                 { text: "Start the Adventure!", next: 'scene1' }
             ]
@@ -82,7 +82,7 @@ const book = {
         scene5A: {
             title: "The Honest Feelings",
             image: "/Images/book9/5A.png",
-            text: "Oliver found Mom in the kitchen and tugged her sleeve. \"I have a big feeling,\" he said, remembering what the tree showed him. Mom put down what she was doing immediately. \"Tell me.\" \"I just want YOU to play with me how you used to — playgrounds and adventures and morning snuggles. Even when Hazel needs you.\" Mom knelt down right there. \"Oh Oliver. That feeling makes complete sense.\" She hugged him for a long time. \"I think about you every single day. Your laugh. Your silly self. I love you always.\" \"Even during tantrums?\" he asked into her neck. \"ESPECIALLY during tantrums. That's when you need love the most.\" And Ivy found Dad on the porch. \"I love Hazel… but I also miss when it was just us. Is that okay to feel?\" \"That's one of the most honest things I've ever heard,\" Dad said, pulling her close. \"Both feelings can be true at the same time.\" From the backyard, the Rhythm Tree played all five notes — fuller and richer than ever before.",
+            text: "Oliver tugged Mom's sleeve. \"I have a big feeling,\" he said. Mom set down what she was doing immediately. \"Tell me.\" \"I just want YOU. The way it used to be. Even when Hazel needs you.\" Mom knelt down right there. \"Oh, sweet boy. That feeling makes complete sense.\" She hugged him for a long time. \"Especially during tantrums — that's when you need love the most.\" On the porch, Ivy whispered to Dad: \"I love Hazel… but I miss when it was just us. Is that okay?\" \"That,\" said Dad, \"is one of the most honest things I've ever heard. Both feelings can be true at the same time.\" From the backyard, the Rhythm Tree played all five notes — fuller and richer than ever before.",
             choices: [
                 { text: "Continue", next: 'scene6' }
             ]
@@ -96,9 +96,9 @@ const book = {
             ]
         },
         scene6: {
-            title: "Mom's Answer & The New Song",
+            title: "The New Song",
             image: "/Images/book9/6.png",
-            text: "Mom appeared in the hallway, Hazel asleep in her arms. Her eyes were tired but full of something else — deep, endless, unbreakable love. She sat right down on the floor, which was not a normal Mom thing to do. \"Come here. Both of you.\" Oliver scrambled into her side. Ivy folded in carefully on the other. \"My love for you is not like a cookie that gets smaller when you share it,\" Mom said. \"It's like the Rhythm Tree — it just grows new branches.\" \"But how do we get you when we need you?\" Oliver asked. \"Simple. Just say: 'I need a hug' or 'Can I have five minutes?' Those are magic words in our family. I will always, always stop for those.\" \"Always?\" Oliver checked. \"Always,\" Mom and Dad said together. Things didn't become perfect overnight. But Oliver started saying his big feelings before they exploded. Ivy let herself be six — loud, silly, full-sized. And from the backyard, the Rhythm Tree played its new song: Hum-hum-hum… da-da… ting… pop… bloop. Five notes. Fuller than before. \"That's what love does,\" Dad said quietly. \"It just makes more room.\"",
+            text: "Mom appeared in the hallway, Hazel asleep in her arms. She sat right down on the floor — not a normal Mom thing to do. \"Come here. Both of you.\" Oliver scrambled into her side. Ivy folded in carefully on the other. \"My love for you is not like a cookie that gets smaller when you share it,\" Mom said. \"It's like the Rhythm Tree — it just grows new branches.\" \"But how do we get you when we need you?\" Oliver asked. \"Two magic phrases,\" Mom said. \"'I need a hug.' Or 'Can I have five minutes?' I will ALWAYS stop for those.\" \"Always,\" Dad echoed. From the backyard, the Rhythm Tree played its new song: Hum-hum-hum… da-da… ting… pop… BLOOP. Five notes. Fuller than before. \"That's what love does,\" Dad said quietly. \"It just makes more room.\"",
             choices: [
                 { text: "The End", next: 'start' }
             ]
