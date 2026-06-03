@@ -346,11 +346,11 @@ const StoryViewer = ({ book, onExit }) => {
     //                         right half with its own scroll.
     return (
         <>
-            <div className="sticky top-0 z-10 bg-white rounded-t-2xl overflow-hidden lg:static lg:rounded-t-none lg:rounded-l-2xl lg:w-1/2 lg:h-full lg:flex-shrink-0">
+            <div className="sticky top-0 z-10 bg-white rounded-t-2xl overflow-hidden lg:static lg:rounded-t-none lg:rounded-l-2xl lg:w-1/2 lg:h-full lg:flex-shrink-0 lg:flex lg:items-center lg:justify-center">
                 <img
                     src={scene.image}
                     alt={scene.title}
-                    className="w-full h-auto max-h-[45vh] object-cover lg:max-h-none lg:h-full"
+                    className="w-full h-auto max-h-[45vh] object-cover lg:max-h-full lg:h-auto lg:w-auto lg:max-w-full lg:object-contain"
                     onError={(e) => { e.target.onerror = null; e.target.src = 'https://placehold.co/600x400/fecaca/9ca3af?text=Image+Not+Found'; }}
                 />
             </div>
