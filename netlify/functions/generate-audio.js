@@ -8,7 +8,9 @@
 // Env vars: ELEVENLABS_API_KEY (primary), GEMINI_API_KEY (fallback),
 // optional GEMINI_TTS_VOICE (default "Aoede").
 
-const ELEVENLABS_VOICE_ID = 'ZF6FPAbjXT4488VcRRnw';
+// Ivanna — matches the default in scripts/record-audio.mjs so the rare
+// live fallback sounds the same as the pre-recorded files.
+const ELEVENLABS_VOICE_ID = 'yM93hbw8Qtvdma2wCnJG';
 const GEMINI_TTS_MODEL = 'gemini-2.5-flash-preview-tts';
 
 // Try ElevenLabs with character-level alignment. Returns
@@ -25,9 +27,9 @@ async function tryElevenLabs(text) {
         body: JSON.stringify({
           text,
           model_id: 'eleven_flash_v2_5',
-          // speed 1.0 is the Flash v2.5 default and reads briskly; 0.9 is a
-          // noticeably calmer pace, easier to follow with word highlighting.
-          voice_settings: { stability: 0.5, similarity_boost: 0.75, speed: 0.9 },
+          // Settings match the Ivanna voice profile in scripts/record-audio.mjs
+          // so live fallback sounds identical to the pre-recorded files.
+          voice_settings: { stability: 0.5, similarity_boost: 0.75, speed: 1.0 },
         }),
       }
     );

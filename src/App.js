@@ -264,11 +264,14 @@ const StoryViewer = ({ book, onExit }) => {
         };
 
         // FAST PATH: try the pre-recorded scene file (saved by
-        // scripts/record-audio.mjs to /audio/<book>/<scene>.{mp3,json}).
-        // Static fetch is ~50ms; no chunking needed.
+        // scripts/record-audio.mjs to /audio/<voice>/<book>/<scene>.{mp3,json}).
+        // Static fetch is ~50ms; no chunking needed. Voice is hardcoded for
+        // now; voice-switching can be added later by threading a voice prop
+        // down to this component.
+        const VOICE = 'Ivanna';
         try {
-            const audioUrl = `/audio/${book.id}/${currentScene}.mp3`;
-            const alignUrl = `/audio/${book.id}/${currentScene}.json`;
+            const audioUrl = `/audio/${VOICE}/${book.id}/${currentScene}.mp3`;
+            const alignUrl = `/audio/${VOICE}/${book.id}/${currentScene}.json`;
             const [headResp, alignResp] = await Promise.all([
                 fetch(audioUrl, { method: 'HEAD' }),
                 fetch(alignUrl),

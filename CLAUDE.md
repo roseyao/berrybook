@@ -6,9 +6,9 @@ Netlify. Each book is a "choose-a-path" story with one illustration + audio per 
 > Universal engineering rules live in `~/.claude/CLAUDE.md`. This file is repo-specific.
 
 ## Where things live
-- **Book data:** `src/App.js` → the `library.books` array. Each book is one object (see schema below).
-- **Illustrations:** `public/images/book<N>/` (served at `/Images/book<N>/...` — note the capital `I`, matching the existing books).
-- **Audio:** automatic — `netlify/functions/generate-audio.js` reads each scene's `text` on demand via **ElevenLabs**, falling back to **Gemini TTS** if ElevenLabs fails or runs out of credits (returns `{audio, mimeType}`; Gemini PCM is wrapped to WAV). Set `ELEVENLABS_API_KEY` and/or `GEMINI_API_KEY` in Netlify env (optional `GEMINI_TTS_VOICE`, default `Aoede`). **New books need zero audio work.**
+- **Book data:** `src/books/<id>/index.js` — one ES module per book. `src/books/index.js` glob-imports them and runs `validate.js` at module load (every `next` target resolves, no unreachable scenes, `start` exists).
+- **Illustrations:** `public/images/book<N>/` (served at `/Images/book<N>/...` — note the capital `I`). Square 1:1 (1024×1024) is the default; see `scripts/generate-art.mjs`.
+- **Audio:** pre-recorded at `public/audio/<voice>/<book-id>/<scene-id>.{mp3,json}` via `scripts/record-audio.mjs`. The client tries the static MP3+alignment first (instant) and falls back to live `netlify/functions/generate-audio.js` (ElevenLabs → Gemini) only if files are missing. Default voice is **Ivanna** (`yM93hbw8Qtvdma2wCnJG`); `Paige-british` is also kept for future voice-switching. **New books DO need an audio recording pass — see step 6 below.**
 - **Authoring kit (`content/`):**
   - `AUTHORING.md` — the full step-by-step recipe for a new book.
   - `characters.md` — canonical recurring cast (voices + looks + reference images). **Update this when a character recurs.**
@@ -17,30 +17,38 @@ Netlify. Each book is a "choose-a-path" story with one illustration + audio per 
   - `books/<id>.md` — per-book working draft (story text + per-scene image prompts).
 
 ## How to make a new book (high level)
-1. Pick the **lesson/theme** and which characters appear (default Ivy + Oliver; +Mom/Dad/Grandma Quinn/etc.). Most books introduce **one** new character.
-2. **Draft the story** in `content/books/<id>.md` following `content/AUTHORING.md` (the fixed 11-entry "diamond" structure) and the voices in `content/characters.md`. **Get the text approved before art.**
+1. Pick the **lesson/theme** and which characters appear (default Ivy + Oliver; +Mom/Dad/Hazel/Grandma Quinn/etc.). Most books introduce **one** new character.
+2. **Draft the story** in `content/books/<id>.md` following `content/AUTHORING.md` and the voices in `content/characters.md`. **Get the text approved before art.** Scene structure is free-form (no required diamond) — author whatever shape fits the story; the validator catches dangling `next` targets and unreachable scenes at module load.
 3. **New character:** write a design-sheet, generate a reference image, and get it **approved** before any scenes (it's fed into every scene the character appears in).
 4. **Generate art** with `scripts/generate-art.mjs` (see below). Review every image; re-roll the bad ones.
-5. **Wire the book** into the `library.books` array in `src/App.js` (schema below).
-6. **Deploy:** verify `CI=false npm run build`, then `git push origin main` (Netlify auto-builds).
+5. **Wire the book** into `src/books/<id>/index.js` (schema below) and add the import to `src/books/index.js`.
+6. **Record audio.** Run `ELEVENLABS_API_KEY=... node scripts/record-audio.mjs --book=<id>` (or omit `--book` to record everything missing). Writes `public/audio/Ivanna/<id>/<scene>.{mp3,json}`. Cache invalidation is automatic via SHA-1 of (text + voice settings) in the `.meta.json` sidecar — re-runs only re-record scenes whose text or voice settings changed. Use `--voice=Paige-british` to record an alternate.
+7. **Deploy:** verify `CI=false npm run build`, then `git push origin main` (Netlify auto-builds).
 
-## Book object schema (the "diamond")
-11 scene entries, 3 choice points, 4 paths, all converging on one ending. Keys/wiring must match exactly:
+## Book object schema (free-form)
+Each book is `{ id, title, coverImage, scenes }`. `scenes` is keyed by any string scene id you like (`start` is required as the entry point). Each scene is `{ title, image, text, choices }`; each choice is `{ text, next }`. The validator in `src/books/validate.js` runs at module load and fails the build on dangling `next`, unreachable scenes, or a missing `start`.
 
 ```js
-{ id: 'kebab-id', title: 'Book Title', coverImage: '/Images/book<N>/0-cover.png',
-  story: {
-    start:   { title, image:'/Images/book<N>/0-intro.png', text, choices:[{text, nextScene:'scene1'}] },
-    scene1:  { …, choices:[→scene2A, →scene2B] },
-    scene2A: { …, choices:[→scene3A, →scene3B] },   scene2B: { …, choices:[→scene3A, →scene3B] },
-    scene3A: { …, choices:[{text:'Continue', nextScene:'scene4'}] },  scene3B: { … →scene4 },
-    scene4:  { …, choices:[→scene5A, →scene5B] },
-    scene5A: { … →scene6 },  scene5B: { … →scene6 },
-    scene6:  { …, choices:[{text:'The End', nextScene:'start'}] },
-  } }
+const book = {
+  id: 'kebab-id',
+  title: 'Book Title',
+  coverImage: '/Images/book<N>/0-cover.png',
+  scenes: {
+    start: {
+      title: 'Hook',
+      image: '/Images/book<N>/0-intro.png',
+      text: '…',
+      choices: [{ text: 'Start the Adventure!', next: 'scene1' }],
+    },
+    scene1: { /* … */ choices: [{ text, next: 'scene2A' }, { text, next: 'scene2B' }] },
+    // …any scene ids, any number of choices, any graph shape.
+    // 'The End' is conventional (any choice that returns to 'start').
+  },
+};
+export default book;
 ```
-Each scene: `{ title, image:'/Images/book<N>/<file>.png', text, choices:[{text, nextScene}] }`.
-Image files: `0-cover, 0-intro, 1, 2A, 2B, 3A, 3B, 4, 5A, 5B, 6`. Keep `text` under ~1200 chars (the audio function caps payload).
+
+A clean diamond is still a fine pattern (`scene1 → 2A/2B → 3A/3B → 4 → 5A/5B → 6`), but isn't required. Sequential or branch-and-converge structures both work — see `closet-portal` for a sequential example, `family-rhythm-tree` for an arc that plays out both paths every read. Keep each scene's `text` under ~1200 chars so the chunked live-TTS fallback's payload limit isn't a concern (pre-recorded paths have no such limit).
 
 ## Art pipeline — `scripts/generate-art.mjs`
 Calls Gemini **`gemini-2.5-flash-image`** ("Nano Banana"). API key auto-loaded from `../games/.env.local` (`GEMINI_API_KEY`). **Reference images are THE consistency mechanism** — every call attaches the relevant character PNGs.

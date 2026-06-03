@@ -25,14 +25,32 @@ const REPO = path.resolve(__dirname, '..');
 const PUBLIC_AUDIO = path.join(REPO, 'public/audio');
 const BOOKS_DIR = path.join(REPO, 'src/books');
 
-const ELEVENLABS_VOICE_ID = 'ZF6FPAbjXT4488VcRRnw';
+// Voice profiles. The "id" comes from ElevenLabs's voice library (the URL
+// segment when you open a voice). "settings" stays per-voice so we can tune
+// pace/expression independently. Default is whatever DEFAULT_VOICE points
+// at; pre-recorded files live under public/audio/<voice>/<book>/<scene>.{mp3,json}.
+const VOICES = {
+  'Paige-british': {
+    id: 'ZF6FPAbjXT4488VcRRnw',
+    settings: { stability: 0.5, similarity_boost: 0.75, speed: 0.9 },
+  },
+  'Ivanna': {
+    id: 'yM93hbw8Qtvdma2wCnJG',
+    settings: { stability: 0.5, similarity_boost: 0.75, speed: 1.0 },
+  },
+};
+const DEFAULT_VOICE = 'Ivanna';
 const MODEL_ID = 'eleven_flash_v2_5';
-const VOICE_SETTINGS = { stability: 0.5, similarity_boost: 0.75, speed: 0.9 };
 
 const args = process.argv.slice(2);
 const FORCE = args.includes('--force');
 const onlyArg = args.find((a) => a.startsWith('--book='));
 const ONLY_BOOK = onlyArg ? onlyArg.slice('--book='.length) : null;
+const voiceArg = args.find((a) => a.startsWith('--voice='));
+const VOICE_NAME = voiceArg ? voiceArg.slice('--voice='.length) : DEFAULT_VOICE;
+const VOICE = VOICES[VOICE_NAME];
+if (!VOICE) throw new Error(`Unknown voice "${VOICE_NAME}". Known: ${Object.keys(VOICES).join(', ')}`);
+if (VOICE.id.startsWith('__')) throw new Error(`Voice "${VOICE_NAME}" has no id set yet.`);
 
 async function loadApiKey() {
   // 1) Shell env (works for `export ELEVENLABS_API_KEY=... && node ...`).
@@ -60,7 +78,7 @@ async function loadApiKey() {
 }
 
 async function callElevenLabs(text, apiKey) {
-  const url = `https://api.elevenlabs.io/v1/text-to-speech/${ELEVENLABS_VOICE_ID}/with-timestamps`;
+  const url = `https://api.elevenlabs.io/v1/text-to-speech/${VOICE.id}/with-timestamps`;
   const resp = await fetch(url, {
     method: 'POST',
     headers: {
@@ -68,7 +86,7 @@ async function callElevenLabs(text, apiKey) {
       'Content-Type': 'application/json',
       'xi-api-key': apiKey,
     },
-    body: JSON.stringify({ text, model_id: MODEL_ID, voice_settings: VOICE_SETTINGS }),
+    body: JSON.stringify({ text, model_id: MODEL_ID, voice_settings: VOICE.settings }),
   });
   if (!resp.ok) {
     const body = (await resp.text()).slice(0, 300);
@@ -95,7 +113,7 @@ async function loadBook(bookDir) {
 }
 
 async function recordScene({ bookId, sceneId, text, apiKey }) {
-  const dir = path.join(PUBLIC_AUDIO, bookId);
+  const dir = path.join(PUBLIC_AUDIO, VOICE_NAME, bookId);
   await fs.mkdir(dir, { recursive: true });
   const mp3 = path.join(dir, `${sceneId}.mp3`);
   const json = path.join(dir, `${sceneId}.json`);
@@ -121,7 +139,7 @@ async function recordScene({ bookId, sceneId, text, apiKey }) {
   const { audioBase64, alignment } = await callElevenLabs(text, apiKey);
   await fs.writeFile(mp3, Buffer.from(audioBase64, 'base64'));
   await fs.writeFile(json, JSON.stringify(alignment));
-  await fs.writeFile(meta, JSON.stringify({ sig, model: MODEL_ID, voice: ELEVENLABS_VOICE_ID, settings: VOICE_SETTINGS, recordedAt: new Date().toISOString() }));
+  await fs.writeFile(meta, JSON.stringify({ sig, model: MODEL_ID, voice: VOICE_NAME, voiceId: VOICE.id, settings: VOICE.settings, recordedAt: new Date().toISOString() }));
   process.stdout.write(`ok (${((Date.now() - t0) / 1000).toFixed(1)}s)\n`);
   return { recorded: true };
 }
@@ -129,7 +147,7 @@ async function recordScene({ bookId, sceneId, text, apiKey }) {
 async function textSignature(text) {
   const crypto = await import('node:crypto');
   return crypto.createHash('sha1')
-    .update(MODEL_ID + '|' + JSON.stringify(VOICE_SETTINGS) + '|' + text)
+    .update(MODEL_ID + '|' + VOICE.id + '|' + JSON.stringify(VOICE.settings) + '|' + text)
     .digest('hex')
     .slice(0, 12);
 }
