@@ -326,11 +326,24 @@ const StoryViewer = ({ book, onExit }) => {
     // on every activeWord change.
     const displayTokens = useMemo(() => tokenizeForDisplay(scene.text), [scene.text]);
 
-    // Keep the active word in view (scrolls page in portrait, scrolls the text
-    // panel in landscape since it has its own overflow-y-auto container).
+    // Keep the active word in view, but only nudge the scroll when it's
+    // actually outside (or near the edge of) the visible area. Without this
+    // gate, every word triggers a fresh smooth-scroll and they fight each
+    // other for ~300ms, causing visible jitter.
     useEffect(() => {
-        if (activeWord != null && activeWordRef.current) {
-            activeWordRef.current.scrollIntoView({ behavior: 'smooth', block: 'center', inline: 'nearest' });
+        if (activeWord == null) return;
+        const el = activeWordRef.current;
+        if (!el) return;
+        const r = el.getBoundingClientRect();
+        const vh = window.innerHeight;
+        // Leave generous margins so we only scroll when the word is genuinely
+        // near a viewport edge (within 20% of top/bottom). The sticky image
+        // covers up to 45vh on small screens, so the comfortable reading band
+        // is roughly the lower 55% of the viewport.
+        const topPad = Math.max(vh * 0.5, 200);
+        const bottomPad = Math.max(vh * 0.2, 100);
+        if (r.top < topPad || r.bottom > vh - bottomPad) {
+            el.scrollIntoView({ behavior: 'smooth', block: 'center', inline: 'nearest' });
         }
     }, [activeWord]);
 
@@ -371,7 +384,7 @@ const StoryViewer = ({ book, onExit }) => {
                             <span
                                 key={i}
                                 ref={isActive ? activeWordRef : null}
-                                className={isActive ? 'bg-yellow-200 rounded-md px-0.5 transition-colors' : 'transition-colors'}
+                                className={`rounded-md px-0.5 transition-colors duration-150 ${isActive ? 'bg-yellow-200' : 'bg-transparent'}`}
                             >
                                 {tok.text}
                             </span>
