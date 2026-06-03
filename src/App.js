@@ -346,7 +346,7 @@ const StoryViewer = ({ book, onExit }) => {
     //                         right half with its own scroll.
     return (
         <>
-            <div className="sticky top-0 z-10 bg-white rounded-t-2xl overflow-hidden lg:static lg:rounded-t-none lg:rounded-l-2xl lg:w-1/2 lg:h-full lg:flex-shrink-0 lg:flex lg:items-center lg:justify-center">
+            <div className="sticky top-0 z-10 bg-white rounded-t-2xl overflow-hidden lg:static lg:rounded-t-none lg:rounded-l-2xl lg:w-1/2 lg:h-full lg:flex-shrink-0 lg:flex lg:items-start lg:justify-center">
                 <img
                     src={scene.image}
                     alt={scene.title}
