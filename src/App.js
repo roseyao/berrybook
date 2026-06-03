@@ -238,12 +238,21 @@ const StoryViewer = ({ book, onExit }) => {
         setCurrentScene(scenes[nextSceneId] ? nextSceneId : 'start');
     };
 
+    // Layout:
+    //   Portrait / below lg — sticky image at top, page scrolls beneath it.
+    //   lg+ landscape       — image fills left half of the card, text fills
+    //                         right half with its own scroll.
     return (
-        <div>
-            <div className="w-full">
-                <img src={scene.image} alt={scene.title} className="w-full h-auto" onError={(e) => { e.target.onerror = null; e.target.src = 'https://placehold.co/600x400/fecaca/9ca3af?text=Image+Not+Found'; }} />
+        <>
+            <div className="sticky top-0 z-10 bg-white rounded-t-2xl overflow-hidden lg:static lg:rounded-t-none lg:rounded-l-2xl lg:w-1/2 lg:h-full lg:flex-shrink-0">
+                <img
+                    src={scene.image}
+                    alt={scene.title}
+                    className="w-full h-auto max-h-[45vh] object-cover lg:max-h-none lg:h-full"
+                    onError={(e) => { e.target.onerror = null; e.target.src = 'https://placehold.co/600x400/fecaca/9ca3af?text=Image+Not+Found'; }}
+                />
             </div>
-            <div className="p-6 md:p-8">
+            <div className="p-6 md:p-8 lg:w-1/2 lg:h-full lg:overflow-y-auto">
                 <div className="flex justify-between items-start mb-4">
                     <h1 className="text-2xl md:text-3xl font-bold text-slate-800 text-left flex-1 mr-4">{scene.title}</h1>
                     <button onClick={() => handleReadAloud(scene.text)} disabled={isLoading} className={`flex items-center justify-center px-4 py-2 rounded-full text-sm font-semibold transition-colors duration-300 ${isPlaying ? 'bg-red-500 text-white' : 'bg-blue-500 text-white hover:bg-blue-600'} ${isLoading ? 'bg-slate-400 cursor-not-allowed' : ''} focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500`}>
@@ -259,14 +268,13 @@ const StoryViewer = ({ book, onExit }) => {
                             {choice.text}
                         </button>
                     ))}
-                    {/* Add a button to go back to the library */}
                     <button onClick={onExit} className="mt-4 text-sm text-slate-500 hover:text-purple-600">
                         &larr; Back to Library
                     </button>
                 </div>
             </div>
-            <audio ref={audioRef} />
-        </div>
+            <audio ref={audioRef} className="hidden" />
+        </>
     );
 };
 
@@ -320,14 +328,23 @@ export default function App() {
 
     const selectedBook = selectedBookId ? library.books.find(b => b.id === selectedBookId) : null;
 
+    // Two top-level layouts. Library = centered card on a tall page.
+    // Book viewer = full-viewport on lg (so side-by-side panels can each scroll
+    // independently), stacked on smaller screens (image sticks at top while
+    // text scrolls underneath).
+    if (selectedBook) {
+        return (
+            <div className="bg-slate-100 font-sans min-h-screen lg:h-screen lg:overflow-hidden p-2 lg:p-4">
+                <div className="bg-white w-full max-w-4xl mx-auto rounded-2xl shadow-2xl lg:max-w-6xl lg:h-full lg:flex lg:overflow-hidden">
+                    <StoryViewer book={selectedBook} onExit={handleExitBook} />
+                </div>
+            </div>
+        );
+    }
     return (
         <div className="bg-slate-100 font-sans min-h-screen flex items-center justify-center p-4">
             <div className="bg-white w-full max-w-4xl rounded-2xl shadow-2xl overflow-hidden transform transition-all duration-500 ease-in-out">
-                {selectedBook ? (
-                    <StoryViewer book={selectedBook} onExit={handleExitBook} />
-                ) : (
-                    <BookSelection books={library.books} onSelectBook={handleSelectBook} />
-                )}
+                <BookSelection books={library.books} onSelectBook={handleSelectBook} />
             </div>
         </div>
     );
