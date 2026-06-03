@@ -38,14 +38,19 @@ function imgPart(p) {
   return { inlineData: { mimeType, data: fs.readFileSync(p).toString('base64') } };
 }
 
-async function generate({ prompt, refs = [], out, refDir = REFS, outDir = REFS }) {
+// Default to 1:1 square output — mobile-friendly, plays well with the
+// responsive layout, and avoids the portrait-then-crop tax. Override per-job
+// with aspectRatio: null (or any other Gemini-supported value) when needed.
+async function generate({ prompt, refs = [], out, refDir = REFS, outDir = REFS, aspectRatio = '1:1' }) {
   const parts = refs.map(r => imgPart(path.join(refDir, r)));
   parts.push({ text: prompt });
   const url = `https://generativelanguage.googleapis.com/v1beta/models/${MODEL}:generateContent?key=${API_KEY}`;
+  const generationConfig = { responseModalities: ['IMAGE'] };
+  if (aspectRatio) generationConfig.imageConfig = { aspectRatio };
   const resp = await fetch(url, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ contents: [{ parts }], generationConfig: { responseModalities: ['IMAGE'] } }),
+    body: JSON.stringify({ contents: [{ parts }], generationConfig }),
   });
   if (!resp.ok) throw new Error(`HTTP ${resp.status}: ${(await resp.text()).slice(0, 300)}`);
   const data = await resp.json();
@@ -190,10 +195,67 @@ const SCENES = {
   },
 };
 
+// One-off regeneration table: scenes that need to be redone at NATIVE 1:1
+// aspect ratio (Gemini-side) rather than generated portrait then cropped.
+// Each prompt is composed for a square frame.
+const REGEN = {
+  // --- Book 10 ---
+  'b10-5A': {
+    refDir: THUMBS, outDir: BOOK10, out: '5A.png', aspectRatio: '1:1',
+    refs: ['ivy.png', 'oliver.png', 'captain-grumblebeard.png', 'complaint-kingdom.png'],
+    prompt: `SQUARE composition (1:1), inside a treasure room of the Complaint Kingdom (per the attached complaint-kingdom reference — gray stone walls behind, open treasure chests around the floor). SINGLE PANEL (no split, no top/bottom division). Center stage: OLIVER (bright emerald-green child dragon, orange round patches, orange heart chest patch, two small rounded dragon horns, small wings, dragon tail, same size as Ivy) standing slightly right of center, holding up in his small claws a RUBY that is BLAZING brilliant warm red light, casting a warm red glow on his face. Just to the left of him, IVY (white child unicorn, four legs, purple mane, feathered wings, star birthmark, single pearlescent unicorn horn, horse muzzle, NO human hands, four hooves) leans in close with an expression softening from forced politeness to genuine warmth. A floating speech-arc rises near Ivy in three stages: a small dim "Hmph…" at the far left, a medium "That's… pretty" in the middle, and a bright golden "I'm GLAD you found a nice one!" rising toward Oliver — and the ruby visibly brighter from left to right. CAPTAIN GRUMBLE-BEARD (per the attached captain reference: grizzled adult brown bear pirate, tricorne pirate hat with skull, eye patch, ratty navy captain's coat, salt-and-pepper beard) stands to the right behind them watching with an amused warm half-smile. Other treasures around the room: some glowing brightly, some dull gray. ${KINGDOM} ${CAPTAIN} Exactly THREE characters — Captain, Ivy, Oliver — no duplicates, no humans, no split panels, no diamond. Square framing with the trio nicely centered. Soft watercolor.` + SCENE_STYLE,
+  },
+
+  // --- Book 9 (Rhythm Tree - redwood) ---
+  'b9-0-intro': {
+    refDir: THUMBS, outDir: BOOK9, out: '0-intro.png', aspectRatio: '1:1',
+    refs: ['ivy.png', 'oliver.png', 'mom.png', 'rhythm-tree.png'],
+    prompt: `SQUARE composition (1:1), cozy forest cottage backyard, warm late-afternoon golden light. The RHYTHM TREE (an ancient towering coastal REDWOOD per the attached tree reference — reddish-brown furrowed bark, feathery green needle layers, trunk softly glowing warm gold through cracks) is centered in the frame BUT we see only the lower half of it — the tree's wide base + lower needle layers fill the upper portion of the square so the tree dominates the upper-middle while its very top extends out of frame; this keeps a sense of the tree being grand without losing the bottom. Among the visible lower needle layers: four floating colored note-orbs (3 warm golden, 2 silver, 1 sparkly purple, 1 orange flame-shaped). On the lawn in the FOREGROUND lower portion: IVY (white child unicorn, four legs, purple mane, feathered wings, star birthmark, single pearlescent horn, horse muzzle/hooves) standing alert and excited. OLIVER (green child dragon, orange patches, orange heart chest patch, two small rounded dragon horns, same size as Ivy, NOT a baby) mid bouncy dance. On the cottage porch in the background, MOM (golden HONEY adult unicorn, lavender mane, gold heart necklace, soft shawl, four-legged horse stance) standing small in frame. Exactly THREE characters appear — Ivy, Oliver, Mom — no Hazel, no Dad, no duplicates, no humans. Square framing, soft watercolor.` + SCENE_STYLE,
+  },
+  'b9-2A': {
+    refDir: THUMBS, outDir: BOOK9, out: '2A.png', aspectRatio: '1:1',
+    refs: ['ivy.png', 'oliver.png', 'rhythm-tree.png'],
+    prompt: `SQUARE composition (1:1), Rhythm Tree backyard. The lower portion of the redwood (per the attached tree reference — reddish-brown trunk + feathery green needle layers + soft golden trunk glow) fills the upper third of the square, with the tree's very top out of frame so we focus on the lower trunk and needle layers visible in the middle of the image. Among those visible needle layers, the five note-orbs are in DISARRAY — swirling at odd angles (3 gold floating strangely, 2 silver rushing, 1 purple unusually small, 1 orange flame-shaped popping out of turn, plus 1 brand-new SOFT PINK round orb — gentle, distinct, smaller than the others). The trunk still glows steady and warm — the contrast between the musical chaos and the tree's reassuring glow is the whole image. IVY (white child unicorn, four legs, purple mane, wings, star birthmark, horse muzzle/hooves) stands in the lower-left foreground pressing one ear toward the trunk listening carefully. OLIVER (green child dragon, orange patches, heart chest patch, two small dragon horns, same size as Ivy) stands in the lower-right foreground arms-crossed-frowning at the swirling notes. Exactly TWO characters — Ivy and Oliver — no other characters, no duplicates. Square framing, soft watercolor.` + SCENE_STYLE,
+  },
+  'b9-3A': {
+    refDir: THUMBS, outDir: BOOK9, out: '3A.png', aspectRatio: '1:1',
+    refs: ['oliver.png', 'rhythm-tree.png'],
+    prompt: `SQUARE composition (1:1), close-up at the base of the Rhythm Tree (per the attached tree reference — only the lower portion of the redwood is visible: the wide reddish-brown furrowed trunk with its warm golden inner glow fills the BACKGROUND of the square; needle layers visible only at the very top of the frame). OLIVER (green child dragon, orange patches, orange heart chest patch, two small rounded dragon horns, small wings, dragon tail, same size as Ivy, NOT a baby) sits in the foreground center against the base of the trunk, a small fallen stick beside him. His expression shifts from angry to small and honest — a faint translucent soft "balloon" glows gently in his chest area to suggest the big feeling inside him. Floating gently in the air above Oliver are TWO separate note-orbs hovering close to each other (close, but NOT overlapping into any infinity-symbol or figure-8 or loop or ∞ shape — they remain TWO clearly distinct round-ish orbs): (1) one small ORANGE FLAME-SHAPED orb drawn as a tiny cartoon CANDLE FLAME with a teardrop tip, warm and steady, and (2) one warm GOLDEN ROUND orb (slightly larger). The two orbs glow softly and lean toward each other but stay as TWO SEPARATE shapes — do NOT draw an infinity symbol, do NOT draw a ribbon loop, do NOT draw a figure-eight. Just two distinct floating note-orbs near each other. Only ONE character — Oliver. NO Ivy, NO Mom, NO duplicates, no other characters. Square framing, soft watercolor, quiet and tender.` + SCENE_STYLE,
+  },
+  'b9-3B': {
+    refDir: THUMBS, outDir: BOOK9, out: '3B.png', aspectRatio: '1:1',
+    refs: ['ivy.png', 'rhythm-tree.png'],
+    prompt: `SQUARE composition (1:1), close-up at the base of the Rhythm Tree (per the attached tree reference — only the lower portion of the redwood is visible: wide reddish-brown furrowed trunk with warm golden inner glow fills the BACKGROUND of the square; needle layers visible only at the very top of the frame). IVY (white child unicorn, four legs, purple mane, feathered wings, star birthmark, single pearlescent horn, horse muzzle/hooves) stands in the foreground center, posture a little TOO composed — trying to look perfectly fine. Her sparkly purple note-orb hovers just above her, drawn UNUSUALLY TINY AND DIM. In the visible needle layers above her, the tree plays the same purple note back FULL and BIG and BRIGHT — a clear visual contrast between her dim note and the tree's bright version. All five note-orbs visible somewhere in the visible canopy area (3 gold, 2 silver, the 1 big bright purple, 1 orange flame-shaped, 1 tiny soft pink). Ivy's composed expression beginning to crack, lip wobbling, a single honest tear forming. Only ONE character — Ivy. NO Oliver, no duplicates, no other characters. Square framing, soft watercolor.` + SCENE_STYLE,
+  },
+  'b9-4': {
+    refDir: THUMBS, outDir: BOOK9, out: '4.png', aspectRatio: '1:1',
+    refs: ['ivy.png', 'oliver.png', 'rhythm-tree.png'],
+    prompt: `SQUARE composition (1:1), dusk in the cottage backyard, sky a soft pink-and-gold gradient. The base of the Rhythm Tree (per the attached tree reference — reddish-brown furrowed trunk, warm golden glow, needle layers at top) fills the upper half of the square, providing a warm glowing background. The bottom half is the lawn. IVY (white child unicorn, four legs, purple mane, wings, star birthmark, horse muzzle/hooves) and OLIVER (green child dragon, orange patches, orange heart chest patch, two small dragon horns, same size as Ivy, NOT a baby) sit side by side in the foreground at the base of the tree, leaning gently into each other, expressions tired-honest, sharing a tiny watery shared smile. Above them in the canopy area at the top of the frame, all five note-orbs drift gently (3 gold, 2 silver, 1 sparkly purple, 1 orange flame-shaped, 1 soft pink). In the background to the side, a small cottage window glows warm yellow (NO figures visible inside, just the warm glow). Exactly TWO characters — Ivy and Oliver — no duplicates, no other characters. Square framing, tender twilight mood, soft watercolor.` + SCENE_STYLE,
+  },
+
+  // --- Book 8 (Little Light) ---
+  'b8-cover': {
+    refDir: THUMBS, outDir: BOOK8, out: '0-cover.png', aspectRatio: '1:1',
+    refs: ['ivy.png', 'oliver.png', 'baby-sister.png', 'mom.png', 'dad.png'],
+    prompt: `SQUARE composition (1:1), BOOK COVER. Across the TOP of the image, the title in warm rounded hand-lettered glowing storybook letters: "The New Little Light". The WHOLE family centered below the title, grouped close together: MOM (golden HONEY adult unicorn, lavender mane, gold heart necklace, four-legged horse stance, NOT humanoid) and DAD (big soft-bodied bronzed-green adult dragon, NOT muscular, small dragon horns) standing behind, with IVY (white child unicorn, four legs, purple mane, feathered wings, star birthmark, single pearlescent horn) and OLIVER (bright emerald-green child dragon, orange round patches, orange heart chest patch, two small dragon horns, same size as Ivy) in front. The tiny PINK baby unicorn HAZEL (rose mane, gold-glowing horn nub) cradled in Mom's foreleg/under her chin so she is clearly visible in the very middle. The whole family glowing softly together, cozy and magical. Warm sunset background. At the bottom in small lettering: "The Problem Solver Series". Exactly FIVE family members — Mom, Dad, Hazel, Ivy, Oliver — only the named family, no Captain, no duplicates, no humans. Square framing.` + SCENE_STYLE,
+  },
+  'b8-1': {
+    refDir: THUMBS, outDir: BOOK8, out: '1.png', aspectRatio: '1:1',
+    refs: ['mom-pregnant.png', 'dad.png', 'ivy.png', 'oliver.png'],
+    prompt: `SQUARE composition (1:1), homey cottage living room, warm afternoon light. ALL CHARACTERS must be drawn exactly on-model per the attached character references — same colors, same markings, same proportions, same softness. STYLE: soft watercolor + colored-pencil children's-book illustration matching the other scenes in this series — warm inviting palette, gentle linework, characters pop with their canonical bright colors. MOM (golden HONEY adult unicorn — clearly warm gold, NOT pale white or cream — lavender mane, gold heart necklace, soft shawl over her back). CRITICAL MOM POSE: she is napping HORIZONTALLY on the couch on her side like a sleeping HORSE, body stretched out lengthwise along the couch, her back/spine running parallel to the back of the couch. She is NOT sitting upright. She is NOT reclining like a person in a recliner. Her head rests on a couch pillow at one end with her muzzle on the cushion (eyes closed peacefully), her neck and shoulders lying along the couch, her round pregnant belly visible in profile, and all four of her legs folded UNDER her body. A cozy patchwork blanket is draped lengthwise OVER her body (over her back, hips, belly, and folded legs), tucked snugly so that ONLY her head, neck, and the silhouette of her round pregnant belly under the blanket are visible above the covers — NO hooves and NO front legs are sticking up above the blanket near her face. She has HOOVES (not hands or arms), one normal unicorn head, one pair of ears, single pearlescent unicorn horn. Her front hooves stay hidden under the blanket; she is not gesturing with them. In the kitchen visible at the side of the frame, DAD (tall friendly bronzed-green adult dragon, NOT muscular, soft-bodied, gentle rounded tummy, small dragon horns) stirring a pot. IVY (white child unicorn — pure clean WHITE coat, lavender-purple mane, feathered wings, star birthmark on her shoulder, single pearlescent horn) sitting patiently on the rug, hooves tucked under her. OLIVER — a child dragon with BRIGHT EMERALD-GREEN scales (clearly vivid emerald, NOT olive, NOT muted army-green, NOT dark — match the bright green of the attached oliver.png reference exactly), warm YELLOW belly, round ORANGE PATCHES on his sides and an ORANGE HEART PATCH centered on his chest, TWO small rounded dragon horns on top of his head, small wings, dragon tail, same size as Ivy, NOT a baby. Oliver is lying on his tummy on the rug, chin propped on his claws, looking bored and a bit anxious. Cozy waiting mood. Exactly FOUR characters — Mom, Dad, Ivy, Oliver — NO Hazel anywhere in the scene (she has NOT been born yet; she is still inside Mom's pregnant belly, NOT a separate visible character), no Grandma, no duplicates, no humans. Square framing, soft watercolor, consistent style with the rest of the series.` + SCENE_STYLE,
+  },
+  'b8-4': {
+    refDir: THUMBS, outDir: BOOK8, out: '4.png', aspectRatio: '1:1',
+    refs: ['mom.png', 'dad.png', 'baby-sister.png', 'ivy.png', 'oliver.png'],
+    prompt: `SQUARE composition (1:1), warm cottage entryway, the family just home from the hospital. DAD (tall soft-bodied friendly bronzed-green adult dragon, NOT muscular, gentle rounded tummy, small dragon horns) gently cradling in his arms a tiny swaddled newborn PINK baby unicorn HAZEL (rose mane, tiny gold-glowing horn nub) with little golden sparkles. MOM — a four-legged unicorn with horse muzzle and four hooves (NOT humanoid, NO hands, NO arms — her front legs end in HOOVES; exactly four legs, no extra limbs) — stands beside Dad with ALL FOUR of her hooves planted on the floor. She wears a soft shawl draped over her back. Golden HONEY coat, lavender mane, gold heart necklace, no longer pregnant. On a small side table, two little wrapped gift boxes (sparkly star for Ivy, shiny medal for Oliver). IVY (white child unicorn, four legs, purple mane, wings, star birthmark, single horn) and OLIVER (bright emerald-green child dragon, orange patches, orange heart chest patch, two small dragon horns, same size as Ivy, NOT a baby) creeping close in wonder; OLIVER pinching his nose as the baby begins to cry. Exactly FIVE characters — Mom, Dad, Hazel, Ivy, Oliver — no duplicates, no humans, no Grandma. Square framing, joyful and tender, soft watercolor.` + SCENE_STYLE,
+  },
+};
+
 async function main() {
   const args = process.argv.slice(2);
   let table = JOBS, argNames = args;
   if (args[0] === 'scenes') { table = SCENES; argNames = args.slice(1); }
+  else if (args[0] === 'regen') { table = REGEN; argNames = args.slice(1); }
   const names = argNames.length ? argNames : Object.keys(table);
   for (const name of names) {
     const job = table[name];
