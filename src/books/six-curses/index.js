@@ -138,6 +138,7 @@ const chapter1 = {
   id: 'ch1',
   label: 'Chapter 1',
   title: 'The Ward of Always More',
+  sin: 'Gluttony',
   fullImage: `${IMG}/ch1-peach-tree.png`,
   spots: [`${IMG}/ch1-feast-tables.png`, `${IMG}/ch1-theo-freed.png`],
   text: `The path from the courtyard sloped gently downward, and the smell reached them before anything else did.
@@ -469,6 +470,7 @@ const chapter2 = {
   id: 'ch2',
   label: 'Chapter 2',
   title: 'The Ward of Not Fair',
+  sin: 'Envy',
   fullImage: `${IMG}/ch2-comparing-garden.png`,
   spots: [`${IMG}/ch2-beccas-pile.png`, `${IMG}/ch2-ivys-pencils.png`],
   text: `The courtyard shimmered back into view around them.
@@ -772,19 +774,19 @@ The book was already opening in Ivy's hands.`,
 // the table of contents shows the full arc; the reader renders a gentle
 // "coming soon" page for any section whose text is empty.
 const chapter3 = {
-  id: 'ch3', label: 'Chapter 3', title: 'The Ward of Lazy Bum',
+  id: 'ch3', label: 'Chapter 3', title: 'The Ward of Lazy Bum', sin: 'Sloth',
   fullImage: `${IMG}/ch3-full.png`, spots: [], text: '',
 };
 const chapter4 = {
-  id: 'ch4', label: 'Chapter 4', title: 'The Ward of Never Share',
+  id: 'ch4', label: 'Chapter 4', title: 'The Ward of Never Share', sin: 'Greed',
   fullImage: `${IMG}/ch4-full.png`, spots: [], text: '',
 };
 const chapter5 = {
-  id: 'ch5', label: 'Chapter 5', title: 'The Ward of Always Right',
+  id: 'ch5', label: 'Chapter 5', title: 'The Ward of Always Right', sin: 'Pride',
   fullImage: `${IMG}/ch5-full.png`, spots: [], text: '',
 };
 const chapter6 = {
-  id: 'ch6', label: 'Chapter 6', title: 'The Ward of Screaming Tantrum',
+  id: 'ch6', label: 'Chapter 6', title: 'The Ward of Screaming Tantrum', sin: 'Wrath',
   fullImage: `${IMG}/ch6-full.png`, spots: [], text: '',
 };
 const epilogue = {

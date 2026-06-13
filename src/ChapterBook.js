@@ -27,6 +27,10 @@ const TYPE = {
 };
 // Antique display face for the book title (loaded in public/index.html).
 const TITLE_FONT = '"Cinzel Decorative", Georgia, serif';
+
+// The ward subject without its "The Ward of " prefix, lowercased — e.g.
+// "The Ward of Always More" -> "always more".
+const wardSubject = (title) => (title || '').replace(/^the ward of\s+/i, '').toLowerCase();
 const SPOT_WIDTH_FRAC = 0.78;  // spot image width as a fraction of the text column
 const SPOT_CAPTION_GAP = 18;   // vertical space a spot reserves below itself
 // Vertical space the chrome steals from the text column, so pagination doesn't
@@ -471,21 +475,38 @@ export default function ChapterBook({ book, onExit }) {
             </div>
           </Page>
         );
-      case 'opener':
+      case 'opener': {
+        const sec = page.section;
         return (
           <Page key={key} style={{ padding: 0, overflow: 'hidden', display: 'flex', flexDirection: 'column' }}>
-            <div style={{ flex: 1, position: 'relative', background: '#efe6d4' }}>
-              <img src={page.section.fullImage} alt={page.section.title}
+            {/* Classic chapter heading at the TOP, two lines, image below. */}
+            <div style={{ padding: '22px 22px 18px', textAlign: 'center', fontFamily: TYPE.fontFamily, background: PAPER }}>
+              <div style={{ fontFamily: TITLE_FONT, fontSize: Math.max(21, dims.w * 0.066), fontWeight: 700, color: '#6b4a28', lineHeight: 1.1, letterSpacing: 0.5 }}>
+                {sec.label}
+              </div>
+              <div style={{ marginTop: 8, fontSize: Math.max(13, dims.w * 0.034), color: '#3a2f25', lineHeight: 1.3 }}>
+                {sec.sin ? (
+                  <>
+                    <span style={{ textTransform: 'uppercase', letterSpacing: 1, fontWeight: 700, color: '#8a5a2b' }}>{sec.sin}</span>
+                    <span style={{ color: '#b08a52' }}>{'  —  '}</span>
+                    <span style={{ fontStyle: 'italic' }}>The curse of {wardSubject(sec.title)}</span>
+                  </>
+                ) : (
+                  <span style={{ fontStyle: 'italic' }}>{sec.title}</span>
+                )}
+              </div>
+            </div>
+            <div style={{ flex: 1, minHeight: 0, position: 'relative', background: '#efe6d4' }}>
+              <img src={sec.fullImage} alt={sec.title}
                 style={{ width: '100%', height: '100%', objectFit: 'cover' }}
                 onError={(e) => { e.target.style.opacity = 0.15; }} />
             </div>
-            <div style={{ padding: '16px 24px 26px', textAlign: 'center', fontFamily: TYPE.fontFamily, background: PAPER }}>
-              <div style={{ letterSpacing: 2, textTransform: 'uppercase', fontSize: 12, color: '#a07c4a' }}>{page.section.label}</div>
-              <div style={{ fontSize: Math.max(18, dims.w * 0.052), fontWeight: 700, color: '#3a2f25', marginTop: 4 }}>{page.section.title}</div>
-            </div>
+            {/* thin paper strip so the page number sits on cream, not the art */}
+            <div style={{ height: 26, background: PAPER }} />
             <PageNumber n={page.folio} />
           </Page>
         );
+      }
       case 'text': {
         // Highlight words by their global index within the section, but only
         // while THIS section's audio is playing.
