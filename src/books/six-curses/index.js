@@ -770,13 +770,345 @@ Four paths remained dark.
 The book was already opening in Ivy's hands.`,
 };
 
-// Chapters 3–6 + epilogue are outlined but not yet written. They're included so
-// the table of contents shows the full arc; the reader renders a gentle
-// "coming soon" page for any section whose text is empty.
 const chapter3 = {
-  id: 'ch3', label: 'Chapter 3', title: 'The Ward of Lazy Bum', sin: 'Sloth',
-  fullImage: `${IMG}/ch3-full.png`, spots: [], text: '',
+  id: 'ch3',
+  label: 'Chapter 3',
+  title: 'The Ward of Lazy Bum',
+  sin: 'Sloth',
+  fullImage: `${IMG}/ch3-swamp.png`,
+  spots: [`${IMG}/ch3-bedroom.png`, `${IMG}/ch3-maverick-freed.png`],
+  text: `The courtyard shimmered back around them. Two symbols glowed steadily on the book's cover. The two fountains trickled quietly beside each other. The sky had settled on something — not quite blue, not quite gold, but warmer than before.
+
+The book fell open in Ivy's hands.
+
+This curse is called Envy — and its younger sister is Jealousy.
+
+Envy is wanting what someone else has. Jealousy is feeling like what they have somehow makes yours less. Together they whisper the same thing: not fair, not fair, not fair. They count everything. They measure everything. And the more you listen to them, the less you can taste your own cake or feel how soft your own stuffies are.
+
+You broke this curse, brave Ivy, when you stopped counting and started seeing. When you opened your presents and let them be yours — not compared, not measured. Just yours. When you found the treasure that was already there.
+
+Remember this. Envy and Jealousy are patient. They will find you again — every time you start counting instead of seeing, every time not fair feels louder than thank you. But now you know their names. And you know what breaks them.
+
+Stop counting. Start seeing.
+
+The book closed. Ivy held it quietly, thinking about the purple pencils. About Becca's face when she read the note.
+
+Oliver was looking at the third path. Something about it was making his eyes go soft and heavy in a very specific way.
+
+"Oliver," Ivy said.
+
+"Mmm?"
+
+"Don't get any ideas."
+
+"I don't have any ideas," he said. "I'm just looking."
+
+Ivy took his arm and they stepped onto the path together.
+
+It wasn't a garden this time.
+
+It was their bedroom.
+
+Not exactly — not precisely — but close enough to make Ivy's breath catch. The same two beds, one with purple bedding, one with green. The same bookshelf, slightly too full. The same window with the same light coming through it. The same general atmosphere of things that had been meant to be put away and hadn't quite got there yet.
+
+[[SPOT 0]]
+
+Oliver's bed looked extraordinarily comfortable.
+
+"Oh," said Oliver.
+
+"Don't," said Ivy.
+
+"I'm just—"
+
+"Don't."
+
+Oliver didn't. For approximately four seconds. Then he crossed the room in six steps and fell backwards onto his bed with an expression of profound relief.
+
+"I'm just resting for a second," he said to the ceiling.
+
+"We just got here."
+
+"I know. I'm very tired though." He reached sideways without looking and picked up a snack from the bedside table — there was a small pile of them, just sitting there — and ate it. Then he put the wrapper down on the bed beside him. Then he looked at the ceiling some more.
+
+"Oliver," Ivy said, in the voice she used when she was keeping herself very calm. "Can we focus please. What's our job right now?"
+
+"Mmm." He reached for another snack.
+
+"Oliver."
+
+"I'm focusing. I'm focusing while resting." He finished the snack and dropped the wrapper on the floor. He looked at his empty hands. "I want water."
+
+"There's a cup on the shelf."
+
+"Can you get it?"
+
+"No."
+
+"It's very far."
+
+The shelf was four steps away. Ivy looked at him. He looked at the ceiling.
+
+"It's too hard," he said.
+
+"Getting a cup of water is not too hard, Oliver."
+
+"It's a lot of steps though."
+
+Ivy looked around the room. Something was beginning to feel off — the same prickling unease she'd felt in the other gardens, that sense of something wrong underneath the pleasant surface. The room was messy. Not their normal messy. Messier. Like things had been accumulating for a very long time without anyone doing anything about them.
+
+"Oliver," she said. "Something is wrong here. I need you to get up and help me look around."
+
+"In a minute."
+
+"Now, Oliver."
+
+"It's too much work," he said. Not lazily — genuinely. Like the words were just a fact about the world. "It's too hard. I'll do it in a minute."
+
+He reached for another snack.
+
+And Ivy noticed, with a cold feeling in her stomach, that the edges of his green scales had gone slightly — dull. Slightly grey-green. She told herself it was the light.
+
+"Oliver." She kept her voice steady. "Our job right now is to find the cursed kid and break the curse. That's why we're here. Can you please get up and help me."
+
+"You're doing really well though," Oliver said encouragingly from the bed. "You don't need me."
+
+"I do need you," Ivy said. She put down what she was holding and looked at him properly. "Just because I can do something doesn't mean I want to do it alone. Or that it's fair that I have to." A pause. "I want to do it together."
+
+Oliver looked at the ceiling.
+
+Then at Ivy.
+
+Something in his face shifted — not dramatic, just quiet. Like a small thing landing.
+
+"Okay," he said. And didn't get up yet. But something had changed.
+
+"Oliver. Please. Get. Up."
+
+"In a minute," he said. "I'll do it in a minute. I'm just — I'm tired. It's been a long day. We've already broken two curses. That's a lot. I think we deserve a rest."
+
+Ivy looked at him on the bed. She looked at the wrapper on the floor. She looked at the cup on the shelf, still sitting there. She looked at the room — at the mess accumulating, at the things waiting to be put away, at the homework on the desk with nothing done on it.
+
+She picked up the wrapper.
+
+She got the cup of water.
+
+She started putting things away.
+
+She told herself she was just tidying while she looked for the cursed kid. She told herself she wasn't doing the thing she always did. She told herself Oliver would get up in a minute like he said.
+
+Oliver did not get up in a minute.
+
+He got more comfortable. His scales were definitely greener — a darker, boggier green. His outline had gone slightly soft. He reached for another snack and his arm moved slowly, slowly, slower than arms should move.
+
+"Oliver," Ivy said. More urgent now. "Something is actually wrong. Look at your arm."
+
+"Mmm," said Oliver.
+
+The light in the room had changed. The warm familiar window-light had gone grey-green. The floor felt softer underfoot. Something smelled like mud and old leaves.
+
+"Oliver." Ivy dropped what she was holding. "Oliver, I can't do this by myself. Something is really wrong. I need you to get up RIGHT NOW."
+
+Oliver turned his head slowly on the pillow. His eyes were very heavy. "Just... five more minutes," he said. "I'll help in five more minutes. You're doing great though."
+
+The floor buckled softly.
+
+The bookshelf sprouted moss.
+
+The bedding turned grey and damp and the window went dark and the room — their room, their familiar safe room — dissolved into something else entirely.
+
+A swamp.
+
+Ivy stood in the middle of it, completely solid, completely herself, looking around.
+
+Bog water crept across the floor. Thick grey-green fog rolled in from the corners. The beds had become mounds of moss. The bookshelf was barely visible under the vines. Everything smelled like deep still water and things that had stopped moving a long time ago.
+
+Oliver was in the corner.
+
+He was a swamp creature.
+
+Not completely — not yet — but most of the way there. Draped in moss, slow, grey-green from snout to tail, his bright amber eyes barely visible through the murk. He was still holding a snack. He was still, against all odds, eating it.
+
+And on the other side of the swamp, half hidden behind a rotting log, hunched something enormous and still and draped in so much moss it was almost invisible. Two dark eyes peered out from the murk. A small panda hand, visible through the moss, clutched a piece of paper — a drawing, half-finished, held close.
+
+Oliver saw it at the exact moment it saw him.
+
+"MONSTER!!!" Oliver screamed.
+
+"MONSTER!!!" screamed Maverick.
+
+Ivy walked calmly between them.
+
+"Hi," she said to Maverick. "What's your name? What happened to you?"
+
+Maverick stared at her.
+
+He had the expression of someone who had been alone in a swamp for a very long time and had forgotten that other people existed and was now having considerable difficulty processing the reality of a small white unicorn standing in his bog asking him questions in a normal tone of voice.
+
+"I—" he started.
+
+"Take your time," Ivy said.
+
+"She's very calm," Oliver said from his corner, in a slightly awed voice. He was looking at his own mossy hands now with dawning horror.
+
+Maverick looked from Ivy to Oliver. His eyes settled on Oliver — on the moss, the slow movement, the bog water dripping from his wings.
+
+"You look like me," he said. Very quietly.
+
+"I'm not—" Oliver started. Then stopped. Looked at himself properly. "Oh," he said. "Oh no."
+
+"Yeah," said Maverick.
+
+They regarded each other across the swamp in a silence of mutual recognition.
+
+Ivy sat down on a mossy log and waited.
+
+"What happened to you?" she asked Maverick again. Gently.
+
+Maverick was quiet for a long moment. When he spoke his voice was slow and low, like something that had forgotten how to move at regular speed.
+
+"It started because the bed was warm," he said. "That's all. The bed was warm and getting up was cold and Mama would make breakfast anyway. So I stayed."
+
+Oliver said nothing. He was listening.
+
+"Then it was the homework. It was hard and Papa would help if I waited long enough. So I waited." A pause. "And then it was everything. Cleaning my room. Getting my own water. Getting dressed. All of it — too hard, too much, someone else would do it." The voice dropped lower. "And they did. They always did. So I just... stopped trying."
+
+"What happened then?" Ivy asked.
+
+"One day nobody came." Maverick looked at his mossy hands. "And I didn't know how to start anymore. I'd forgotten. I'd waited so long for someone else that I forgot I could do things myself." A long silence. "And by then everything felt impossible. Even the small things. Even getting up." He paused. "The swamp was already comfortable. And I didn't know how to leave it."
+
+He looked at the half-finished drawing in his hand.
+
+"I was drawing my family," he said. "Before. I never finished it."
+
+Oliver had been getting slowly, quietly, to his feet.
+
+It wasn't dramatic. He didn't announce it. He just — stood up. Moss falling from his scales, his outline sharpening slightly, his amber eyes clearing.
+
+"I'll help you finish it," he said.
+
+Maverick looked at him. "It's hard."
+
+"It's a drawing," Oliver said. "I'll help." He looked at Ivy. "Can I use your pencils?"
+
+Ivy looked at her purple pencils. She'd used exactly none of them so far. She held them out without a word.
+
+Oliver took them and crossed the swamp to Maverick. He sat down beside him in the bog water without hesitating, not minding the wet, and held out his hand for the drawing.
+
+Maverick looked at him for a long moment.
+
+Then he handed it over.
+
+Oliver smoothed the drawing out on a flat piece of log and looked at it seriously. A panda family. Most of them finished. Two outlines barely started — a little brother and Maverick himself.
+
+"Who's this one?" Oliver asked, pointing to the smaller outline.
+
+"My little brother."
+
+"What does he look like?"
+
+And Maverick described him. Slowly at first, then more steadily — the round ears, the black patches, the way he always had something in his hands, the gap in his teeth. Oliver drew, tongue between his teeth, asking questions as he went. Like this? Bigger? What about the ears? Every few strokes he'd hold it up and Maverick would lean forward and look and say a little more like this and Oliver would adjust with great seriousness.
+
+Ivy watched from her log.
+
+She watched Oliver — who had said it's too hard twenty minutes ago, who had lain on a mossy bed eating snacks while she put things away — bent over a drawing in a swamp, completely focused, asking the exact right questions.
+
+She didn't say anything. She just watched.
+
+When the little brother was done Oliver moved to the last outline.
+
+"This is you?" he said.
+
+"Yes."
+
+"What do you look like?"
+
+Maverick was quiet for a moment. "I've forgotten a bit," he said.
+
+"That's okay," Oliver said. "I'll draw a panda and you tell me what's wrong."
+
+He drew. Round ears, white face, black patches, small round nose, sleepy eyes. He held it up.
+
+Maverick looked at it for a long time.
+
+"The eyes are right," he said quietly. "I do have sleepy eyes."
+
+"Good sleepy or sad sleepy?" Oliver asked.
+
+Maverick thought about it. Really thought about it.
+
+"I think they used to be good sleepy," he said. "I think they could be again."
+
+Oliver nodded and added the very smallest suggestion of a smile to the face. He held the finished drawing up — the whole family, every panda present, complete.
+
+"That's a good drawing," he said. "You started it. We finished it. That counts."
+
+Something changed.
+
+The bog water began to recede. The fog thinned. The moss fell away in slow quiet patches and underneath — a small panda. Round black ears. White face. Black patches around sleepy eyes that were, just slightly, good sleepy rather than sad sleepy.
+
+He sat up.
+
+He looked at the drawing.
+
+He looked at it for a long time.
+
+[[SPOT 1]]
+
+"I did that," he said softly. "We did that." Something moved through his face — surprise first, then something warmer. "That feels really good. I forgot it felt like that."
+
+"What does it feel like?" Oliver asked.
+
+Maverick thought about it carefully.
+
+"Like I'm real," he said. "Like I'm actually here."
+
+He looked at Oliver — really looked, taking in the fading moss, the clearing scales, the pencils still in his hand.
+
+"You got up," he said. "You were almost all the way in the swamp and you got up and did the thing."
+
+Oliver looked at his hands. The moss was almost gone now. His scales were bright green again, his outline sharp, his amber eyes clear.
+
+"It wasn't that hard," he said. Then paused. "I mean. It kind of was. But." He looked at the drawing. "It was worth it."
+
+Maverick sat up very straight.
+
+"My name is Maverick," he said. Clear and certain and wide awake. "My name is Maverick and I have a lot of things to finish."
+
+"Same," said Oliver.
+
+Above them the third symbol blazed gold and held.
+
+Ivy held out her hand. Maverick looked at the drawing one more time — the whole family, complete, his sleepy-eyed face in the corner — and then he took it. And between one breath and the next he was gone, back to the warm bed he'd actually earned, back to the homework and the breakfast and the family waiting — and the swamp receded entirely, the room reassembling itself around them, familiar and messy and completely real.
+
+Oliver stood in the middle of it.
+
+He picked up the snack wrapper from the floor.
+
+He put it in the bin.
+
+He got himself a glass of water from the shelf.
+
+Ivy watched all of this without saying a word.
+
+"Don't," Oliver said.
+
+"I didn't say anything."
+
+"You were thinking something."
+
+"I was thinking it's nice to have my pencils back," Ivy said.
+
+Oliver drank his water. It tasted, he thought, much better than water usually did. Maybe because he'd got it himself.
+
+The courtyard settled back around them. Three symbols glowing now. Three fountains trickling. The sky warm gold and certain.
+
+Three paths remained.
+
+The book was already opening.`,
 };
+// Chapters 4–6 + epilogue are outlined but not yet written; the reader shows a
+// gentle "coming soon" page for any section whose text is empty.
 const chapter4 = {
   id: 'ch4', label: 'Chapter 4', title: 'The Ward of Never Share', sin: 'Greed',
   fullImage: `${IMG}/ch4-full.png`, spots: [], text: '',

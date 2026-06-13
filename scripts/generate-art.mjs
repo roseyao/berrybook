@@ -325,6 +325,23 @@ const SCENES11 = {
     refs: [],
     prompt: `Children's-book watercolor, soft brushstrokes, warm light. Square STILL-LIFE on a wooden surface (NO characters, no hoof, no hand). TWELVE coloured PENCILS fanned out in a neat row — and they must be TWELVE clearly DIFFERENT shades of PURPLE, a visible gradient from pale lilac and lavender through orchid and violet to deep aubergine/plum, every pencil a distinctly different purple (NOT all the same purple). Beside the fanned pencils, a small closed NOTEBOOK with a tiny unicorn pressed into its cover. Tender and quiet, the colour rich and fully returned, softly glowing. No characters at all.`,
   },
+
+  // ---- Chapter 3: The Ward of Lazy Bum (Sloth / Swamp creature / Maverick) ----
+  'ch3-swamp': {
+    refDir: THUMBS, outDir: BOOK11, out: 'ch3-swamp.png', aspectRatio: '3:4',
+    refs: ['ivy.png', 'oliver.png'],
+    prompt: `Vertical 3:4 portrait, dusty lavender-and-grey palette, comic but slightly eerie (not frightening). A child's BEDROOM that has transformed into a SWAMP — the two beds are now mossy and bog-like, the floor soft and wet, thick grey-green fog everywhere, a bookshelf barely visible under hanging vines. OLIVER (the emerald-green dragon) is HALF-transformed into a swamp creature — wet mossy patches creeping over his green scales, dripping, grey-green spreading up his arms — staring down at his own clawed hands in horror. Hunched in the far corner: an ENORMOUS swamp creature, which is MAVERICK, a PANDA, almost completely buried under thick moss — only two dark eyes and one small black-and-white panda paw show through. IVY (the white unicorn) stands calmly BETWEEN the two of them, NOT transformed, fully herself, looking at Maverick with quiet gentle attention. NO HUMANS. Ivy clearly taller than Oliver. Comic but slightly eerie.` + STYLE11,
+  },
+  'ch3-bedroom': {
+    refDir: THUMBS, outDir: BOOK11, out: 'ch3-bedroom.png', aspectRatio: '1:1',
+    refs: [],
+    prompt: `Children's-book watercolor, soft brushstrokes, warm cozy tones. Square view of a cozy, slightly messy child's BEDROOM with TWO beds — one with PURPLE bedding, one with GREEN bedding. A few snack wrappers on the green-bed side, a cup sitting out of reach on a shelf, a small pile of things waiting to be put away. Comfortable, familiar and lived-in — before any swamp takes over. NO characters. Warm afternoon light through the window.`,
+  },
+  'ch3-maverick-freed': {
+    refDir: THUMBS, outDir: BOOK11, out: 'ch3-maverick-freed.png', aspectRatio: '1:1',
+    refs: [],
+    prompt: `Children's-book watercolor, soft brushstrokes, warm colours returning. Square. A small PANDA (Maverick) — round black ears, white face, black eye-patches around gentle SLEEPY eyes — sitting up very straight, holding a finished crayon DRAWING of his panda family in both paws, gazing at it with a small proud smile. Warm golden light all around. NO other characters — just the panda and his drawing.`,
+  },
 };
 
 async function main() {
