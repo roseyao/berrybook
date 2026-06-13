@@ -24,6 +24,8 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const REPO = path.resolve(__dirname, '..');
 const PUBLIC_AUDIO = path.join(REPO, 'public/audio');
 const BOOKS_DIR = path.join(REPO, 'src/books');
+// Shared secrets live alongside the games repo (same file generate-art.mjs reads).
+const ENV_FILE = path.resolve(REPO, '../games/.env.local');
 
 // Voice profiles. The "id" comes from ElevenLabs's voice library (the URL
 // segment when you open a voice). "settings" stays per-voice so we can tune
@@ -55,6 +57,12 @@ if (VOICE.id.startsWith('__')) throw new Error(`Voice "${VOICE_NAME}" has no id 
 async function loadApiKey() {
   // 1) Shell env (works for `export ELEVENLABS_API_KEY=... && node ...`).
   if (process.env.ELEVENLABS_API_KEY) return process.env.ELEVENLABS_API_KEY;
+  // 1b) ../games/.env.local (same shared secrets file the art script reads).
+  try {
+    const m = (await fs.readFile(ENV_FILE, 'utf8'))
+      .match(/^\s*ELEVENLABS_API_KEY\s*=\s*"?([^"\n\r]+)"?/mi);
+    if (m) return m[1].trim();
+  } catch { /* file missing — fall through */ }
   // 2) 1Password CLI (user's preferred secret store).
   try {
     const v = execSync(
@@ -104,6 +112,17 @@ async function callElevenLabs(text, apiKey) {
       ends: a.character_end_times_seconds,
     },
   };
+}
+
+// A chapter section's spoken text: prose paragraphs only, dropping [[SPOT n]]
+// marker lines, joined by blank lines. Mirrors spokenTextFromBlocks() in
+// src/readaloud.js so audio + on-screen word indices stay aligned.
+function sectionSpokenText(text) {
+  return (text || '')
+    .split(/\n\s*\n/)
+    .map((p) => p.trim())
+    .filter((p) => p && !/^\[\[SPOT \d+\]\]$/.test(p))
+    .join('\n\n');
 }
 
 async function loadBook(bookDir) {
@@ -174,14 +193,23 @@ async function main() {
       continue;
     }
     console.log(`\n  ${book.id} — ${book.title}`);
-    for (const [sceneId, scene] of Object.entries(book.scenes)) {
+    // Two book shapes: branching picture-books keyed by `scenes`, and chapter
+    // books keyed by `sections`. For chapter books the spoken text is the
+    // section's prose only — [[SPOT n]] markers and the title are not read —
+    // which must match spokenTextFromBlocks() in src/readaloud.js.
+    const units = book.kind === 'chapter'
+      ? (book.sections || [])
+          .filter((s) => (s.text || '').trim())
+          .map((s) => ({ id: s.id, text: sectionSpokenText(s.text) }))
+      : Object.entries(book.scenes).map(([id, scene]) => ({ id, text: scene.text }));
+    for (const unit of units) {
       try {
-        const r = await recordScene({ bookId: book.id, sceneId, text: scene.text, apiKey });
+        const r = await recordScene({ bookId: book.id, sceneId: unit.id, text: unit.text, apiKey });
         if (r.recorded) recorded++; else skipped++;
         // small delay to be polite to the API
         if (r.recorded) await new Promise((r) => setTimeout(r, 250));
       } catch (e) {
-        console.error(`    FAIL  ${sceneId}: ${e.message}`);
+        console.error(`    FAIL  ${unit.id}: ${e.message}`);
       }
     }
   }

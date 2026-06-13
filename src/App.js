@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef, useMemo } from 'react';
 // --- Library: each book lives in src/books/<id>/index.js, validated on import.
 import { books } from './books';
+import ChapterBook from './ChapterBook';
 const library = { books };
 
 
@@ -501,6 +502,11 @@ export default function App() {
     // independently), stacked on smaller screens (image sticks at top while
     // text scrolls underneath).
     if (selectedBook) {
+        // Chapter books use the turn-the-page reader; branching picture-books
+        // use the image/text scene viewer.
+        if (selectedBook.kind === 'chapter') {
+            return <ChapterBook book={selectedBook} onExit={handleExitBook} />;
+        }
         return (
             <div className="bg-slate-100 font-sans min-h-screen lg:h-screen lg:overflow-hidden p-2 lg:p-4">
                 <div className="bg-white w-full max-w-4xl mx-auto rounded-2xl shadow-2xl lg:max-w-6xl lg:h-full lg:flex lg:overflow-hidden">

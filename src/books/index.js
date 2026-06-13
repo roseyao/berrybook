@@ -15,6 +15,7 @@ import closetPortal from './closet-portal';
 import littleLight from './little-light';
 import familyRhythmTree from './family-rhythm-tree';
 import everythingTreasure from './everything-treasure';
+import sixCurses from './six-curses';
 
 export const books = [
   rainbowBerries,
@@ -27,6 +28,7 @@ export const books = [
   littleLight,
   familyRhythmTree,
   everythingTreasure,
+  sixCurses,
 ];
 
 books.forEach(validateBook);
