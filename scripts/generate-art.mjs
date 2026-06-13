@@ -19,16 +19,23 @@ const WORLD_REFS = path.join(REPO, 'content/world/refs');
 const BOOK8 = path.join(REPO, 'public/images/book8');
 const BOOK9 = path.join(REPO, 'public/images/book9');
 const BOOK10 = path.join(REPO, 'public/images/book10');
+const BOOK11 = path.join(REPO, 'public/images/book11');
 const ENV_FILE = path.resolve(REPO, '../games/.env.local');
 const MODEL = 'gemini-2.5-flash-image';
 
 function loadKey() {
+  // Prefer a dedicated image-gen key (image models need billing; the plain
+  // GEMINI_API_KEY is free-tier and returns 429 limit:0 for image models).
+  // Order: GEMINI_IMAGE_KEY env > gemini_image_key in file > GEMINI_API_KEY.
+  if (process.env.GEMINI_IMAGE_KEY) return process.env.GEMINI_IMAGE_KEY;
   if (process.env.GEMINI_API_KEY) return process.env.GEMINI_API_KEY;
-  try {
-    const m = fs.readFileSync(ENV_FILE, 'utf8').match(/^\s*GEMINI_API_KEY\s*=\s*"?([^"\n\r]+)"?/m);
+  let file = '';
+  try { file = fs.readFileSync(ENV_FILE, 'utf8'); } catch { /* ignore */ }
+  for (const name of ['gemini_image_key', 'GEMINI_IMAGE_KEY', 'GEMINI_API_KEY']) {
+    const m = file.match(new RegExp(`^\\s*${name}\\s*=\\s*"?([^"\\n\\r]+)"?`, 'mi'));
     if (m) return m[1].trim();
-  } catch { /* ignore */ }
-  throw new Error('GEMINI_API_KEY not found in env or ' + ENV_FILE);
+  }
+  throw new Error('No Gemini key found. Add gemini_image_key=... to ' + ENV_FILE);
 }
 const API_KEY = loadKey();
 
@@ -251,11 +258,81 @@ const REGEN = {
   },
 };
 
+// ===========================================================================
+// BOOK 11 — "The Six Curses of the Lost Kingdom" (chapter book, kind:'chapter')
+// A darker, more atmospheric world than the Berry Patch picture-books. Reuses
+// the established lead refs (ivy.png white unicorn, oliver.png green dragon,
+// mom.png, dad.png). Full-page openers + the cover are 3:4 portrait (they fill
+// a book PAGE in the turn-the-page reader); spot illustrations are 1:1 square.
+// Run:  node scripts/generate-art.mjs book11 [name ...]
+// ===========================================================================
+const STYLE11 = " Children's-book WATERCOLOR illustration, soft brushstrokes, warm and whimsical but atmospheric and a little mysterious — never scary for young readers. The attached images are CHARACTER REFERENCES — keep each named character exactly on-model (same colors, markings, proportions). IVY is a FOUR-LEGGED white UNICORN: lavender-purple mane and tail, violet eyes, pearlescent spiral horn, soft feathered wings, a small star birthmark on her flank — horse-like muzzle and hooves, exactly four legs, NEVER humanoid, NO human face/hands; her front legs end in HOOVES, not hands. OLIVER is a small EMERALD-GREEN DRAGON: orange round patches, yellow-green belly, orange wings, amber eyes, two small rounded horns, and an orange heart patch on his chest — he has little dragon arms with claws and CAN hold things; when upset, small puffs of orange flame escape his mouth. IVY is clearly TALLER than OLIVER. NO HUMANS anywhere. ONLY the characters named in the scene appear — no duplicates, no extra background characters; each named character appears exactly once.";
+
+const SCENES11 = {
+  '0-cover': {
+    refDir: THUMBS, outDir: BOOK11, out: '0-cover.png', aspectRatio: '3:4',
+    refs: ['ivy.png', 'oliver.png'],
+    prompt: `BOOK COVER, vertical 3:4 portrait, with the UPPER THIRD kept calm and open for a title (title added later — leave clear glowing sky/space up top, no lettering). Rich twilight palette of deep violet and warm gold. The two heroes are FRONT AND CENTRE, FACING THE VIEWER, close together, warm and inviting, faces clearly visible with curious, wonder-struck expressions: IVY (white unicorn, lavender-purple mane, violet eyes, pearlescent spiral horn, soft white wings, star birthmark) stands on the LEFT; the smaller OLIVER (emerald-green dragon, orange patches, yellow-green belly, orange wings, two small horns, orange heart chest-patch) stands on the RIGHT, a head shorter. BETWEEN them, at chest height, an ancient dark heavy BOOK glows and floats — SIX distinct glowing symbols arranged in a ring on its cover, warm golden light spilling from it onto both their faces; Oliver steadies the book with his small clawed hands while Ivy leans in close beside it. Softly blurred BEHIND them, a hint of the crumbling fairy-tale courtyard with faint glowing paths, kept dim so the two characters and the glowing book are the clear focus. Awe, warmth, the start of a big adventure. Ivy taller than Oliver; exactly two characters.` + STYLE11,
+  },
+
+  // ---- Prologue: The Attic ----
+  'prologue-kitchen': {
+    refDir: THUMBS, outDir: BOOK11, out: 'prologue-kitchen.png', aspectRatio: '3:4',
+    refs: ['ivy.png', 'oliver.png', 'mom.png', 'dad.png'],
+    prompt: `Vertical 3:4 portrait. A cozy summer-house KITCHEN on a rainy day, warm lamplight glowing against cool grey rain on the window. Exactly FOUR characters: IVY (white unicorn) sits calmly at a wooden kitchen table on the side, watching. OLIVER (emerald-green dragon) stands in the MIDDLE of the room mid-tantrum — crocodile tears rolling down his face, small agitated puffs of orange flame escaping his mouth, little clawed fists balled at his sides. MAMA (the adult golden-honey UNICORN from the reference, lavender mane, gold heart necklace, soft shawl over her back, four legs, NOT humanoid) stands at the kitchen counter, calm but tired and sad. DAD (the adult green DRAGON from the reference, deeper bronzed-green scales with silver patches, larger than Oliver) is just visible in the doorway behind. Warm, rainy, tender domestic mood. Ivy taller than Oliver.` + STYLE11,
+  },
+  'prologue-book': {
+    refDir: THUMBS, outDir: BOOK11, out: 'prologue-book.png', aspectRatio: '1:1',
+    refs: [],
+    prompt: `Children's-book watercolor, soft brushstrokes. Square close-up of an ancient heavy BOOK lying on dusty attic floorboards. Dark, worn leather-like cover. SIX different glowing symbols pressed in a RING on the cover, each symbol distinct, each emanating soft warm light. Old worn lettering across the centre reading "The Six Curses of the Lost Kingdom". A single grey beam of rainy light falls from above; dusty attic atmosphere, motes drifting. NO characters at all — just the book on the floorboards. Mysterious, hushed, not scary.`,
+  },
+  'prologue-courtyard': {
+    refDir: THUMBS, outDir: BOOK11, out: 'prologue-courtyard.png', aspectRatio: '1:1',
+    refs: ['ivy.png', 'oliver.png'],
+    prompt: `Square composition, slightly elevated/overhead view so all the paths are clearly countable. A once-magnificent, now CRUMBLING stone COURTYARD with a single round fountain at the dead centre. From that central fountain, EXACTLY SIX garden paths radiate outward like the spokes of a wheel — COUNT THEM: 6 paths and 6 wedge-shaped garden beds between them, NO MORE THAN SIX, not seven, not eight, exactly six. Each of the six beds is wrong in its OWN distinct way: (1) one OVERFLOWING, spilling over with too much fruit and bloom; (2) one stripped COMPLETELY BARE to cracked earth; (3) one frozen in pale-blue ICE, perfectly still; (4) one a tangle of grey THORNS; (5) one WILTED and drained grey; (6) one full of wind-blown swirling autumn leaves. Stone towers wrapped in dry grey vines around the edges. The sky swirls with indecisive colours. Small, in the very centre beside the fountain with their backs to us: IVY (white unicorn) and OLIVER (emerald dragon), looking out at the six paths. Atmospheric and mysterious, NOT frightening. Ivy taller than Oliver.` + STYLE11,
+  },
+
+  // ---- Chapter 1: The Ward of Always More (Gluttony / Blob / Theo) ----
+  'ch1-peach-tree': {
+    refDir: THUMBS, outDir: BOOK11, out: 'ch1-peach-tree.png', aspectRatio: '3:4',
+    refs: ['ivy.png', 'oliver.png'],
+    prompt: `Vertical 3:4 portrait, sickly gold-and-green overripe palette. A single perfect PEACH TREE grows up through cracked stone ground at the centre of an overwhelming FEAST garden — tables stretching away laden with towers of cakes, overflowing fruit, trophies, gold stars, flickering screens, far too much of everything. At the BASE of the tree sprawls a large translucent pulsing BLOB CREATURE — soft jelly-like body, two small sad exhausted eyes floating deep inside it, half-eaten objects and food (a ribbon, a tilted trophy) faintly visible through its sides; the bare ground all around it stripped to nothing. IVY (white unicorn) crouches near the blob, looking at it gently and kindly. OLIVER (emerald dragon) stands nearby staring in alarm at his own front claws, which are FADING and turning translucent / see-through at the fingertips (you can faintly see the ground through them). Unsettling but not frightening. Ivy taller than Oliver.` + STYLE11,
+  },
+  'ch1-feast-tables': {
+    refDir: THUMBS, outDir: BOOK11, out: 'ch1-feast-tables.png', aspectRatio: '1:1',
+    refs: [],
+    prompt: `Children's-book watercolor, soft brushstrokes, sickly-sweet gold and green tones. Square wide view of endless FEAST TABLES receding into darkness, laden with TOO MUCH of everything — cakes too tall, fruit overflowing onto the floor, trophies and ribbons stacked high, screens flickering with no one watching. Everything slightly too vivid, slightly too much, faintly wrong. NO characters at all. Overripe, overwhelming, a little eerie — not scary.`,
+  },
+  'ch1-theo-freed': {
+    refDir: THUMBS, outDir: BOOK11, out: 'ch1-theo-freed.png', aspectRatio: '1:1',
+    refs: ['ivy.png', 'oliver.png'],
+    prompt: `Square composition, warm tones returning to the scene. A small HEDGEHOG (Theo) — round dark eyes, soft brown spines — sits on the stone ground at the base of the peach tree, little legs straight out in front of him, looking at his own small hands with a wondering, just-woke-up expression. IVY (white unicorn) and OLIVER (emerald dragon) crouch nearby, watching him gently and warmly. The sickly garden colours have softened; warm light is beginning to return. Exactly THREE characters — Theo the hedgehog, Ivy, Oliver. Ivy taller than Oliver.` + STYLE11,
+  },
+
+  // ---- Chapter 2: The Ward of Not Fair (Envy / Ghost / Becca) ----
+  'ch2-comparing-garden': {
+    refDir: THUMBS, outDir: BOOK11, out: 'ch2-comparing-garden.png', aspectRatio: '3:4',
+    refs: ['ivy.png', 'oliver.png'],
+    prompt: `Vertical 3:4 portrait, sour greens and yellows, faintly wilted party atmosphere. A round birthday table, and on it TWO clearly SEPARATE birthday-gift piles side by side, each with its own big easy-to-read place-card label — the LEFT pile's card reads "IVY", the RIGHT pile's card reads "OLIVER". The two piles are DRAMATICALLY different in size, and that size gap is the whole point of the picture: OLIVER's pile is a big TALL HEAP — many wrapped presents stacked high, a large bulging candy bag, a crowd of stuffed animals. IVY's pile is OBVIOUSLY, sadly SMALLER — just one or two little presents, a tiny candy bag, a single stuffy. Make Oliver's pile look at least TWICE the size of Ivy's at a glance. IVY (white unicorn) stands by her own small pile, mid-tantrum, tears streaming, lifting a HOOF toward Oliver's big heap — and she is turning GHOSTLY: her outline faded and translucent, her own little presents gone grey and see-through. OLIVER (emerald dragon) stands by his big pile looking alarmed, reaching a claw out toward her. Hovering just behind Ivy: a pale, wispy translucent RABBIT GHOST (Becca) — long drifting ears, big sad eyes — one small paw raised to tap Ivy's shoulder. Exactly THREE characters — Ivy, Oliver, and the rabbit ghost. Ivy taller than Oliver. Eerie-gentle, not scary.` + STYLE11,
+  },
+  'ch2-beccas-pile': {
+    refDir: THUMBS, outDir: BOOK11, out: 'ch2-beccas-pile.png', aspectRatio: '1:1',
+    refs: [],
+    prompt: `Children's-book watercolor, soft brushstrokes, warm tones. Square still-life of a small, modest pile of belongings with a little handwritten label reading "BECCA": a worn, loved stuffed rabbit (grey, soft from cuddling); a small folded handwritten note; a single slice of carrot cake on a tiny plate. Simple, real, and quietly precious — the kind of small treasure that was there all along but unseen. NO characters. Soft warm light.`,
+  },
+  'ch2-ivys-pencils': {
+    refDir: THUMBS, outDir: BOOK11, out: 'ch2-ivys-pencils.png', aspectRatio: '1:1',
+    refs: [],
+    prompt: `Children's-book watercolor, soft brushstrokes, warm light. Square STILL-LIFE on a wooden surface (NO characters, no hoof, no hand). TWELVE coloured PENCILS fanned out in a neat row — and they must be TWELVE clearly DIFFERENT shades of PURPLE, a visible gradient from pale lilac and lavender through orchid and violet to deep aubergine/plum, every pencil a distinctly different purple (NOT all the same purple). Beside the fanned pencils, a small closed NOTEBOOK with a tiny unicorn pressed into its cover. Tender and quiet, the colour rich and fully returned, softly glowing. No characters at all.`,
+  },
+};
+
 async function main() {
   const args = process.argv.slice(2);
   let table = JOBS, argNames = args;
   if (args[0] === 'scenes') { table = SCENES; argNames = args.slice(1); }
   else if (args[0] === 'regen') { table = REGEN; argNames = args.slice(1); }
+  else if (args[0] === 'book11') { table = SCENES11; argNames = args.slice(1); }
   const names = argNames.length ? argNames : Object.keys(table);
   for (const name of names) {
     const job = table[name];
