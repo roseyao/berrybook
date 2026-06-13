@@ -25,8 +25,15 @@ const TYPE = {
   padX: 38,
   padY: 40,
 };
+// Antique display face for the book title (loaded in public/index.html).
+const TITLE_FONT = '"Cinzel Decorative", Georgia, serif';
 const SPOT_WIDTH_FRAC = 0.78;  // spot image width as a fraction of the text column
 const SPOT_CAPTION_GAP = 18;   // vertical space a spot reserves below itself
+// Vertical space the chrome steals from the text column, so pagination doesn't
+// pack a line into it: a running chapter header (top of every text page) and
+// the page-number footer (bottom of every text page).
+const TOP_RESERVE = 40;
+const FOOTER_RESERVE = 30;
 
 // Compute the page size from the viewport, choosing the reading mode by
 // ORIENTATION (not a fixed width breakpoint):
@@ -92,12 +99,15 @@ function blocksToHTML(blocks, innerW) {
 function paginateSection(section, innerW, innerH, measureEl) {
   const blocks = parseBlocks(section);
   measureEl.style.width = innerW + 'px';
-  const fits = (bs) => {
-    measureEl.innerHTML = blocksToHTML(bs, innerW);
-    return measureEl.scrollHeight <= innerH;
-  };
   const pages = [];
   let cur = [];
+  // Every text page renders a running header (top) and a page number (bottom),
+  // so the text column is shorter than the raw page by both reserves.
+  const cap = innerH - TOP_RESERVE - FOOTER_RESERVE;
+  const fits = (bs) => {
+    measureEl.innerHTML = blocksToHTML(bs, innerW);
+    return measureEl.scrollHeight <= cap;
+  };
   const flush = () => { if (cur.length) { pages.push(cur); cur = []; } };
 
   for (const block of blocks) {
@@ -143,6 +153,14 @@ function buildPages(book, innerW, innerH, measureEl) {
     }
   }
   pages.push({ kind: 'end', book });
+  // Folio numbers: number the readable pages (chapter openers + text + soon)
+  // sequentially from 1, like a real book. The cover/end/blank get none.
+  let folio = 0;
+  for (const p of pages) {
+    if (p.kind === 'opener' || p.kind === 'text' || p.kind === 'soon') p.folio = ++folio;
+  }
+  const totalFolios = folio;
+  pages.forEach((p) => { if (p.folio) p.totalFolios = totalFolios; });
   // react-pageflip pairs pages into spreads after the cover; pad to keep the
   // back cover on its own right-hand leaf.
   if (pages.length % 2 !== 0) pages.push({ kind: 'blank' });
@@ -152,6 +170,31 @@ function buildPages(book, innerW, innerH, measureEl) {
 // --- Page renderers (forwardRef — react-pageflip needs real DOM children) ---
 
 const PAPER = '#fdf8ef';
+
+// Running chapter header at the top of every text/soon page — small-caps
+// "CHAPTER 1 · THE WARD OF ALWAYS MORE" with a hairline rule, like a real book.
+function RunningHead({ section }) {
+  return (
+    <div style={{
+      textAlign: 'center', marginBottom: 16, paddingBottom: 8, borderBottom: '1px solid #ece0c8',
+      whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', fontFamily: TYPE.fontFamily,
+    }}>
+      <span style={{ letterSpacing: 1.5, textTransform: 'uppercase', fontSize: 10.5, color: '#b08a52' }}>
+        {section.label}{' · '}{section.title}
+      </span>
+    </div>
+  );
+}
+
+// Page (folio) number, centered at the bottom of every numbered page.
+function PageNumber({ n }) {
+  if (!n) return null;
+  return (
+    <div style={{ position: 'absolute', bottom: 12, left: 0, right: 0, textAlign: 'center', fontFamily: TYPE.fontFamily, fontSize: 12, color: '#b3a489' }}>
+      {n}
+    </div>
+  );
+}
 
 // react-pageflip owns the inline style of each page's ROOT element (it sets
 // width/height/transform/etc. and wipes anything else). So the root stays bare
@@ -409,13 +452,21 @@ export default function ChapterBook({ book, onExit }) {
               <img src={page.book.coverImage} alt={page.book.title}
                 style={{ width: '100%', height: '100%', objectFit: 'cover' }}
                 onError={(e) => { e.target.style.display = 'none'; }} />
-              <div style={{ position: 'absolute', inset: 0, display: 'flex', flexDirection: 'column', justifyContent: 'space-between', padding: '8% 10%', textAlign: 'center' }}>
-                <h1 style={{ fontFamily: TYPE.fontFamily, color: '#fff', fontSize: Math.max(22, dims.w * 0.075), fontWeight: 700, textShadow: '0 2px 12px rgba(0,0,0,0.6)', lineHeight: 1.15 }}>
+              <div style={{ position: 'absolute', inset: 0, display: 'flex', flexDirection: 'column', justifyContent: 'space-between', padding: '7% 9%', textAlign: 'center' }}>
+                <h1 style={{ fontFamily: TITLE_FONT, color: '#fdf3df', fontSize: Math.max(22, dims.w * 0.082), fontWeight: 900, textShadow: '0 2px 14px rgba(0,0,0,0.7)', lineHeight: 1.2, letterSpacing: 0.5 }}>
                   {page.book.title}
                 </h1>
-                <p style={{ fontFamily: TYPE.fontFamily, color: '#f3e9d8', fontSize: Math.max(13, dims.w * 0.035), textShadow: '0 1px 8px rgba(0,0,0,0.6)' }}>
-                  An Ivy &amp; Oliver Adventure
-                </p>
+                <div style={{ fontFamily: TYPE.fontFamily, color: '#f3e9d8', textShadow: '0 1px 8px rgba(0,0,0,0.7)' }}>
+                  <p style={{ fontStyle: 'italic', fontSize: Math.max(13, dims.w * 0.034), marginBottom: 10 }}>
+                    An Ivy &amp; Oliver Adventure
+                  </p>
+                  <p style={{ fontSize: Math.max(11, dims.w * 0.027), lineHeight: 1.5 }}>
+                    By Rose Yao and Claude
+                  </p>
+                  <p style={{ fontSize: Math.max(11, dims.w * 0.027), lineHeight: 1.5 }}>
+                    Illustrations by Rose Yao and Gemini
+                  </p>
+                </div>
               </div>
             </div>
           </Page>
@@ -428,10 +479,11 @@ export default function ChapterBook({ book, onExit }) {
                 style={{ width: '100%', height: '100%', objectFit: 'cover' }}
                 onError={(e) => { e.target.style.opacity = 0.15; }} />
             </div>
-            <div style={{ padding: '18px 24px 22px', textAlign: 'center', fontFamily: TYPE.fontFamily, background: PAPER }}>
+            <div style={{ padding: '16px 24px 26px', textAlign: 'center', fontFamily: TYPE.fontFamily, background: PAPER }}>
               <div style={{ letterSpacing: 2, textTransform: 'uppercase', fontSize: 12, color: '#a07c4a' }}>{page.section.label}</div>
               <div style={{ fontSize: Math.max(18, dims.w * 0.052), fontWeight: 700, color: '#3a2f25', marginTop: 4 }}>{page.section.title}</div>
             </div>
+            <PageNumber n={page.folio} />
           </Page>
         );
       case 'text': {
@@ -441,12 +493,7 @@ export default function ChapterBook({ book, onExit }) {
         let cursor = page.wordBase;
         return (
           <Page key={key} style={textPageStyle}>
-            {page.leaf === 0 && (
-              <div style={{ textAlign: 'center', marginBottom: 18, fontFamily: TYPE.fontFamily }}>
-                <div style={{ letterSpacing: 2, textTransform: 'uppercase', fontSize: 11, color: '#a07c4a' }}>{page.section.label}</div>
-                <div style={{ fontSize: 15, fontStyle: 'italic', color: '#7a6a55' }}>{page.section.title}</div>
-              </div>
-            )}
+            <RunningHead section={page.section} />
             {page.blocks.map((b, i) => {
               if (b.type === 'spot') return <SpotImg key={i} src={b.src} innerW={innerW} />;
               const toks = tokenize(b.text, cursor);
@@ -459,22 +506,24 @@ export default function ChapterBook({ book, onExit }) {
                 </p>
               );
             })}
-            <div style={{ position: 'absolute', bottom: 12, left: 0, right: 0, textAlign: 'center', fontFamily: TYPE.fontFamily, fontSize: 11, color: '#b3a489' }}>
-              {page.section.label}
-            </div>
+            <PageNumber n={page.folio} />
           </Page>
         );
       }
       case 'soon':
         return (
-          <Page key={key} style={{ ...textPageStyle, display: 'flex', alignItems: 'center', justifyContent: 'center', textAlign: 'center' }}>
-            <div>
-              <div style={{ fontSize: 42 }}>✶</div>
-              <p style={{ fontStyle: 'italic', color: '#7a6a55', marginTop: 12 }}>
-                {page.section.title} is still being written.
-              </p>
-              <p style={{ color: '#a07c4a', marginTop: 8, fontSize: 15 }}>Come back soon!</p>
+          <Page key={key} style={textPageStyle}>
+            <RunningHead section={page.section} />
+            <div style={{ height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', textAlign: 'center' }}>
+              <div>
+                <div style={{ fontSize: 42 }}>✶</div>
+                <p style={{ fontStyle: 'italic', color: '#7a6a55', marginTop: 12 }}>
+                  {page.section.title} is still being written.
+                </p>
+                <p style={{ color: '#a07c4a', marginTop: 8, fontSize: 15 }}>Come back soon!</p>
+              </div>
             </div>
+            <PageNumber n={page.folio} />
           </Page>
         );
       case 'end':
@@ -557,8 +606,13 @@ export default function ChapterBook({ book, onExit }) {
               </button>
             );
           })()}
-          <span style={{ color: '#e7ddc8', fontFamily: TYPE.fontFamily, fontSize: 13, minWidth: 64, textAlign: 'center' }}>
-            {Math.min(pageIdx + 1, pages.length)} / {pages.length}
+          <span style={{ color: '#e7ddc8', fontFamily: TYPE.fontFamily, fontSize: 13, minWidth: 78, textAlign: 'center' }}>
+            {(() => {
+              const cur = pages[pageIdx];
+              if (cur?.folio) return `Page ${cur.folio} of ${cur.totalFolios}`;
+              if (cur?.kind === 'cover') return 'Cover';
+              return ' ';
+            })()}
           </span>
           <button onClick={goNext} disabled={pageIdx >= pages.length - 1} style={ctrlBtn(pageIdx >= pages.length - 1)}>›</button>
         </div>
