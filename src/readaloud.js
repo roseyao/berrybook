@@ -44,6 +44,21 @@ export const highestLE = (arr, t) => {
   return best;
 };
 
+// The audio time (seconds) at which word `wordIndex` (0-based within this
+// alignment) begins to be spoken. Lets a reader seek into a longer recording to
+// start at an arbitrary word, or stop when the next word would begin. Returns 0
+// for the start of the audio and Infinity when the index is past the last word
+// (caller treats that as "play to the natural end").
+export const wordStartTime = (alignment, wordIndex) => {
+  if (!alignment || !alignment.chars || !alignment.starts) return 0;
+  if (wordIndex <= 0) return 0;
+  const c2w = charToWordMap(alignment.chars);
+  for (let i = 0; i < c2w.length; i++) {
+    if (c2w[i] === wordIndex) return alignment.starts[i];
+  }
+  return Infinity;
+};
+
 // Split spoken text into small speakable chunks (~sentence-sized) so the live
 // TTS fallback can start playing the first words before the rest is fetched.
 export const splitIntoChunks = (text) => {

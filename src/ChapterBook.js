@@ -1,6 +1,6 @@
 import React, { useState, useRef, useEffect, useLayoutEffect, useCallback } from 'react';
 import HTMLFlipBook from 'react-pageflip';
-import { tokenize, countWords, charToWordMap, highestLE, splitIntoChunks, spokenTextFromBlocks } from './readaloud';
+import { tokenize, countWords, charToWordMap, highestLE, wordStartTime, spokenTextFromBlocks } from './readaloud';
 
 const VOICE = 'Ivanna';  // matches scripts/record-audio.mjs default
 
@@ -277,7 +277,11 @@ export default function ChapterBook({ book, onExit }) {
     return () => window.removeEventListener('keydown', onKey);
   }, [goNext, goPrev, onExit]);
 
-  // --- Read-aloud (per-section audio + per-word highlight + auto page-turn) ---
+  // --- Read-aloud: PAGE-scoped, with stop-on-turn and per-page resume ---------
+  // Read-along reads only the page(s) the reader is looking at, never the whole
+  // chapter, and never turns the page on its own. A manual page turn stops it
+  // (the audio belonged to the page you left), and where each page stopped is
+  // remembered so pressing Read again resumes instead of starting over.
   const [isPlaying, setIsPlaying] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [activeWord, setActiveWord] = useState(null);      // global word idx within the playing section
@@ -285,8 +289,14 @@ export default function ChapterBook({ book, onExit }) {
   const audioRef = useRef(null);
   const rafRef = useRef(null);
   const userStopped = useRef(false);
-  const audioCache = useRef(new Map());                    // live-TTS chunk cache: text -> Promise<{url,alignment}>
-  const sectionPagesRef = useRef([]);                      // [{pageIndex, wordBase, wordCount}] for the playing section
+  const audioCache = useRef(new Map());                    // live-TTS cache: text -> Promise<{url,alignment}>
+  const playingUnitRef = useRef(null);                     // the read unit currently playing
+  const resumeRef = useRef(new Map());                     // primaryIndex -> last highlighted global word
+  const activeWordRef = useRef(null);                      // mirror of activeWord for event-handler reads
+  const activeRef = useRef(false);                         // mirror of (isPlaying || isLoading)
+
+  useEffect(() => { activeWordRef.current = activeWord; }, [activeWord]);
+  useEffect(() => { activeRef.current = isPlaying || isLoading; }, [isPlaying, isLoading]);
 
   const fetchAudioChunk = (text) => {
     const cache = audioCache.current;
@@ -310,26 +320,63 @@ export default function ChapterBook({ book, onExit }) {
 
   const stopWordTracking = () => { if (rafRef.current) { cancelAnimationFrame(rafRef.current); rafRef.current = null; } };
 
+  // The read unit = the text page(s) the reader is currently looking at (one on
+  // phones, the two-page spread on desktop), with their combined global word
+  // range. `null` when no text page is visible (cover/opener/end).
+  const computeReadUnit = useCallback(() => {
+    if (!pages) return null;
+    const visible = dims.single ? [pageIdx] : [pageIdx, pageIdx + 1];
+    const tps = visible.map((i) => ({ i, p: pages[i] })).filter(({ p }) => p && p.kind === 'text');
+    if (!tps.length) return null;
+    return {
+      primaryIndex: tps[0].i,
+      sectionId: tps[0].p.sectionId,
+      fromWord: Math.min(...tps.map(({ p }) => p.wordBase)),
+      toWord: Math.max(...tps.map(({ p }) => p.wordBase + p.wordCount)),
+      blocks: tps.flatMap(({ p }) => p.blocks),
+    };
+  }, [pages, pageIdx, dims.single]);
+
   const stopPlayback = useCallback(() => {
     const a = audioRef.current;
     if (a) { a.pause(); a.oncanplaythrough = null; a.onended = null; a.onerror = null; a.src = ''; }
     stopWordTracking();
     setActiveWord(null);
+    activeWordRef.current = null;
     setIsPlaying(false);
     setIsLoading(false);
     setPlayingSectionId(null);
+    playingUnitRef.current = null;
   }, []);
 
+  // Finished reading a page's range — drop its resume point so the next Read
+  // starts the page from the top.
+  const completePlayback = useCallback((primaryIndex) => {
+    resumeRef.current.delete(primaryIndex);
+    stopPlayback();
+  }, [stopPlayback]);
+
+  // Stopped mid-page (Stop button or a manual page turn) — remember the last
+  // highlighted word so the next Read resumes from there.
+  const rememberAndStop = useCallback(() => {
+    const u = playingUnitRef.current;
+    if (u && activeWordRef.current != null) resumeRef.current.set(u.primaryIndex, activeWordRef.current);
+    userStopped.current = true;
+    stopPlayback();
+  }, [stopPlayback]);
+
   // Drive activeWord from audio.currentTime via rAF. `wordOffset` is the global
-  // index of the alignment's first word within the section.
-  const startWordTracking = (alignment, wordOffset) => {
+  // word index of the alignment's first word. `endTime` (seconds, or null) stops
+  // playback when the page's range ends — the recording may run on past it.
+  const startWordTracking = (alignment, wordOffset, endTime, primaryIndex) => {
     stopWordTracking();
-    if (!alignment) { return; }
+    if (!alignment) return;
     const c2w = charToWordMap(alignment.chars);
     const starts = alignment.starts;
     const tick = () => {
       const a = audioRef.current;
       if (!a || a.paused) { rafRef.current = null; return; }
+      if (endTime != null && isFinite(endTime) && a.currentTime >= endTime) { completePlayback(primaryIndex); return; }
       const charIdx = highestLE(starts, a.currentTime);
       const wInRange = charIdx >= 0 ? c2w[charIdx] : -1;
       const next = wInRange >= 0 ? wordOffset + wInRange : null;
@@ -339,90 +386,76 @@ export default function ChapterBook({ book, onExit }) {
     rafRef.current = requestAnimationFrame(tick);
   };
 
-  const readSection = useCallback(async (section) => {
-    if (!section || !(section.text || '').trim()) return;
-    // Toggle off if this section is already playing/loading.
-    if ((isPlaying || isLoading) && playingSectionId === section.id) {
-      userStopped.current = true;
-      stopPlayback();
+  const beginPlayback = (src, alignment, wordOffset, startTime, endTime, primaryIndex) => {
+    const audio = audioRef.current;
+    audio.src = src;
+    audio.oncanplaythrough = async () => {
+      audio.oncanplaythrough = null;   // act once
+      try {
+        if (isFinite(startTime) && startTime > 0) { try { audio.currentTime = startTime; } catch { /* seek unsupported */ } }
+        await audio.play();
+        setIsLoading(false); setIsPlaying(true);
+        startWordTracking(alignment, wordOffset, endTime, primaryIndex);
+      } catch { stopPlayback(); }
+    };
+    audio.onended = () => completePlayback(primaryIndex);
+    audio.onerror = () => { if (!userStopped.current) stopPlayback(); };
+  };
+
+  const readCurrentPage = useCallback(async () => {
+    const unit = computeReadUnit();
+    if (!unit) return;
+    // Toggle: pressing the button while this page plays pauses it (resume saved).
+    if ((isPlaying || isLoading) && playingUnitRef.current?.primaryIndex === unit.primaryIndex) {
+      rememberAndStop();
       return;
     }
     stopPlayback();
     userStopped.current = false;
 
-    // Text pages of this section + their global word ranges, in reading order.
-    const secPages = (pages || [])
-      .map((p, i) => ({ p, i }))
-      .filter(({ p }) => p.kind === 'text' && p.sectionId === section.id)
-      .map(({ p, i }) => ({ pageIndex: i, wordBase: p.wordBase, wordCount: p.wordCount }));
-    sectionPagesRef.current = secPages;
-    if (!secPages.length) return;
-
-    setPlayingSectionId(section.id);
+    // Resume where this page last stopped, if within its range; else its start.
+    const saved = resumeRef.current.get(unit.primaryIndex);
+    const fromWord = (saved != null && saved >= unit.fromWord && saved < unit.toWord) ? saved : unit.fromWord;
+    playingUnitRef.current = { ...unit, fromWord };
+    setPlayingSectionId(unit.sectionId);
     setIsLoading(true);
-    // Jump to the section's first text page so the read starts where the eye is.
-    flipRef.current?.pageFlip()?.flip(secPages[0].pageIndex);
 
-    const blocks = parseBlocks(section);
-    const spoken = spokenTextFromBlocks(blocks);
-    const audio = audioRef.current;
-
-    // FAST PATH: pre-recorded section file (instant, free). One mp3 + alignment
-    // for the whole section; word offset 0.
+    // FAST PATH: pre-recorded SECTION recording — seek into it for just this
+    // page's word range, and stop when the next page's first word would begin.
     try {
-      const mp3 = `/audio/${VOICE}/${book.id}/${section.id}.mp3`;
-      const json = `/audio/${VOICE}/${book.id}/${section.id}.json`;
+      const mp3 = `/audio/${VOICE}/${book.id}/${unit.sectionId}.mp3`;
+      const json = `/audio/${VOICE}/${book.id}/${unit.sectionId}.json`;
       const [head, alignResp] = await Promise.all([fetch(mp3, { method: 'HEAD' }), fetch(json)]);
       if (head.ok && alignResp.ok && !userStopped.current) {
         const alignment = await alignResp.json();
-        audio.src = mp3;
-        audio.oncanplaythrough = async () => {
-          try { await audio.play(); setIsLoading(false); setIsPlaying(true); startWordTracking(alignment, 0); }
-          catch { stopPlayback(); }
-        };
-        audio.onended = () => stopPlayback();
-        audio.onerror = () => { if (!userStopped.current) stopPlayback(); };
+        const startTime = wordStartTime(alignment, fromWord);
+        const endTime = wordStartTime(alignment, unit.toWord);   // Infinity ⇒ play to the natural end
+        beginPlayback(mp3, alignment, 0, startTime, endTime, unit.primaryIndex);
         return;
       }
     } catch { /* fall through to live */ }
     if (userStopped.current) { stopPlayback(); return; }
 
-    // SLOW PATH: live TTS via Netlify function, chunked so the first words start
-    // before the rest is fetched. Each chunk's global word offset is tracked.
-    const chunks = splitIntoChunks(spoken);
-    if (!chunks.length) { stopPlayback(); return; }
-    const chunkWordStarts = [];
-    let acc = 0;
-    for (const c of chunks) { chunkWordStarts.push(acc); acc += countWords(c); }
-
-    const playFrom = async (i) => {
-      let entry;
-      try { entry = await fetchAudioChunk(chunks[i]); }
-      catch { if (!userStopped.current) stopPlayback(); return; }
-      if (userStopped.current) return;
-      if (chunks[i + 1]) fetchAudioChunk(chunks[i + 1]).catch(() => {});
-      audio.src = entry.url;
-      audio.oncanplaythrough = async () => {
-        try { await audio.play(); setIsLoading(false); setIsPlaying(true); startWordTracking(entry.alignment, chunkWordStarts[i]); }
-        catch { stopPlayback(); }
-      };
-      audio.onended = () => { stopWordTracking(); if (i + 1 < chunks.length) playFrom(i + 1); else stopPlayback(); };
-      audio.onerror = () => { if (!userStopped.current) stopPlayback(); };
-    };
-    playFrom(0);
+    // SLOW PATH: synthesize ONLY this page's prose (one request — a page is
+    // small). The alignment's word 0 is the page's first word (unit.fromWord),
+    // so the recording is exactly the page and ends on its own.
+    const spoken = spokenTextFromBlocks(unit.blocks);
+    if (!spoken.trim()) { stopPlayback(); return; }
+    let entry;
+    try { entry = await fetchAudioChunk(spoken); }
+    catch { if (!userStopped.current) stopPlayback(); return; }
+    if (userStopped.current) { stopPlayback(); return; }
+    const startTime = wordStartTime(entry.alignment, fromWord - unit.fromWord);
+    beginPlayback(entry.url, entry.alignment, unit.fromWord, startTime, null, unit.primaryIndex);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [pages, isPlaying, isLoading, playingSectionId, stopPlayback, book.id]);
+  }, [computeReadUnit, isPlaying, isLoading, rememberAndStop, stopPlayback, book.id]);
 
-  // Auto-turn the page to follow the highlighted word while reading.
+  // Repagination (resize / orientation / book change) invalidates page indices
+  // and any in-progress read — stop and drop saved resume points.
   useEffect(() => {
-    if (activeWord == null) return;
-    const target = sectionPagesRef.current.find((sp) => activeWord >= sp.wordBase && activeWord < sp.wordBase + sp.wordCount);
-    if (!target) return;
-    const visible = dims.single ? [pageIdx] : [pageIdx, pageIdx + 1];
-    if (!visible.includes(target.pageIndex)) {
-      flipRef.current?.pageFlip()?.flip(target.pageIndex);
-    }
-  }, [activeWord, pageIdx, dims.single]);
+    resumeRef.current.clear();
+    stopPlayback();
+  }, [innerW, innerH, book, stopPlayback]);
 
   // Stop audio + free cached blob URLs on unmount.
   useEffect(() => {
@@ -434,8 +467,8 @@ export default function ChapterBook({ book, onExit }) {
     };
   }, [stopPlayback]);
 
-  // The section the reader is currently looking at (for the Read button).
-  const currentSection = pages && pages[pageIdx] ? pages[pageIdx].section : null;
+  // The read unit the reader is currently looking at (for the Read button).
+  const readUnit = computeReadUnit();
 
   const textPageStyle = {
     padding: `${TYPE.padY}px ${TYPE.padX}px`,
@@ -596,7 +629,12 @@ export default function ChapterBook({ book, onExit }) {
           maxShadowOpacity={0.4}
           drawShadow={true}
           flippingTime={700}
-          onFlip={(e) => setPageIdx(e.data)}
+          onFlip={(e) => {
+            setPageIdx(e.data);
+            // A manual page turn stops read-along — the audio belonged to the
+            // page just left (resume point saved so Read can pick it back up).
+            if (activeRef.current) rememberAndStop();
+          }}
           className="cb-flipbook"
           style={{}}
         >
@@ -609,11 +647,11 @@ export default function ChapterBook({ book, onExit }) {
         <div style={{ display: 'flex', alignItems: 'center', gap: 16, marginTop: 14 }}>
           <button onClick={goPrev} disabled={pageIdx <= 0} style={ctrlBtn(pageIdx <= 0)}>‹</button>
           {(() => {
-            const canRead = !!(currentSection && (currentSection.text || '').trim());
+            const canRead = !!readUnit;
             const playingHere = isPlaying || isLoading;
             return (
               <button
-                onClick={() => canRead && readSection(currentSection)}
+                onClick={() => canRead && readCurrentPage()}
                 disabled={!canRead}
                 style={{
                   display: 'flex', alignItems: 'center', gap: 8, height: 46, padding: '0 20px', borderRadius: 999, border: 'none',
