@@ -214,6 +214,18 @@ const Page = React.forwardRef(({ children, style, hard }, ref) => (
   </div>
 ));
 
+// A little ribbon tucked into a page's top-right corner to mark it bookmarked.
+function BookmarkRibbon() {
+  return (
+    <div aria-hidden style={{
+      position: 'absolute', top: 0, right: 22, width: 20, height: 30, zIndex: 5,
+      background: 'linear-gradient(180deg,#d4567a,#b22f57)',
+      clipPath: 'polygon(0 0, 100% 0, 100% 100%, 50% 76%, 0 100%)',
+      boxShadow: '0 1px 4px rgba(0,0,0,0.3)',
+    }} />
+  );
+}
+
 function SpotImg({ src, innerW }) {
   const w = Math.round(innerW * SPOT_WIDTH_FRAC);
   return (
@@ -473,6 +485,7 @@ export default function ChapterBook({ book, onExit }) {
   const handleFlipRef = useRef();
   handleFlipRef.current = (e) => {
     setPageIdx(e.data);
+    setShowBookmarks(false);
     const fromSection = autoAdvanceRef.current;
     if (fromSection != null) {
       autoAdvanceRef.current = null;
@@ -503,6 +516,75 @@ export default function ChapterBook({ book, onExit }) {
 
   // The read unit the reader is currently looking at (for the Read button).
   const readUnit = computeReadUnit();
+
+  // --- Bookmarks --------------------------------------------------------------
+  // A bookmark is a stable anchor into the story — { sectionId, word } — not a
+  // raw page index, so it survives repagination (resize / orientation / font).
+  // `word` is the global word index within the section where the bookmarked page
+  // begins; `null` marks a chapter opener. To turn to a bookmark we find the
+  // page whose word range contains it.
+  const [bookmarks, setBookmarks] = useState([]);
+  const [showBookmarks, setShowBookmarks] = useState(false);
+
+  // Load on book change; persist on change. Per book, in localStorage.
+  useEffect(() => {
+    setShowBookmarks(false);
+    try {
+      const raw = localStorage.getItem(`berrybook:bookmarks:${book.id}`);
+      setBookmarks(raw ? JSON.parse(raw) : []);
+    } catch { setBookmarks([]); }
+  }, [book.id]);
+  useEffect(() => {
+    try { localStorage.setItem(`berrybook:bookmarks:${book.id}`, JSON.stringify(bookmarks)); } catch { /* storage full/blocked */ }
+  }, [bookmarks, book.id]);
+
+  // Does bookmark `bm` live on page `p`? (Robust to re-pagination: a text
+  // bookmark matches the page whose word range now contains its word.)
+  const bmOnPage = (bm, p) => {
+    if (!p) return false;
+    if (p.kind === 'opener') return bm.word == null && bm.sectionId === p.section.id;
+    if (p.kind === 'text') return bm.word != null && bm.sectionId === p.sectionId && bm.word >= p.wordBase && bm.word < p.wordBase + p.wordCount;
+    return false;
+  };
+  const pageBookmarked = (p) => bookmarks.some((bm) => bmOnPage(bm, p));
+
+  // The bookmarkable page in view (a chapter opener or a text page).
+  const visibleIdxs = dims.single ? [pageIdx] : [pageIdx, pageIdx + 1];
+  const bmTargetIdx = pages ? visibleIdxs.find((i) => pages[i] && (pages[i].kind === 'text' || pages[i].kind === 'opener')) : undefined;
+  const bmTargetPage = bmTargetIdx != null ? pages[bmTargetIdx] : null;
+
+  const toggleBookmark = () => {
+    const p = bmTargetPage;
+    if (!p) return;
+    setBookmarks((prev) => {
+      if (prev.some((bm) => bmOnPage(bm, p))) return prev.filter((bm) => !bmOnPage(bm, p));
+      const anchor = p.kind === 'opener'
+        ? { sectionId: p.section.id, word: null }
+        : { sectionId: p.sectionId, word: p.wordBase };
+      return [...prev, anchor];
+    });
+  };
+
+  // Resolve a bookmark to its current page index (or -1 if it no longer maps).
+  const bookmarkPageIndex = (bm) => (pages || []).findIndex((p) => bmOnPage(bm, p));
+
+  const goToBookmark = (bm) => {
+    const idx = bookmarkPageIndex(bm);
+    if (idx >= 0) flipRef.current?.pageFlip()?.flip(idx);
+    setShowBookmarks(false);
+  };
+
+  // Bookmarks in reading order, resolved to their pages (dropping any that no
+  // longer map), each with a label + snippet for the list.
+  const resolvedBookmarks = (pages ? bookmarks.map((bm) => ({ bm, idx: bookmarkPageIndex(bm) })) : [])
+    .filter((x) => x.idx >= 0)
+    .sort((a, b) => a.idx - b.idx)
+    .map(({ bm, idx }) => {
+      const p = pages[idx];
+      const firstP = p.kind === 'text' ? (p.blocks.find((b) => b.type === 'p')?.text || '') : '';
+      const snippet = firstP ? (firstP.length > 56 ? firstP.slice(0, 56).trimEnd() + '…' : firstP) : 'Chapter start';
+      return { bm, idx, label: p.section?.label || '', folio: p.folio, snippet };
+    });
 
   const textPageStyle = {
     padding: `${TYPE.padY}px ${TYPE.padX}px`,
@@ -546,6 +628,7 @@ export default function ChapterBook({ book, onExit }) {
         const sec = page.section;
         return (
           <Page key={key} style={{ padding: 0, overflow: 'hidden', display: 'flex', flexDirection: 'column' }}>
+            {pageBookmarked(page) && <BookmarkRibbon />}
             {/* Classic chapter heading at the TOP, two lines, image below. */}
             <div style={{ padding: '22px 22px 18px', textAlign: 'center', fontFamily: TYPE.fontFamily, background: PAPER }}>
               <div style={{ fontFamily: TITLE_FONT, fontSize: Math.max(21, dims.w * 0.066), fontWeight: 700, color: '#6b4a28', lineHeight: 1.1, letterSpacing: 0.5 }}>
@@ -581,6 +664,7 @@ export default function ChapterBook({ book, onExit }) {
         let cursor = page.wordBase;
         return (
           <Page key={key} style={textPageStyle}>
+            {pageBookmarked(page) && <BookmarkRibbon />}
             <RunningHead section={page.section} />
             {page.blocks.map((b, i) => {
               if (b.type === 'spot') return <SpotImg key={i} src={b.src} innerW={innerW} />;
@@ -645,6 +729,50 @@ export default function ChapterBook({ book, onExit }) {
         style={{ position: 'fixed', top: 14, left: 16, zIndex: 50, background: 'rgba(255,255,255,0.92)', border: 'none', borderRadius: 999, padding: '8px 16px', fontSize: 14, fontWeight: 600, color: '#3a2f25', cursor: 'pointer', boxShadow: '0 2px 10px rgba(0,0,0,0.25)' }}>
         ← Library
       </button>
+
+      {/* Bookmarks: drop a ribbon on the page in view, and jump to saved ones. */}
+      <div style={{ position: 'fixed', top: 14, right: 16, zIndex: 50, display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: 8 }}>
+        <div style={{ display: 'flex', gap: 8 }}>
+          {bmTargetPage && (() => {
+            const on = pageBookmarked(bmTargetPage);
+            return (
+              <button onClick={toggleBookmark}
+                title={on ? 'Remove bookmark from this page' : 'Bookmark this page'}
+                style={{ background: on ? '#c2557a' : 'rgba(255,255,255,0.92)', color: on ? '#fff' : '#3a2f25', border: 'none', borderRadius: 999, padding: '8px 14px', fontSize: 14, fontWeight: 600, cursor: 'pointer', boxShadow: '0 2px 10px rgba(0,0,0,0.25)' }}>
+                {on ? '🔖 Saved' : '🔖 Bookmark'}
+              </button>
+            );
+          })()}
+          {resolvedBookmarks.length > 0 && (
+            <button onClick={() => setShowBookmarks((s) => !s)}
+              title="Go to a bookmark"
+              style={{ background: 'rgba(255,255,255,0.92)', color: '#3a2f25', border: 'none', borderRadius: 999, padding: '8px 14px', fontSize: 14, fontWeight: 600, cursor: 'pointer', boxShadow: '0 2px 10px rgba(0,0,0,0.25)' }}>
+              Bookmarks ({resolvedBookmarks.length})
+            </button>
+          )}
+        </div>
+        {showBookmarks && resolvedBookmarks.length > 0 && (
+          <div style={{ width: 270, maxHeight: '60vh', overflowY: 'auto', background: '#fffdf8', borderRadius: 12, boxShadow: '0 6px 24px rgba(0,0,0,0.35)', padding: 6 }}>
+            {resolvedBookmarks.map(({ bm, idx, label, folio, snippet }) => (
+              <div key={`${bm.sectionId}:${bm.word}`}
+                style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '8px 10px', borderRadius: 8 }}>
+                <button onClick={() => goToBookmark(bm)}
+                  style={{ flex: 1, textAlign: 'left', background: idx === pageIdx ? '#f1e7d2' : 'transparent', border: 'none', borderRadius: 8, padding: '6px 8px', cursor: 'pointer', fontFamily: TYPE.fontFamily }}>
+                  <div style={{ fontSize: 12, fontWeight: 700, color: '#8a5a2b', textTransform: 'uppercase', letterSpacing: 0.5 }}>
+                    {label}{folio ? ` · p.${folio}` : ''}
+                  </div>
+                  <div style={{ fontSize: 13, color: '#5a4a38', marginTop: 2, fontStyle: 'italic' }}>{snippet}</div>
+                </button>
+                <button onClick={() => setBookmarks((prev) => prev.filter((b) => !(b.sectionId === bm.sectionId && b.word === bm.word)))}
+                  title="Remove bookmark"
+                  style={{ background: 'transparent', border: 'none', color: '#b3a489', fontSize: 18, lineHeight: 1, cursor: 'pointer', padding: 4 }}>
+                  ×
+                </button>
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
 
       {pages && (
         <HTMLFlipBook
