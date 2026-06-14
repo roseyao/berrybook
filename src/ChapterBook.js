@@ -277,11 +277,11 @@ export default function ChapterBook({ book, onExit }) {
     return () => window.removeEventListener('keydown', onKey);
   }, [goNext, goPrev, onExit]);
 
-  // --- Read-aloud: PAGE-scoped, with stop-on-turn and per-page resume ---------
-  // Read-along reads only the page(s) the reader is looking at, never the whole
-  // chapter, and never turns the page on its own. A manual page turn stops it
-  // (the audio belonged to the page you left), and where each page stopped is
-  // remembered so pressing Read again resumes instead of starting over.
+  // --- Read-aloud: PAGE-scoped, auto-advancing, stop-on-manual-turn -----------
+  // Read-along reads the page(s) on screen, then auto-turns to the next page and
+  // keeps reading to the end of the chapter (audiobook style). A *manual* page
+  // turn stops it (the audio belonged to the page you left), and where each page
+  // stopped is remembered so pressing Read again resumes instead of restarting.
   const [isPlaying, setIsPlaying] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [activeWord, setActiveWord] = useState(null);      // global word idx within the playing section
@@ -294,6 +294,10 @@ export default function ChapterBook({ book, onExit }) {
   const resumeRef = useRef(new Map());                     // primaryIndex -> last highlighted global word
   const activeWordRef = useRef(null);                      // mirror of activeWord for event-handler reads
   const activeRef = useRef(false);                         // mirror of (isPlaying || isLoading)
+  // When read-along finishes a page it turns the page itself; this holds the
+  // just-finished section id so the resulting onFlip knows the turn was ours
+  // (continue reading) rather than the reader's (stop). `null` = no auto-turn.
+  const autoAdvanceRef = useRef(null);
 
   useEffect(() => { activeWordRef.current = activeWord; }, [activeWord]);
   useEffect(() => { activeRef.current = isPlaying || isLoading; }, [isPlaying, isLoading]);
@@ -323,9 +327,9 @@ export default function ChapterBook({ book, onExit }) {
   // The read unit = the text page(s) the reader is currently looking at (one on
   // phones, the two-page spread on desktop), with their combined global word
   // range. `null` when no text page is visible (cover/opener/end).
-  const computeReadUnit = useCallback(() => {
+  const computeReadUnit = useCallback((atIdx = pageIdx) => {
     if (!pages) return null;
-    const visible = dims.single ? [pageIdx] : [pageIdx, pageIdx + 1];
+    const visible = dims.single ? [atIdx] : [atIdx, atIdx + 1];
     const tps = visible.map((i) => ({ i, p: pages[i] })).filter(({ p }) => p && p.kind === 'text');
     if (!tps.length) return null;
     return {
@@ -347,13 +351,19 @@ export default function ChapterBook({ book, onExit }) {
     setIsLoading(false);
     setPlayingSectionId(null);
     playingUnitRef.current = null;
+    autoAdvanceRef.current = null;
   }, []);
 
-  // Finished reading a page's range — drop its resume point so the next Read
-  // starts the page from the top.
-  const completePlayback = useCallback((primaryIndex) => {
+  // Finished reading a page's range. Drop its resume point (so re-reading it
+  // starts at the top), then auto-turn to the next page and keep reading — the
+  // resulting onFlip continues the read while it stays in this chapter, and
+  // stops at the chapter break. A manual turn instead is caught by handleFlip.
+  const finishPage = useCallback((primaryIndex) => {
     resumeRef.current.delete(primaryIndex);
+    const finishedSection = playingUnitRef.current?.sectionId ?? null;
     stopPlayback();
+    autoAdvanceRef.current = finishedSection;
+    flipRef.current?.pageFlip()?.flipNext();
   }, [stopPlayback]);
 
   // Stopped mid-page (Stop button or a manual page turn) — remember the last
@@ -376,7 +386,7 @@ export default function ChapterBook({ book, onExit }) {
     const tick = () => {
       const a = audioRef.current;
       if (!a || a.paused) { rafRef.current = null; return; }
-      if (endTime != null && isFinite(endTime) && a.currentTime >= endTime) { completePlayback(primaryIndex); return; }
+      if (endTime != null && isFinite(endTime) && a.currentTime >= endTime) { finishPage(primaryIndex); return; }
       const charIdx = highestLE(starts, a.currentTime);
       const wInRange = charIdx >= 0 ? c2w[charIdx] : -1;
       const next = wInRange >= 0 ? wordOffset + wInRange : null;
@@ -398,18 +408,13 @@ export default function ChapterBook({ book, onExit }) {
         startWordTracking(alignment, wordOffset, endTime, primaryIndex);
       } catch { stopPlayback(); }
     };
-    audio.onended = () => completePlayback(primaryIndex);
+    audio.onended = () => finishPage(primaryIndex);
     audio.onerror = () => { if (!userStopped.current) stopPlayback(); };
   };
 
-  const readCurrentPage = useCallback(async () => {
-    const unit = computeReadUnit();
-    if (!unit) return;
-    // Toggle: pressing the button while this page plays pauses it (resume saved).
-    if ((isPlaying || isLoading) && playingUnitRef.current?.primaryIndex === unit.primaryIndex) {
-      rememberAndStop();
-      return;
-    }
+  // Start reading a specific read unit from its resume point (or its start).
+  const playUnit = useCallback(async (unit) => {
+    if (!unit) { stopPlayback(); return; }
     stopPlayback();
     userStopped.current = false;
 
@@ -448,7 +453,36 @@ export default function ChapterBook({ book, onExit }) {
     const startTime = wordStartTime(entry.alignment, fromWord - unit.fromWord);
     beginPlayback(entry.url, entry.alignment, unit.fromWord, startTime, null, unit.primaryIndex);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [computeReadUnit, isPlaying, isLoading, rememberAndStop, stopPlayback, book.id]);
+  }, [stopPlayback, book.id]);
+
+  // The Read button: toggle the page on screen.
+  const readCurrentPage = useCallback(() => {
+    const unit = computeReadUnit();
+    if (!unit) return;
+    // Pressing the button while this page plays pauses it (resume saved).
+    if ((isPlaying || isLoading) && playingUnitRef.current?.primaryIndex === unit.primaryIndex) {
+      rememberAndStop();
+      return;
+    }
+    playUnit(unit);
+  }, [computeReadUnit, isPlaying, isLoading, rememberAndStop, playUnit]);
+
+  // A page turn. If read-along turned it (autoAdvanceRef set), keep reading the
+  // new page when it's the same chapter, else stop at the chapter break. A turn
+  // the reader made while reading stops read-along.
+  const handleFlipRef = useRef();
+  handleFlipRef.current = (e) => {
+    setPageIdx(e.data);
+    const fromSection = autoAdvanceRef.current;
+    if (fromSection != null) {
+      autoAdvanceRef.current = null;
+      const unit = computeReadUnit(e.data);
+      if (unit && unit.sectionId === fromSection) playUnit(unit);
+      else stopPlayback();
+      return;
+    }
+    if (activeRef.current) rememberAndStop();
+  };
 
   // Repagination (resize / orientation / book change) invalidates page indices
   // and any in-progress read — stop and drop saved resume points.
@@ -629,12 +663,7 @@ export default function ChapterBook({ book, onExit }) {
           maxShadowOpacity={0.4}
           drawShadow={true}
           flippingTime={700}
-          onFlip={(e) => {
-            setPageIdx(e.data);
-            // A manual page turn stops read-along — the audio belonged to the
-            // page just left (resume point saved so Read can pick it back up).
-            if (activeRef.current) rememberAndStop();
-          }}
+          onFlip={(e) => handleFlipRef.current(e)}
           className="cb-flipbook"
           style={{}}
         >
