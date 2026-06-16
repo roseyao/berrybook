@@ -1,3 +1,21 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+/* App-like, stable surface: full-height root, no tap-highlight flashes, and the
+   page-flip reader never lets you select text or drag the page images (both
+   read as a "glitch" mid-flip). Page/overscroll locking while a book is open is
+   handled imperatively in ChapterBook so the library still scrolls normally. */
+html, body, #root { height: 100%; }
+body { margin: 0; -webkit-text-size-adjust: 100%; text-size-adjust: 100%; }
+* { -webkit-tap-highlight-color: transparent; }
+
+.cb-flipbook, .cb-page, .cb-page-inner {
+  -webkit-user-select: none;
+  user-select: none;
+}
+.cb-page img {
+  -webkit-user-drag: none;
+  user-drag: none;
+  pointer-events: none;
+}

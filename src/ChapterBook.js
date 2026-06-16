@@ -51,8 +51,11 @@ function computeDims() {
   const ASPECT = 0.72;
   // Spread only when the viewport is landscape AND can fit two readable pages.
   const single = !(vw > vh && vw >= 900);
-  // Leave vertical room for the controls bar + the floating Library button.
-  const maxH = vh - 96;
+  // Leave vertical room for the in-flow header (Library + bookmarks) and the
+  // footer controls bar so the whole book + chrome fit the *visible* viewport
+  // with nothing clipped or hanging off the edge (we size to window.innerHeight,
+  // and the container is 100dvh, so the two agree on real phones).
+  const maxH = vh - 132;
   if (single) {
     let h = Math.min(maxH, 820);
     let w = Math.min(vw * 0.94, h * ASPECT);
@@ -171,6 +174,24 @@ function buildPages(book, innerW, innerH, measureEl) {
   return pages;
 }
 
+// A stable reading anchor for a page — { sectionId, word } (word null = a
+// chapter opener / placeholder). Used to restore the reader's place across a
+// repagination (resize / orientation change) instead of snapping to the cover.
+function pageAnchor(p) {
+  if (!p) return null;
+  if (p.kind === 'text') return { sectionId: p.sectionId, word: p.wordBase };
+  if (p.kind === 'opener' || p.kind === 'soon') return { sectionId: p.section.id, word: null };
+  return null;
+}
+// Does anchor `a` (from pageAnchor) currently land on page `p`? Robust to
+// repagination: a text anchor matches whichever page now holds its word.
+function anchorOnPage(a, p) {
+  if (!a || !p) return false;
+  if (p.kind === 'opener' || p.kind === 'soon') return a.word == null && a.sectionId === p.section.id;
+  if (p.kind === 'text') return a.word != null && a.sectionId === p.sectionId && a.word >= p.wordBase && a.word < p.wordBase + p.wordCount;
+  return false;
+}
+
 // --- Page renderers (forwardRef — react-pageflip needs real DOM children) ---
 
 const PAPER = '#fdf8ef';
@@ -246,11 +267,25 @@ export default function ChapterBook({ book, onExit }) {
   const [dims, setDims] = useState(computeDims);
   const [pages, setPages] = useState(null);
   const [pageIdx, setPageIdx] = useState(0);
+  const [startPageIdx, setStartPageIdx] = useState(0);   // initial page for the (re)mounted flipbook
   const flipRef = useRef(null);
   const measureRef = useRef(null);
+  // Mirrors used inside the audio rAF / flip handlers, which must read the
+  // freshest value without re-binding their closures.
+  const pagesRef = useRef(null);
+  const pageIdxRef = useRef(0);
+  const singleRef = useRef(dims.single);
+  const programmaticFlipRef = useRef(false);   // a read-along page-follow turn (don't stop the audio)
+  const flipAnimatingRef = useRef(false);      // a follow turn is mid-animation (don't queue another)
+  const flippingRef = useRef(false);           // ANY flip is animating — pause word-highlight re-renders
+  const anchorRef = useRef(null);              // current reading position, for repagination restore
+  const prevBookRef = useRef(book.id);
 
   const innerW = dims.w - TYPE.padX * 2;
   const innerH = dims.h - TYPE.padY * 2;
+
+  useEffect(() => { pagesRef.current = pages; }, [pages]);
+  useEffect(() => { singleRef.current = dims.single; }, [dims.single]);
 
   // Re-compute page size on resize (debounced via rAF).
   useEffect(() => {
@@ -268,11 +303,28 @@ export default function ChapterBook({ book, onExit }) {
     };
   }, []);
 
-  // (Re)paginate whenever the book or the page size changes.
+  // (Re)paginate whenever the book or the page size changes. A resize /
+  // orientation change rebuilds the page list AND remounts the flipbook (its
+  // key depends on the dims), so we must restore the reader's place: capture an
+  // anchor before, find the page that now holds it, and start the flipbook
+  // there. Without this the book snaps back to the cover on every flip between
+  // portrait and landscape.
   useLayoutEffect(() => {
     if (!measureRef.current) return;
-    setPages(buildPages(book, innerW, innerH, measureRef.current));
-    setPageIdx(0);
+    const built = buildPages(book, innerW, innerH, measureRef.current);
+    const bookChanged = prevBookRef.current !== book.id;
+    prevBookRef.current = book.id;
+    let idx = 0;
+    if (bookChanged) {
+      anchorRef.current = null;            // a new book always opens on its cover
+    } else if (anchorRef.current) {
+      const found = built.findIndex((p) => anchorOnPage(anchorRef.current, p));
+      if (found >= 0) idx = found;
+    }
+    setPages(built);
+    setPageIdx(idx);
+    pageIdxRef.current = idx;
+    setStartPageIdx(idx);
   }, [book, innerW, innerH]);
 
   const goNext = useCallback(() => flipRef.current?.pageFlip()?.flipNext(), []);
@@ -289,11 +341,30 @@ export default function ChapterBook({ book, onExit }) {
     return () => window.removeEventListener('keydown', onKey);
   }, [goNext, goPrev, onExit]);
 
-  // --- Read-aloud: PAGE-scoped, auto-advancing, stop-on-manual-turn -----------
-  // Read-along reads the page(s) on screen, then auto-turns to the next page and
-  // keeps reading to the end of the chapter (audiobook style). A *manual* page
-  // turn stops it (the audio belonged to the page you left), and where each page
-  // stopped is remembered so pressing Read again resumes instead of restarting.
+  // Lock the page while the reader is open: no body scroll, no rubber-band
+  // overscroll, no pull-to-refresh — a stable, app-like surface. Restored on
+  // exit so the library scrolls normally.
+  useEffect(() => {
+    const body = document.body, html = document.documentElement;
+    const prev = { bodyOverflow: body.style.overflow, bodyOverscroll: body.style.overscrollBehavior, htmlOverscroll: html.style.overscrollBehavior };
+    body.style.overflow = 'hidden';
+    body.style.overscrollBehavior = 'none';
+    html.style.overscrollBehavior = 'none';
+    return () => {
+      body.style.overflow = prev.bodyOverflow;
+      body.style.overscrollBehavior = prev.bodyOverscroll;
+      html.style.overscrollBehavior = prev.htmlOverscroll;
+    };
+  }, []);
+
+  // --- Read-aloud: continuous within a chapter, stop-on-manual-turn -----------
+  // Pressing Read plays the chapter's recording straight through (audiobook
+  // style) and the page auto-FOLLOWS the audio — we turn the page when the
+  // spoken word crosses onto the next leaf, WITHOUT pausing or reloading the
+  // audio, so there's no gap or pop at a page turn. A *manual* page turn stops
+  // it (the audio belonged to the page you left), and where each page stopped is
+  // remembered so pressing Read again resumes instead of restarting. (The live
+  // TTS fallback, used only when no recording exists, stays page-scoped.)
   const [isPlaying, setIsPlaying] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [activeWord, setActiveWord] = useState(null);      // global word idx within the playing section
@@ -364,6 +435,8 @@ export default function ChapterBook({ book, onExit }) {
     setPlayingSectionId(null);
     playingUnitRef.current = null;
     autoAdvanceRef.current = null;
+    programmaticFlipRef.current = false;
+    flipAnimatingRef.current = false;
   }, []);
 
   // Finished reading a page's range. Drop its resume point (so re-reading it
@@ -387,10 +460,31 @@ export default function ChapterBook({ book, onExit }) {
     stopPlayback();
   }, [stopPlayback]);
 
+  // When the spoken word `globalWord` (a section-global word index) has moved
+  // past the leaf on screen, turn the page to follow it — programmatically, so
+  // the audio keeps playing uninterrupted. Guarded so only one follow-turn is in
+  // flight at a time (a flip takes ~700ms; a page of prose takes far longer).
+  const maybeFollow = (globalWord) => {
+    if (flipAnimatingRef.current) return;
+    const ps = pagesRef.current;
+    const sectionId = playingUnitRef.current?.sectionId;
+    if (!ps || !sectionId) return;
+    const tgt = ps.findIndex((p) => p.kind === 'text' && p.sectionId === sectionId
+      && globalWord >= p.wordBase && globalWord < p.wordBase + p.wordCount);
+    if (tgt < 0) return;
+    const lastVisible = pageIdxRef.current + (singleRef.current ? 0 : 1);
+    if (tgt > lastVisible) {
+      programmaticFlipRef.current = true;
+      flipAnimatingRef.current = true;
+      flipRef.current?.pageFlip()?.flipNext();
+    }
+  };
+
   // Drive activeWord from audio.currentTime via rAF. `wordOffset` is the global
   // word index of the alignment's first word. `endTime` (seconds, or null) stops
-  // playback when the page's range ends — the recording may run on past it.
-  const startWordTracking = (alignment, wordOffset, endTime, primaryIndex) => {
+  // playback when the range ends. `follow` true ⇒ continuous chapter playback:
+  // don't stop at a page edge, turn the page to follow the audio instead.
+  const startWordTracking = (alignment, wordOffset, endTime, primaryIndex, follow) => {
     stopWordTracking();
     if (!alignment) return;
     const c2w = charToWordMap(alignment.chars);
@@ -398,17 +492,22 @@ export default function ChapterBook({ book, onExit }) {
     const tick = () => {
       const a = audioRef.current;
       if (!a || a.paused) { rafRef.current = null; return; }
+      // Keep the audio rolling but DON'T touch React state while a page is
+      // mid-flip: a re-render here makes react-pageflip rebuild the turning page
+      // and the curl animation stutters. Resume highlighting once it settles.
+      if (flippingRef.current) { rafRef.current = requestAnimationFrame(tick); return; }
       if (endTime != null && isFinite(endTime) && a.currentTime >= endTime) { finishPage(primaryIndex); return; }
       const charIdx = highestLE(starts, a.currentTime);
       const wInRange = charIdx >= 0 ? c2w[charIdx] : -1;
       const next = wInRange >= 0 ? wordOffset + wInRange : null;
       setActiveWord((prev) => (prev === next ? prev : next));
+      if (follow && next != null) maybeFollow(next);
       rafRef.current = requestAnimationFrame(tick);
     };
     rafRef.current = requestAnimationFrame(tick);
   };
 
-  const beginPlayback = (src, alignment, wordOffset, startTime, endTime, primaryIndex) => {
+  const beginPlayback = (src, alignment, wordOffset, startTime, endTime, primaryIndex, follow) => {
     const audio = audioRef.current;
     audio.src = src;
     audio.oncanplaythrough = async () => {
@@ -417,10 +516,12 @@ export default function ChapterBook({ book, onExit }) {
         if (isFinite(startTime) && startTime > 0) { try { audio.currentTime = startTime; } catch { /* seek unsupported */ } }
         await audio.play();
         setIsLoading(false); setIsPlaying(true);
-        startWordTracking(alignment, wordOffset, endTime, primaryIndex);
+        startWordTracking(alignment, wordOffset, endTime, primaryIndex, follow);
       } catch { stopPlayback(); }
     };
-    audio.onended = () => finishPage(primaryIndex);
+    // Continuous chapter playback ends at the chapter's natural end → just stop.
+    // Page-scoped (live TTS) playback advances to the next page on end.
+    audio.onended = () => { if (follow) stopPlayback(); else finishPage(primaryIndex); };
     audio.onerror = () => { if (!userStopped.current) stopPlayback(); };
   };
 
@@ -437,8 +538,10 @@ export default function ChapterBook({ book, onExit }) {
     setPlayingSectionId(unit.sectionId);
     setIsLoading(true);
 
-    // FAST PATH: pre-recorded SECTION recording — seek into it for just this
-    // page's word range, and stop when the next page's first word would begin.
+    // FAST PATH: pre-recorded SECTION recording — seek to this page's first word
+    // and play the chapter STRAIGHT THROUGH to its natural end. The page follows
+    // the audio (see startWordTracking's `follow`), so there's no reload or gap
+    // at a page turn; reading stops on its own at the chapter break.
     try {
       const mp3 = `/audio/${VOICE}/${book.id}/${unit.sectionId}.mp3`;
       const json = `/audio/${VOICE}/${book.id}/${unit.sectionId}.json`;
@@ -446,8 +549,7 @@ export default function ChapterBook({ book, onExit }) {
       if (head.ok && alignResp.ok && !userStopped.current) {
         const alignment = await alignResp.json();
         const startTime = wordStartTime(alignment, fromWord);
-        const endTime = wordStartTime(alignment, unit.toWord);   // Infinity ⇒ play to the natural end
-        beginPlayback(mp3, alignment, 0, startTime, endTime, unit.primaryIndex);
+        beginPlayback(mp3, alignment, 0, startTime, null, unit.primaryIndex, true);
         return;
       }
     } catch { /* fall through to live */ }
@@ -463,7 +565,7 @@ export default function ChapterBook({ book, onExit }) {
     catch { if (!userStopped.current) stopPlayback(); return; }
     if (userStopped.current) { stopPlayback(); return; }
     const startTime = wordStartTime(entry.alignment, fromWord - unit.fromWord);
-    beginPlayback(entry.url, entry.alignment, unit.fromWord, startTime, null, unit.primaryIndex);
+    beginPlayback(entry.url, entry.alignment, unit.fromWord, startTime, null, unit.primaryIndex, false);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [stopPlayback, book.id]);
 
@@ -479,13 +581,28 @@ export default function ChapterBook({ book, onExit }) {
     playUnit(unit);
   }, [computeReadUnit, isPlaying, isLoading, rememberAndStop, playUnit]);
 
-  // A page turn. If read-along turned it (autoAdvanceRef set), keep reading the
-  // new page when it's the same chapter, else stop at the chapter break. A turn
-  // the reader made while reading stops read-along.
+  // A page turn. Three kinds:
+  //  1. A read-along page-FOLLOW turn (programmaticFlipRef) — the audio is still
+  //     playing through this chapter; just adopt the new page and keep going.
+  //  2. A live-TTS auto-advance (autoAdvanceRef) — start the next page's audio,
+  //     or stop at the chapter break.
+  //  3. A turn the reader made — if read-along is going, stop it.
+  // Always record an anchor for the new page so a later repagination can restore
+  // the reader's place instead of snapping to the cover.
   const handleFlipRef = useRef();
   handleFlipRef.current = (e) => {
     setPageIdx(e.data);
+    pageIdxRef.current = e.data;
     setShowBookmarks(false);
+    const a = pageAnchor(pagesRef.current?.[e.data]);
+    if (a) anchorRef.current = a;
+
+    if (programmaticFlipRef.current) {
+      programmaticFlipRef.current = false;
+      flipAnimatingRef.current = false;
+      if (playingUnitRef.current) playingUnitRef.current.primaryIndex = e.data;  // resume key follows the page
+      return;
+    }
     const fromSection = autoAdvanceRef.current;
     if (fromSection != null) {
       autoAdvanceRef.current = null;
@@ -713,7 +830,12 @@ export default function ChapterBook({ book, onExit }) {
   };
 
   return (
-    <div style={{ minHeight: '100vh', background: 'linear-gradient(160deg,#3a3357,#241f38)', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: 12 }}>
+    <div style={{
+      height: '100dvh', maxHeight: '100dvh', width: '100%', boxSizing: 'border-box',
+      background: 'linear-gradient(160deg,#3a3357,#241f38)',
+      display: 'flex', flexDirection: 'column', alignItems: 'stretch',
+      overflow: 'hidden', touchAction: 'manipulation', WebkitUserSelect: 'none', userSelect: 'none',
+    }}>
       {/* Off-screen measurer — same width/typography as a real text page. */}
       <div
         ref={measureRef}
@@ -725,14 +847,16 @@ export default function ChapterBook({ book, onExit }) {
         }}
       />
 
-      <button onClick={onExit}
-        style={{ position: 'fixed', top: 14, left: 16, zIndex: 50, background: 'rgba(255,255,255,0.92)', border: 'none', borderRadius: 999, padding: '8px 16px', fontSize: 14, fontWeight: 600, color: '#3a2f25', cursor: 'pointer', boxShadow: '0 2px 10px rgba(0,0,0,0.25)' }}>
-        ← Library
-      </button>
+      {/* Header bar — in normal flow, so it never overlaps the book. */}
+      <div style={{ flexShrink: 0, display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: 8, padding: '10px 14px 0', zIndex: 50 }}>
+        <button onClick={onExit}
+          style={{ background: 'rgba(255,255,255,0.92)', border: 'none', borderRadius: 999, padding: '8px 16px', fontSize: 14, fontWeight: 600, color: '#3a2f25', cursor: 'pointer', boxShadow: '0 2px 10px rgba(0,0,0,0.25)' }}>
+          ← Library
+        </button>
 
-      {/* Bookmarks: drop a ribbon on the page in view, and jump to saved ones. */}
-      <div style={{ position: 'fixed', top: 14, right: 16, zIndex: 50, display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: 8 }}>
-        <div style={{ display: 'flex', gap: 8 }}>
+        {/* Bookmarks: drop a ribbon on the page in view, and jump to saved ones. */}
+        <div style={{ position: 'relative', display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: 8 }}>
+          <div style={{ display: 'flex', gap: 8 }}>
           {bmTargetPage && (() => {
             const on = pageBookmarked(bmTargetPage);
             return (
@@ -752,7 +876,7 @@ export default function ChapterBook({ book, onExit }) {
           )}
         </div>
         {showBookmarks && resolvedBookmarks.length > 0 && (
-          <div style={{ width: 270, maxHeight: '60vh', overflowY: 'auto', background: '#fffdf8', borderRadius: 12, boxShadow: '0 6px 24px rgba(0,0,0,0.35)', padding: 6 }}>
+          <div style={{ position: 'absolute', top: '100%', right: 0, marginTop: 8, zIndex: 60, width: 270, maxHeight: '60vh', overflowY: 'auto', background: '#fffdf8', borderRadius: 12, boxShadow: '0 6px 24px rgba(0,0,0,0.35)', padding: 6 }}>
             {resolvedBookmarks.map(({ bm, idx, label, folio, snippet }) => (
               <div key={`${bm.sectionId}:${bm.word}`}
                 style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '8px 10px', borderRadius: 8 }}>
@@ -772,36 +896,42 @@ export default function ChapterBook({ book, onExit }) {
             ))}
           </div>
         )}
+        </div>
       </div>
 
-      {pages && (
-        <HTMLFlipBook
-          key={`${dims.w}x${dims.h}x${dims.single}`}
-          ref={flipRef}
-          width={dims.w}
-          height={dims.h}
-          size="fixed"
-          minWidth={dims.w}
-          maxWidth={dims.w}
-          minHeight={dims.h}
-          maxHeight={dims.h}
-          usePortrait={dims.single}
-          showCover={true}
-          mobileScrollSupport={true}
-          maxShadowOpacity={0.4}
-          drawShadow={true}
-          flippingTime={700}
-          onFlip={(e) => handleFlipRef.current(e)}
-          className="cb-flipbook"
-          style={{}}
-        >
-          {pages.map((p, i) => renderPage(p, i))}
-        </HTMLFlipBook>
-      )}
+      {/* The book — centered in the space left between header and footer. */}
+      <div style={{ flex: 1, minHeight: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', width: '100%' }}>
+        {pages && (
+          <HTMLFlipBook
+            key={`${dims.w}x${dims.h}x${dims.single}`}
+            ref={flipRef}
+            startPage={startPageIdx}
+            width={dims.w}
+            height={dims.h}
+            size="fixed"
+            minWidth={dims.w}
+            maxWidth={dims.w}
+            minHeight={dims.h}
+            maxHeight={dims.h}
+            usePortrait={dims.single}
+            showCover={true}
+            mobileScrollSupport={true}
+            maxShadowOpacity={0.4}
+            drawShadow={true}
+            flippingTime={700}
+            onFlip={(e) => handleFlipRef.current(e)}
+            onChangeState={(e) => { flippingRef.current = e.data !== 'read'; }}
+            className="cb-flipbook"
+            style={{}}
+          >
+            {pages.map((p, i) => renderPage(p, i))}
+          </HTMLFlipBook>
+        )}
+      </div>
 
       {/* Controls: prev · read-aloud · page · next */}
       {pages && (
-        <div style={{ display: 'flex', alignItems: 'center', gap: 16, marginTop: 14 }}>
+        <div style={{ flexShrink: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 16, padding: '12px 0 16px' }}>
           <button onClick={goPrev} disabled={pageIdx <= 0} style={ctrlBtn(pageIdx <= 0)}>‹</button>
           {(() => {
             const canRead = !!readUnit;
