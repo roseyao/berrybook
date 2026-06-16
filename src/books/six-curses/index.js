@@ -509,207 +509,105 @@ And on each item, a small neat label.
 
 OLIVER. IVY. OLIVER. IVY.
 
-"Oh," said Oliver, looking around with great satisfaction. "They knew we were coming."
+"Oh," said Oliver, looking around with great satisfaction. "They knew we were coming." He dropped into his chair and counted his presents. "One, two, three." Then he looked over at Ivy's pedestal. "You've got — oh. Two." He picked up his candy bag and gave it a shake. It was bigger than hers. Noticeably. "Huh," he said. "Mine's bigger."
 
-Ivy looked around more slowly.
+And there it was.
 
-Something felt off. She couldn't say what exactly. Everything looked fine. Everything looked perfectly, carefully, deliberately fine.
+Ivy felt it rise up in her chest, quick and hot, the way it always did. He has three and I have two. His bag is bigger. It's not fair. Why does he always—
 
-"I suppose," she said.
+She opened her mouth to say it.
 
-Oliver had already dropped into his chair and was examining his presents with great interest. "One, two, three," he counted happily. He looked over at Ivy's pedestal. "You've got — oh. Two." He shrugged. "Cool."
+And then she stopped.
 
-Ivy sat down in her chair.
+Because she had felt this exact feeling before. She knew its shape. She knew exactly where it went.
 
-She looked at her two presents.
+"Oh," she said slowly. "Oh, I know this one."
 
-She looked at his three.
+Oliver looked up from his candy. "Know what?"
 
-It's fine, she told herself. It doesn't matter. It's fine.
+"This feeling." Ivy put her small candy bag down, very deliberately, like setting down something hot. "The not-fair feeling. The counting one." She looked at him. "Remember when Mom sat us both down? After the popsicle fight, when we were both yelling not fair?"
 
-She picked up her fork and tried a bite of cake. It was good. She barely tasted it.
+Oliver's eyes went wide. "Stop counting," he said. "Start seeing." He said it like a password he'd suddenly remembered.
 
-Oliver had moved on to the candy bags. He picked his up, hefted it, gave it a satisfied shake. It was large and full and made a very pleasing rustling sound.
+"Be grateful for what you have," Ivy said. "Because the counting never stops. There's always going to be someone with more." She looked around the garden — at the two of everything, the careful labels, the candy bag that had been made just slightly bigger on purpose. "This whole place is built to make us count. That's the trap. That's the curse."
 
-Ivy picked up hers.
+Oliver looked at his three presents. Then at her two. Then he grinned.
 
-It was smaller. Noticeably. She turned it over in her hands. Same stripes. Different size.
+"Oooo," he said. "We are not falling for this one."
 
-"Oliver," she said carefully. "Is your candy bag bigger than mine?"
+"We are not falling for this one," Ivy agreed.
 
-Oliver looked at both bags with genuine scientific interest. "Yeah," he said. "A bit."
+And here is the strange thing. The moment they decided not to play, the garden seemed to lean in closer. Oliver's candy bag swelled a little bigger, just to tempt them. A fourth present appeared on his pedestal with a soft pop. The cake on his plate quietly grew an extra layer.
 
-"Why?"
+Ivy laughed. "It's trying really hard."
 
-He thought about it. "Don't know." He held his out. "Want some?"
+"Have the extra present," Oliver said grandly, and tipped it off his pedestal onto the grass. "I don't even want it. I want my own three. They're mine, and that's enough." He paused, rather pleased with himself. "Hey. That's the peach one. From the last garden."
 
-"No," Ivy said. Her voice was very controlled. "I don't want some of yours. I want my bag to be the same size."
+"They're kind of the same," Ivy said. "Always wanting more. Wanting what someone else has. They both make you forget to just — have your own thing. And be glad about it."
 
-"Oh." Oliver considered this. "That does seem a bit unfair." He said it the way you say something is mildly interesting, then went back to his candy.
+She picked up one of her own two presents, ready to open it, ready to be glad it was hers —
 
-Ivy put her bag down.
+And there was a cold tap on her shoulder.
 
-She looked at the cake. Took another bite. Still couldn't taste it.
+Ivy turned around.
 
-She noticed, without meaning to, that Oliver's slice was slightly larger than hers. Just slightly. Just enough.
+Hovering just behind her — just off the ground, pale and wispy, trailing a faint cold mist — was a rabbit. Or what had been a rabbit. She was small and slight and translucent, her long ears drifting as though moved by a breeze that wasn't there. Her eyes were large and sad and fixed on Ivy with a kind of desperate confusion.
 
-The stuffed animals were next. Oliver had four — a bear, a fox, a small elephant, and something fluffy and blue that Ivy couldn't identify. They were all soft and bright-eyed and new-looking.
+"How," the rabbit whispered. "How are you not fading? Everybody fades here."
 
-Ivy had three. A rabbit, a hedgehog, and an owl. All fine. All perfectly nice.
+Ivy looked down at her own hands. Solid. White. Completely there.
 
-One less.
+"We almost did," Ivy said honestly. "We felt it start. But we've met this one before." She crouched down to the little ghost's level, slow and careful, the way you'd come up to a bird that might startle. "Who are you? What happened to you?"
 
-"Oliver," she said. Her voice had developed an edge. "You have four stuffies."
+The rabbit stared at her, as though a unicorn crouching in the grass and asking questions in a normal voice was the strangest thing she had seen in a very long time.
 
-"Mmm." He was already introducing them to each other.
+"My name is Becca," she said at last.
 
-"I have three."
+"Hi, Becca," said Ivy. "Take your time."
 
-"Okay." He held up the fluffy blue thing. "What do you think this is? I think it might be a cloud."
+And slowly, it came out.
 
-"Oliver. Are you listening to me? You have MORE."
+"I have ten brothers and sisters," Becca said. "I'm the second oldest. Mama was always asking me to help. To be patient. To be nice to the little ones." A pause. "And mostly I tried. But the little ones always got the first slice of carrot cake. And when their stuffies wore out they got new ones. I got told I was too old for new stuffies."
 
-He looked up. Looked at her pile, then his. "Oh. Yeah." He held out the cloud. "Here, have the cloud."
+Ivy said nothing. Ivy just listened.
 
-"I don't WANT the cloud, Oliver, that's not the—" she stopped. Breathed. "It's not about the cloud. It's about the fact that my pile has less and yours has more and it's NOT FAIR."
+"I kept thinking — it's not fair. Every meal, every birthday, every time Mama said Becca, help me. Becca, be patient. Becca, you understand." Becca's voice was barely there. "And I did understand. But it still hurt."
 
-The last two words came out louder than she intended.
+Oliver had come to crouch beside Ivy. Quietly. Both of them now, low in the grass, looking at the little ghost.
 
-Oliver blinked.
+"And the more I thought it," Becca went on, "the more I faded. Because while I was busy counting what everyone else had, I stopped tasting my own cake. I stopped noticing my own stuffies. I stopped feeling any of the good things that were actually mine." Becca looked down at her own translucent paws. "Everything I had went grey and far away. Not because anyone took it. Because I stopped seeing it. And by the end I couldn't even hold my own things anymore."
 
-Something in the garden brightened slightly. Like a light turning up. Ivy didn't notice.
+"We can help," Ivy said. "I think. If you'll let us."
 
-Her stuffies, she didn't notice either, had gone slightly grey.
+Becca looked between them. "How? You don't even have that much." She glanced at Ivy's pedestal — counting, even now, the way she always did. "Your pile's small. Smaller than his."
 
-The presents were the worst.
+"I know," Ivy said. And Ivy smiled, because it didn't hurt the way it would have ten minutes ago. "Watch."
 
-Oliver tore into his with great enthusiasm, making appreciative sounds at each one. Ivy sat with her two in front of her, not opening them, just looking at them. Then looking at his three. Then back at hers.
+Ivy picked up one of her two presents and opened it. Inside was a small notebook, the kind with a clasp, a tiny unicorn pressed into the cover. Her name — IVY — in small neat letters on the first page.
 
-Two.
+"Oh," Ivy said softly. And meant it.
 
-He had three and she had two and that was one more than her and someone had decided that was how it should be and it was WRONG and UNFAIR and—
-
-"Ivy." Oliver was standing in front of her, holding something out. "Here. Have one of mine. I don't mind."
-
-"I DON'T WANT ONE OF YOURS."
-
-He stepped back.
-
-"I want my OWN third present," Ivy said. Her voice was shaking now. "I want the same as you. I want it to be FAIR. Why does he get more? Why do I always get less? It's NOT FAIR, Oliver, it's NOT—"
-
-She stopped.
-
-There was a cold tap on her shoulder.
-
-She spun around.
-
-Hovering just behind her — just off the ground, pale and wispy, trailing a faint cold mist — was a rabbit. Or what had been a rabbit. She was small and slight and translucent, her long ears drifting slightly as though moved by a breeze that wasn't there. Her eyes were large and sad and completely focused on Ivy.
-
-She had been right there the whole time. Ivy hadn't seen her once. She'd been too busy looking at Oliver's pile.
-
-"Who are you?" Ivy said. "Why are you—" she gestured at the ghostliness — "like that?"
-
-The rabbit looked at her steadily.
-
-"You are too," she said.
-
-Ivy laughed — a short sharp sound. "No I'm not, I'm perfectly—" She looked at Oliver.
-
-Oliver's face said everything.
-
-"Yeah, Ivy," he said quietly. "She's right. You are."
-
-Ivy looked down at her hands.
-
-They were pale. Not pale like she was cold. Pale like the light was going through them. She could see the yellow tablecloth through her fingers. She lifted one hand and looked at it against the sky and could see, faintly, the shapes of clouds on the other side.
-
-She was almost see-through.
-
-"What—" her voice came out very small. "What happened to me?"
-
-She looked at her presents. They were grey and translucent, the bright paper faded to almost nothing. Her candy bag barely there. Her stuffies pale shadows of themselves, the colours washed out, the softness somehow visible but unreachable.
-
-"What happened to us?" she whispered, looking at the ghost rabbit.
-
-The rabbit drifted closer. She looked at Ivy the way someone looks at a person they understand completely.
-
-"I have ten brothers and sisters," she said. "I'm the second oldest. Mama was always asking me to help. To be patient. To be nice to the little ones." A pause. "And mostly I tried. But the little ones always got the first slice of carrot cake. And when their stuffies wore out they got new ones. I got told I was too old for new stuffies."
-
-Ivy said nothing. She was listening.
-
-"I kept thinking — it's not fair. Every meal, every birthday, every time Mama said Becca, help me. Becca, be patient. Becca, you understand." Her voice was barely a whisper. "And I did understand. But it still hurt."
-
-Oliver had sat down on the ground. Quietly. Not interrupting.
-
-"But here's what happened," Becca said. "While I was saying not fair — I stopped tasting my cake. I stopped noticing how soft my stuffies were. I stopped feeling any of the good things I actually had. All I could think about was how everything compared. How much more they had. How little I had."
-
-[[SPOT 0]]
-
-She looked at her own pile — the one labeled BECCA, sitting untouched, unlooked-at, the whole time they'd been there.
-
-"All the joy just went. Everything I had went grey and ghostly." She paused. "Not because it was taken from me. Because I stopped seeing it."
-
-The garden was very quiet.
-
-Ivy looked at her pale translucent hands. At her grey presents. At her faded stuffies.
-
-"So how do we break this?" she said. Her voice cracked slightly. "I don't want to be a ghost. I miss Mama and Dad. I miss—" she looked at Oliver and her voice broke completely — "I can actually see through you from here."
-
-"That's you, Ivy," Oliver said gently. "You're the see-through one."
-
-"I know." She pressed her pale hands together. "I don't want this. I want to go home."
-
-Becca looked at her own pile again. "I wish I knew how," she said quietly. "If I knew I wouldn't still be here."
-
-A silence.
-
-Then Oliver's face did the thing it did when something was clicking into place. That particular expression — brow furrowed, mouth slightly open, eyes going somewhere internal.
-
-"You know how Mama always says that thing?" he said slowly. "When we say not fair? She always says—" he paused, making sure he had it right — "be grateful for what you have."
-
-Nobody spoke.
-
-"I always thought that was just something grownups say," he added honestly.
-
-Ivy looked at him. Then at her grey presents. Then at her pale hands.
-
-She reached out and picked up one of her presents.
-
-It was lighter than she expected. The paper, grey and ghostly as it was, crinkled softly under her fingers. She looked at it for a long moment — really looked, not comparing, just seeing. A small present with a pale ribbon. Hers. Actually hers.
-
-She opened it.
-
-Inside was a small notebook, the kind with a clasp. The cover had a tiny unicorn pressed into it. Her name — IVY — in small neat letters on the first page.
-
-Something in her chest loosened.
-
-"Oh," she said softly.
-
-She picked up the second present. Opened it slowly. A set of coloured pencils — twelve of them, each a different shade of purple. Every shade of her favourite colour she'd ever seen and some she hadn't.
+Ivy picked up the second present and opened it slowly. A set of coloured pencils — twelve of them, each a different shade of purple. Every shade of her favourite colour she'd ever seen, and some she hadn't.
 
 [[SPOT 1]]
 
-She looked at them for a long time.
+Ivy held them up so they caught the light.
 
-"These are really beautiful," she said. Not to Oliver. Not to Becca. Just out loud. Just naming it. Just seeing it.
+"These are mine," Ivy said. "There are only two presents. His pile is bigger. And they're still the most beautiful things I have ever seen, and I don't care even a tiny bit what's sitting on his pedestal." Ivy looked at Becca. "That's the whole trick. You stop looking at everyone else's pile. And you look at your own."
 
-"They are," Oliver said.
+Becca stared at the pencils. Something flickered across her ghostly face.
 
-The colour came back first. A warmth spreading from her hands outward, the purple deepening in her mane, her coat going from pale grey back to white, her edges sharpening back into the familiar clear lines of herself. She watched her stuffies brighten — the rabbit's eyes going dark and shiny, the hedgehog going warm brown, the owl getting its colours back.
+"But I don't have anything," Becca whispered.
 
-Her candy bag fattened and brightened in her hands.
+"Are you sure?" Ivy said gently. "Have you ever actually looked?"
 
-She was solid. She was herself. She was completely, entirely there.
+Becca went very still. Then, slowly, Becca turned toward the small pile behind her — the one she had never once looked at. The one with her own name on it.
 
-She looked at Becca.
-
-"Your pile," she said. "Have you ever actually looked at it?"
-
-Becca turned toward it slowly. As if it might not be there.
+[[SPOT 0]]
 
 It was there.
 
-A small pile. Not as large as Oliver's or Ivy's. But there. A worn stuffy — a little grey rabbit, loved to softness. A handwritten note, folded small. A single slice of carrot cake on a tiny plate, real and fragrant.
+A small pile. Not as large as Oliver's. Not even as large as Ivy's. But there — a worn stuffy, a little grey rabbit loved to softness. A handwritten note, folded small. A single slice of carrot cake on a tiny plate, real and fragrant.
 
 Becca drifted toward it. Reached out and touched the stuffy — and her hand didn't go through it. It was solid under her fingers.
 
@@ -749,19 +647,15 @@ Ivy stood in the dimming garden, her purple pencils in one hand, the notebook tu
 
 "Obviously," said Oliver.
 
-She looked at him. At his solid green scales and his orange patches and his round amber eyes looking back at her, completely there, completely himself.
+"I almost fell for it," Ivy admitted. "Right at the start. I felt the whole thing start up — he's got more, it's not fair, all of it." Ivy looked at her pencils. "It comes up so fast."
 
-"I could see through you," she said. "When I was fading. I could see the garden behind you and I thought — what if I just kept going and couldn't come back."
+"But you caught it," Oliver said.
 
-"I kept trying to get your attention," Oliver said. "You couldn't hear me."
+"We caught it." Ivy bumped him gently with her shoulder. "Mom's thing works. The grateful thing. The stop-counting-and-start-seeing thing."
 
-"I know." She looked at her hands — solid, white, exactly right. "I was so loud about not fair that I couldn't hear anything else."
+"I'm telling her she was right," Oliver said. "She'll like that."
 
-Oliver thought about this with great seriousness.
-
-"Mama's thing works," he said finally. "The grateful thing."
-
-"Yeah," Ivy said. "It does."
+"She will," Ivy said.
 
 The courtyard shimmered back around them. Two symbols glowed steady on the book's cover. The second fountain had joined the first, both trickling quietly now. The sky had settled on something — not quite blue, not quite gold, but trying.
 
@@ -785,7 +679,7 @@ This curse is called Envy — and its younger sister is Jealousy.
 
 Envy is wanting what someone else has. Jealousy is feeling like what they have somehow makes yours less. Together they whisper the same thing: not fair, not fair, not fair. They count everything. They measure everything. And the more you listen to them, the less you can taste your own cake or feel how soft your own stuffies are.
 
-You broke this curse, brave Ivy, when you stopped counting and started seeing. When you opened your presents and let them be yours — not compared, not measured. Just yours. When you found the treasure that was already there.
+You broke this curse, brave ones, the moment you recognised it — when you remembered what Mom taught you, set down the counting, and chose to see your own treasure instead of someone else's. And then you did the bravest thing of all: you turned around and helped Becca see hers.
 
 Remember this. Envy and Jealousy are patient. They will find you again — every time you start counting instead of seeing, every time not fair feels louder than thank you. But now you know their names. And you know what breaks them.
 
