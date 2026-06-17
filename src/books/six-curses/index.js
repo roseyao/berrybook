@@ -149,9 +149,9 @@ It came in waves — first something warm and cinnamony, then sugar, then fruit 
 
 "Yes," Ivy said carefully.
 
-"It smells INCREDIBLE."
+"It smells AMAZING."
 
-Ivy wasn't sure incredible was exactly the word she would have used.
+Ivy wasn't sure amazing was exactly the word she would have used.
 
 The garden opened around them like a fever dream of plenty.
 
@@ -217,7 +217,7 @@ She heard Oliver bite into one.
 
 She turned around.
 
-He had juice running down his chin and his eyes had gone very wide and his expression was the one he got when something was so good it almost hurt.
+Oliver had juice running down his chin and his eyes had gone very wide and his expression was the one he got when something was so good it almost hurt.
 
 "Ivy," he said. "Ivy, this is the best thing I have ever eaten in my entire life."
 
@@ -313,13 +313,13 @@ Then, thin and strange and very far away:
 
 "I remember it started with the cake."
 
-Oliver sat down cross-legged on the stone ground. Like he was settling in. Like he understood this was going to take a while and that was okay.
+Oliver sat down cross-legged on the stone ground, right in front of the big sad blob. Like he was settling in. Like he understood this was going to take a while and that was okay.
 
-"What kind of cake?" he asked.
+"What kind of cake, Blobby?" Oliver asked.
 
-Ivy looked at him. It was exactly the right question. She wouldn't have thought of it.
+Ivy looked at Oliver. It was exactly the right question. She wouldn't have thought of it.
 
-The creature's eyes moved toward Oliver's voice.
+The blob's eyes moved toward Oliver's voice.
 
 "Birthday cake. My birthday. I had one piece and it was so good. So I had another. And another. And then it was gone and the good feeling went with it." A pause. "And I just kept thinking — if I had more. Just more. I'd feel that way again."
 
@@ -343,7 +343,7 @@ The garden was very quiet.
 
 Oliver was looking at the half-eaten peach on the ground in front of him.
 
-Ivy watched his face. She could see it — the thing Theo was describing. She could see Oliver feeling it right now. The wanting already building again, even now, even after everything they'd just seen. His eyes kept moving toward the peach tree. His hand had shifted, almost without him noticing, a few inches closer to the fruit on the ground.
+Ivy watched Oliver's face. She could see it — the thing Blobby was describing. She could see Oliver feeling it right now. The wanting already building again, even now, even after everything they'd just seen. His eyes kept moving toward the peach tree. His hand had shifted, almost without him noticing, a few inches closer to the fruit on the ground.
 
 "Oliver," she said softly.
 
@@ -355,7 +355,7 @@ He was quiet for a moment.
 
 "That's the curse," he said. Not a question.
 
-"Yes," Theo's voice said. "That's the curse."
+"Yes," Blobby's voice said. "That's the curse."
 
 Oliver looked at the peach tree. The fruit glowed golden-pink in the strange light, perfect and fragrant, the best smell in the entire garden. He could have another one. He could reach out right now and have another one and it would be extraordinary and he knew that and knowing it made the wanting worse not better.
 
@@ -385,7 +385,7 @@ The creature went very still. The reaching motion — that endless, exhausted, a
 
 Stopped.
 
-"He stopped," Theo's voice said. Barely a whisper. Full of something that sounded almost like wonder. "He just — he stopped."
+"He stopped," Blobby's voice said. Barely a whisper. Full of something that sounded almost like wonder. "He just — he stopped."
 
 "Yes," Ivy said.
 
@@ -395,7 +395,7 @@ Stopped.
 
 A long silence.
 
-"I don't know if I can," Theo said.
+"I don't know if I can," Blobby said.
 
 "You've been doing the hard thing alone for a really long time," Ivy said. "You don't have to do this part alone."
 
@@ -431,7 +431,7 @@ He nodded slowly. Then he looked at Oliver with something very serious in his ey
 
 Oliver looked at the ground. "You stopped too."
 
-"I had help." Theo was quiet for a moment, looking at them both — this unicorn and this dragon who had come from somewhere else and crouched down in the roots of the peach tree and stayed. Something in his face settled, like a knot finally coming loose.
+"I had help." The hedgehog was quiet for a moment, looking at them both — this unicorn and this dragon who had come from somewhere else and crouched down in the roots of the peach tree and stayed. Something in his face settled, like a knot finally coming loose.
 
 He sat up a little straighter.
 
