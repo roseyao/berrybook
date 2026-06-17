@@ -286,13 +286,46 @@ export default function ChapterBook({ book, onExit }) {
 
   useEffect(() => { pagesRef.current = pages; }, [pages]);
   useEffect(() => { singleRef.current = dims.single; }, [dims.single]);
+  const dimsRef = useRef(dims);
+  useEffect(() => { dimsRef.current = dims; }, [dims]);
 
-  // Re-compute page size on resize (debounced via rAF).
+  // Build the page list at a given size and find where the current reading
+  // anchor now lives, so a resize / rotation can keep the reader's place.
+  // `reset` forces the cover (a freshly opened book).
+  const layout = useCallback((d, reset) => {
+    const built = buildPages(book, d.w - TYPE.padX * 2, d.h - TYPE.padY * 2, measureRef.current);
+    let idx = 0;
+    if (!reset && anchorRef.current) {
+      const found = built.findIndex((p) => anchorOnPage(anchorRef.current, p));
+      idx = found >= 0 ? found : Math.min(pageIdxRef.current, built.length - 1);
+    }
+    return { built, idx };
+  }, [book]);
+
+  // Resize / orientation: recompute the size, repaginate, and restore the place
+  // — all in ONE batched update so the flipbook (whose `key` is the size) mounts
+  // straight onto the restored page. (Doing the repagination in an effect AFTER
+  // the size change let the flipbook remount on the STALE start page first —
+  // that's what was snapping the reader back to the cover on rotation.) Tiny
+  // height jitter with no orientation change (e.g. a mobile toolbar showing /
+  // hiding) is ignored so it can't interrupt reading.
   useEffect(() => {
     let raf = 0;
     const onResize = () => {
       cancelAnimationFrame(raf);
-      raf = requestAnimationFrame(() => setDims(computeDims()));
+      raf = requestAnimationFrame(() => {
+        if (!measureRef.current) return;
+        const nd = computeDims();
+        const cur = dimsRef.current;
+        if (nd.single === cur.single && Math.abs(nd.w - cur.w) < 4 && Math.abs(nd.h - cur.h) < 24) return;
+        const { built, idx } = layout(nd, false);
+        dimsRef.current = nd;
+        pageIdxRef.current = idx;
+        setDims(nd);
+        setPages(built);
+        setStartPageIdx(idx);
+        setPageIdx(idx);
+      });
     };
     window.addEventListener('resize', onResize);
     window.addEventListener('orientationchange', onResize);
@@ -301,31 +334,22 @@ export default function ChapterBook({ book, onExit }) {
       window.removeEventListener('orientationchange', onResize);
       cancelAnimationFrame(raf);
     };
-  }, []);
+  }, [layout]);
 
-  // (Re)paginate whenever the book or the page size changes. A resize /
-  // orientation change rebuilds the page list AND remounts the flipbook (its
-  // key depends on the dims), so we must restore the reader's place: capture an
-  // anchor before, find the page that now holds it, and start the flipbook
-  // there. Without this the book snaps back to the cover on every flip between
-  // portrait and landscape.
+  // Initial pagination + book change (resets to the cover). Size changes are
+  // handled by the resize effect above, not here.
   useLayoutEffect(() => {
     if (!measureRef.current) return;
-    const built = buildPages(book, innerW, innerH, measureRef.current);
     const bookChanged = prevBookRef.current !== book.id;
     prevBookRef.current = book.id;
-    let idx = 0;
-    if (bookChanged) {
-      anchorRef.current = null;            // a new book always opens on its cover
-    } else if (anchorRef.current) {
-      const found = built.findIndex((p) => anchorOnPage(anchorRef.current, p));
-      if (found >= 0) idx = found;
-    }
+    if (bookChanged) anchorRef.current = null;
+    const { built, idx } = layout(dimsRef.current, bookChanged);
     setPages(built);
     setPageIdx(idx);
     pageIdxRef.current = idx;
     setStartPageIdx(idx);
-  }, [book, innerW, innerH]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [book, layout]);
 
   const goNext = useCallback(() => flipRef.current?.pageFlip()?.flipNext(), []);
   const goPrev = useCallback(() => flipRef.current?.pageFlip()?.flipPrev(), []);
@@ -687,7 +711,9 @@ export default function ChapterBook({ book, onExit }) {
 
   const goToBookmark = (bm) => {
     const idx = bookmarkPageIndex(bm);
-    if (idx >= 0) flipRef.current?.pageFlip()?.flip(idx);
+    // turnToPage = instant, reliable jump (it also fires onFlip so our page
+    // state stays in sync). The animated flip(idx) mis-lands on distant pages.
+    if (idx >= 0) flipRef.current?.pageFlip()?.turnToPage(idx);
     setShowBookmarks(false);
   };
 
