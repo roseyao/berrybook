@@ -294,10 +294,12 @@ export default function ChapterBook({ book, onExit }) {
   // `reset` forces the cover (a freshly opened book).
   const layout = useCallback((d, reset) => {
     const built = buildPages(book, d.w - TYPE.padX * 2, d.h - TYPE.padY * 2, measureRef.current);
-    let idx = 0;
+    // Never snap to the cover on a repagination — only a freshly opened book
+    // does that. Default to the current page, then prefer the re-found anchor.
+    let idx = reset ? 0 : Math.min(pageIdxRef.current, built.length - 1);
     if (!reset && anchorRef.current) {
       const found = built.findIndex((p) => anchorOnPage(anchorRef.current, p));
-      idx = found >= 0 ? found : Math.min(pageIdxRef.current, built.length - 1);
+      if (found >= 0) idx = found;
     }
     return { built, idx };
   }, [book]);
@@ -618,6 +620,7 @@ export default function ChapterBook({ book, onExit }) {
     setPageIdx(e.data);
     pageIdxRef.current = e.data;
     setShowBookmarks(false);
+    setShowContents(false);
     const a = pageAnchor(pagesRef.current?.[e.data]);
     if (a) anchorRef.current = a;
 
@@ -666,6 +669,7 @@ export default function ChapterBook({ book, onExit }) {
   // page whose word range contains it.
   const [bookmarks, setBookmarks] = useState([]);
   const [showBookmarks, setShowBookmarks] = useState(false);
+  const [showContents, setShowContents] = useState(false);   // chapter index dropdown
 
   // Load on book change; persist on change. Per book, in localStorage.
   useEffect(() => {
@@ -693,6 +697,13 @@ export default function ChapterBook({ book, onExit }) {
   const visibleIdxs = dims.single ? [pageIdx] : [pageIdx, pageIdx + 1];
   const bmTargetIdx = pages ? visibleIdxs.find((i) => pages[i] && (pages[i].kind === 'text' || pages[i].kind === 'opener')) : undefined;
   const bmTargetPage = bmTargetIdx != null ? pages[bmTargetIdx] : null;
+
+  // Chapter index (table of contents): each section's opener page, in order.
+  const chapterList = (pages || [])
+    .map((p, idx) => ({ p, idx }))
+    .filter(({ p }) => p.kind === 'opener')
+    .map(({ p, idx }) => ({ idx, sectionId: p.section.id, label: p.section.label, title: p.section.title }));
+  const curSectionId = pages?.[pageIdx]?.section?.id;
 
   const toggleBookmark = () => {
     const p = bmTargetPage;
@@ -875,10 +886,30 @@ export default function ChapterBook({ book, onExit }) {
 
       {/* Header bar — in normal flow, so it never overlaps the book. */}
       <div style={{ flexShrink: 0, display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: 8, padding: '10px 14px 0', zIndex: 50 }}>
-        <button onClick={onExit}
-          style={{ background: 'rgba(255,255,255,0.92)', border: 'none', borderRadius: 999, padding: '8px 16px', fontSize: 14, fontWeight: 600, color: '#3a2f25', cursor: 'pointer', boxShadow: '0 2px 10px rgba(0,0,0,0.25)' }}>
-          ← Library
-        </button>
+        <div style={{ position: 'relative', display: 'flex', gap: 8 }}>
+          <button onClick={onExit}
+            style={{ background: 'rgba(255,255,255,0.92)', border: 'none', borderRadius: 999, padding: '8px 16px', fontSize: 14, fontWeight: 600, color: '#3a2f25', cursor: 'pointer', boxShadow: '0 2px 10px rgba(0,0,0,0.25)' }}>
+            ← Library
+          </button>
+          {chapterList.length > 1 && (
+            <button onClick={() => { setShowContents((s) => !s); setShowBookmarks(false); }}
+              title="Jump to a chapter"
+              style={{ background: showContents ? '#7b6cc4' : 'rgba(255,255,255,0.92)', color: showContents ? '#fff' : '#3a2f25', border: 'none', borderRadius: 999, padding: '8px 16px', fontSize: 14, fontWeight: 600, cursor: 'pointer', boxShadow: '0 2px 10px rgba(0,0,0,0.25)' }}>
+              ☰ Contents
+            </button>
+          )}
+          {showContents && (
+            <div style={{ position: 'absolute', top: '100%', left: 0, marginTop: 8, zIndex: 60, width: 264, maxHeight: '64vh', overflowY: 'auto', background: '#fffdf8', borderRadius: 12, boxShadow: '0 6px 24px rgba(0,0,0,0.35)', padding: 6 }}>
+              {chapterList.map((ch) => (
+                <button key={ch.idx} onClick={() => { flipRef.current?.pageFlip()?.turnToPage(ch.idx); setShowContents(false); }}
+                  style={{ display: 'block', width: '100%', textAlign: 'left', background: ch.sectionId === curSectionId ? '#f1e7d2' : 'transparent', border: 'none', borderRadius: 8, padding: '8px 10px', cursor: 'pointer', fontFamily: TYPE.fontFamily }}>
+                  <div style={{ fontSize: 12, fontWeight: 700, color: '#8a5a2b', textTransform: 'uppercase', letterSpacing: 0.5 }}>{ch.label}</div>
+                  <div style={{ fontSize: 13, color: '#5a4a38', marginTop: 2, fontStyle: 'italic' }}>{ch.title}</div>
+                </button>
+              ))}
+            </div>
+          )}
+        </div>
 
         {/* Bookmarks: drop a ribbon on the page in view, and jump to saved ones. */}
         <div style={{ position: 'relative', display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: 8 }}>
@@ -894,7 +925,7 @@ export default function ChapterBook({ book, onExit }) {
             );
           })()}
           {resolvedBookmarks.length > 0 && (
-            <button onClick={() => setShowBookmarks((s) => !s)}
+            <button onClick={() => { setShowBookmarks((s) => !s); setShowContents(false); }}
               title="Go to a bookmark"
               style={{ background: 'rgba(255,255,255,0.92)', color: '#3a2f25', border: 'none', borderRadius: 999, padding: '8px 14px', fontSize: 14, fontWeight: 600, cursor: 'pointer', boxShadow: '0 2px 10px rgba(0,0,0,0.25)' }}>
               Bookmarks ({resolvedBookmarks.length})
