@@ -1004,8 +1004,211 @@ The book was already opening.`,
 // Chapters 4–6 + epilogue are outlined but not yet written; the reader shows a
 // gentle "coming soon" page for any section whose text is empty.
 const chapter4 = {
-  id: 'ch4', label: 'Chapter 4', title: 'The Ward of Never Share', sin: 'Greed',
-  fullImage: `${IMG}/ch4-full.png`, spots: [], text: '',
+  id: 'ch4',
+  label: 'Chapter 4',
+  title: 'The Ward of Never Nice',
+  sin: 'Meanness',
+  fullImage: `${IMG}/ch4-prickly.png`,
+  spots: [`${IMG}/ch4-playfort.png`, `${IMG}/ch4-pip-freed.png`],
+  text: `The courtyard shimmered back around them. Three symbols glowed steadily on the book's cover now, and three fountains trickled together. The sky had warmed another shade.
+
+The book fell open in Ivy's hands.
+
+This curse is called Sloth.
+
+Sloth is the curse of too hard, too much, not now, someone else will do it. It tells you every problem is too big to begin — so you don't begin. You wait. You wait for someone else to get up and do the hard thing for you. And the longer you wait, the more you forget you could have done it yourself.
+
+You broke this curse, brave Oliver, when you stopped waiting and became a problem solver. When you got up out of the cold bog, picked up the pencils, and finished the drawing yourself — not because it was easy, but because a problem solver doesn't wait around for someone else to fix the hard thing. They get up. They figure it out. They do it themselves.
+
+Remember this. Sloth is patient. It is waiting in every warm bed and every hard worksheet and every "in a minute, someone else can do it." But now you know its name. And you know what beats it.
+
+Get up. Solve it yourself.
+
+The book closed softly. Oliver looked rather pleased with himself.
+
+"I solved it myself," he said. "I'm a problem solver."
+
+"You are," Ivy agreed. "You really are."
+
+They looked at the fourth path. From where they stood it just looked like — somewhere to play.
+
+"Together?" said Ivy.
+
+"Together," said Oliver, and took her hoof, and they stepped onto the fourth path.
+
+It was the best place they had ever seen. The path opened out and there it was — a play-fort to end all play-forts. Rope bridges and ladders and a slide that curled around twice. A sandpit. A swing that went all the way up to the sky. Buckets of toys. A whole castle of cushions, waiting to be knocked down.
+
+"WHOA," said Oliver.
+
+[[SPOT 0]]
+
+They ran in. And for a little while it was wonderful. They climbed and slid and swung and built a tower out of cushions and knocked it down. Ivy laughed so hard she got the hiccups.
+
+Then a small voice spoke. Right by Oliver's ear. Soft and friendly and close.
+
+Poke her, it said.
+
+Oliver didn't really decide to. His finger just sort of — did it. He poked Ivy in the arm.
+
+"Hey," said Ivy.
+
+Oliver laughed. It had been, for some reason, extremely funny. The little voice by his ear seemed to laugh too. Do it again, it said. So Oliver poked her again.
+
+"Oliver. Stop it."
+
+He felt something then — a tiny prickle on the back of his own hand, like a splinter going in the wrong way. He didn't look down. The voice was already whispering something sillier, and it was so funny he had to say it.
+
+"You smell like a poopy head!" Oliver announced.
+
+He waited for Ivy to laugh. Ivy did not laugh.
+
+The small voice had come to Ivy's side too. Quiet. Reasonable. It pointed out, gently, that Oliver was being a pain. That she'd been having a much nicer time before he started poking. That she didn't have to let him play with her at all if he was going to be like that.
+
+The voice was right, Ivy thought. That was the worst part. It felt completely right.
+
+"Fine," Ivy said, climbing up onto the cushion castle. "You can't play with me, then."
+
+Something prickled on her shoulder. She ignored it.
+
+"I don't care," said Oliver. But his face did a small flinch. "I've got my own fort anyway. A better one." He grabbed an armful of toys and held them up, bragging the way he did. "And I've got more than you! Look! I got way more!"
+
+A prickle ran up his arm. He still didn't look.
+
+"I don't even want to play with you," Ivy said. The mean thing was right there, easy, and saying it felt like scratching an itch. "I don't like you anymore."
+
+The garden went very quiet.
+
+Oliver stood there with his armful of toys. And Ivy watched his face fall, and heard the words hanging in the air where she'd put them — I don't like you anymore — and her stomach dropped.
+
+But Oliver didn't fire one back.
+
+He put the toys down. He took a breath, the careful kind. And then he said something Ivy did not expect.
+
+"I know you don't really mean that," Oliver said.
+
+Ivy blinked. "What?"
+
+"You're my sister. And you love me. So I know you don't really mean it — I think this place is making us mean." He swallowed. "So I'm not going to believe it." A pause, and then, smaller and braver: "But it still made my tummy hurt. So please don't say it again. Okay?"
+
+And a quill — one of the long grey ones bristling all over Oliver — loosened, and fell, and vanished before it hit the ground.
+
+Ivy stared at him. He hadn't poked back. He hadn't said anything mean at all. He'd just — decided she still loved him, even when she was being awful, and asked her, kindly, to stop.
+
+"I don't mean it," Ivy said, and her voice cracked. "I don't — you're my favorite person in the whole world, and I said the meanest thing, and I'm so sorry."
+
+A quill fell off her shoulder.
+
+"It's okay," said Oliver. "It's the curse." He looked at his own spikes. "But I don't know how to make the rest fall off."
+
+Ivy thought about it. Looked at her brother — bristling all over, and still, somehow, not being mean back.
+
+"I think," she said slowly, "sorry isn't the only kind thing. I think you can also just — tell someone what's good about them."
+
+So she did.
+
+"You're the funnest person I know," Ivy said. "You make me laugh even when I'm trying to be grumpy. And you always know where to find the very best rocks — the smooth ones and the sparkly ones. Nobody finds them like you do. You're brave and you're silly and you're my best friend. That's what's true about you. Not the mean stuff. That."
+
+Oliver's whole face changed. It opened up, lit from the inside, and he smiled so wide his spikes shivered — and three of them dropped off at once.
+
+And here is the thing Ivy hadn't expected: watching Oliver's face go bright like that made something go warm and bright in her own chest too. Making him feel good felt good. It felt better than the mean thing ever had — better and bigger, and it lasted.
+
+"Your turn," Ivy said. "Tell me a true good thing."
+
+"You're the best," Oliver said at once. "You make the most beautiful drawings, and the coolest Legos, and you're the best big sister in the whole world — to me, and to Hazel." He grinned. "And you let me play with you. Mostly."
+
+Ivy laughed — and felt three of her own quills go.
+
+It was only then, with most of their spikes gone and their green and white showing through again, that they noticed they were not alone.
+
+In the far corner of the play-fort, where the warm light didn't reach, something enormous sat very still. It was made entirely of quills — thousands of them, long and grey and sharp, layered so thickly that whatever was underneath hadn't been seen, by anyone, in a very long time. Two small eyes watched them from deep inside.
+
+"Hello," said Ivy.
+
+The bristly creature flinched. "Go away," it said, rough and sharp. "Don't come close. You'll get hurt."
+
+Ivy and Oliver looked at each other — because they had just learned something about mean words.
+
+"I don't think you really want us to go," Ivy said gently. "I think you're scared we'll leave like everybody else. So you're telling us to go first." She sat down, a little way off. "But we're not going to. Is it okay if we stay?"
+
+The eyes blinked. Like nobody had ever seen through it before.
+
+For a long moment the bristly creature said nothing. Then, slowly, it began to talk — more to the floor than to them.
+
+"It started so small," it said. "A poke. A funny mean name. Telling someone they couldn't play. And everyone would laugh, or I'd feel big for a second. Bigger than whoever I poked. And I liked it. That little big feeling." A pause. "But it never stayed. It got smaller every time, so I had to be meaner to get it back. 'You can't sit here.' 'I don't want to be your friend.' 'Go away.' And every single time I said a mean thing, a new spike grew."
+
+"And then?" Ivy asked gently.
+
+"And then I was all spikes. And nobody could get near me without getting poked, so they stopped trying. Every one of them. And I told myself — good. I don't need anybody." A silence. "But I wasn't fine. I was so lonely. I'd made myself into a thing nobody could hug. And I forgot how to be soft. I don't know how to stop. The spikes just grow."
+
+Ivy and Oliver got up — the last few quills and all — and went and sat right next to the bristly creature. Close.
+
+"You'll get poked," it warned.
+
+"That's okay," said Oliver. "We don't mind a little poke. I poke Ivy all the time. I'm working on it."
+
+The creature made a sound that was almost a laugh.
+
+"Can I tell you something true?" Ivy said. "Something good about you?"
+
+The creature went very still.
+
+"When we walked in, you let us play in your whole fort," Ivy said. "The slide, the swings, all of it. You'd been sitting here alone for so long, and you still shared everything you had the second we arrived. That's one of the kindest things anyone's ever done for me. You've got so much kind still in you. I can see it from here."
+
+For a long moment, nothing.
+
+Then the bristly creature began, very quietly, to cry — and with every tear, a quill loosened and fell.
+
+"Nobody's said a good thing about me," it whispered, "in such a long time. I forgot the good things were even in there."
+
+"They're in there," said Oliver. "We can see them."
+
+The creature looked at the two of them — sitting close, not leaving, telling it true good things — and it did the hardest, bravest thing it had done in years. It found a good thing, and gave it away.
+
+"You came and sat by the prickliest thing in the whole kingdom," it said, "just so it wouldn't be alone. That's the kindest thing I've ever seen." A shaky breath. "Thank you. Thank you for staying."
+
+And the quills came off in a soft grey rain, faster and faster, the great bristling shape growing smaller and softer and rounder —
+
+[[SPOT 1]]
+
+— until sitting in the corner of the play-fort, blinking in the warm light, was a small round porcupine. She had soft dark eyes and a snub little nose and quills that lay flat and gentle down her back, the way quills are supposed to. She looked at Ivy and Oliver sitting right beside her — right beside her, nobody poked, nobody gone.
+
+"You stayed," she said.
+
+"We stayed," said Oliver.
+
+The porcupine touched one of her own quills, soft now. "I remember being kind," she said wonderingly. "Little. Before the big feeling. I used to make people smile and it felt so warm." She looked up. "How did I forget the warm feeling was better than the big feeling?"
+
+"Mean feels big for a second," Ivy said. "But it leaves you all alone."
+
+"And kind feels warm for a long time," said Oliver. "And the best part —" he looked at Ivy, surprised to be figuring it out as he said it — "when you make somebody else smile, it makes you feel good too. Both of you. At the same time."
+
+The porcupine smiled — a real one, the first in the longest time. And Ivy felt it warm her chest all over again.
+
+The porcupine sat up very straight. "My name is Pip," she said. Clear and certain. "My name is Pip. And I have a lot of good things to start telling people — starting with the ones I was mean to."
+
+"That's a really good problem to solve," said Oliver. And meant it.
+
+Above them, the fourth symbol blazed bright gold — then settled into a warm, steady glow.
+
+Ivy held out her open hand. Pip looked at it — an open hand, nothing prickly about it — and took it. And between one breath and the next she was gone, back to all the people she was going to make smile.
+
+Ivy and Oliver stood in the gentle wreck of the cushion castle, quills gone, exactly themselves.
+
+Oliver reached over and, instead of poking Ivy, held her hoof. "I really do like you," he said. "I was being the curse."
+
+"I know. And I knew you didn't mean the pokes," Ivy said. "You're just silly. I love that you're silly." She squeezed his hoof. "And the next time I say something like I don't like you anymore — you did exactly the right thing. You knew I didn't mean it. Because I love you. Even when I'm being awful."
+
+"You can't take mean words back," Oliver said wisely. "Mom says. But you can say sorry, and do better, and say a good thing instead."
+
+"Then I'm sorry," said Ivy. "And here's a good thing instead: there's nobody in any kingdom I'd rather do this with than you."
+
+Oliver beamed — another little warm thing, passed back and forth between them.
+
+The courtyard shimmered back around them. Four symbols glowed steady on the book's cover now. A fourth fountain joined the others, all of them singing quietly together. The sky was very nearly its proper blue.
+
+Two paths remained dark.
+
+The book was already opening in Ivy's hands.`,
 };
 const chapter5 = {
   id: 'ch5', label: 'Chapter 5', title: 'The Ward of Always Right', sin: 'Pride',

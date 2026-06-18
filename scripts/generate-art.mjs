@@ -342,6 +342,23 @@ const SCENES11 = {
     refs: [],
     prompt: `Children's-book watercolor, soft brushstrokes, warm colours returning. Square. A small PANDA (Maverick) — round black ears, white face, black eye-patches around gentle SLEEPY eyes — sitting up very straight, holding a finished crayon DRAWING of his panda family in both paws, gazing at it with a small proud smile. Warm golden light all around. NO other characters — just the panda and his drawing.`,
   },
+
+  // ---- Chapter 4: The Ward of Never Nice (Meanness / Quill-creature / Pip) ----
+  'ch4-prickly': {
+    refDir: THUMBS, outDir: BOOK11, out: 'ch4-prickly.png', aspectRatio: '3:4',
+    refs: ['ivy.png', 'oliver.png'],
+    prompt: `Vertical 3:4 portrait, comic but slightly eerie, cool grey palette warming at the edges. A wonderful PLAY-FORT (rope bridges, twisty slide, tall swing, castle of cushions) in the background, but the mood has gone prickly and uneasy. FOREGROUND, the emotional point of the picture: IVY (the white unicorn) and OLIVER (the emerald-green dragon) stand apart, turned partly away from each other with cross, hurt, upset faces — and BOTH are COVERED in a thick bristling pelt of long sharp GREY QUILLS jutting out all over their backs, shoulders and sides (big obvious porcupine spikes growing right out of their bodies). Each reaches one hoof/paw toward the other but the long quills jut between them like a fence and keep them from touching — clearly pushed apart by their own spikes. In the shadowed corner behind them looms a LARGE hunched creature made ENTIRELY of long grey quills — a giant bristling spike-ball with two small sad eyes deep inside (a cursed kid hidden under the spikes). NO HUMANS. Ivy taller than Oliver. Exactly three characters — heavily-quilled Ivy, heavily-quilled Oliver, and the giant bristly creature. Sad and prickly, not frightening.` + STYLE11,
+  },
+  'ch4-playfort': {
+    refDir: THUMBS, outDir: BOOK11, out: 'ch4-playfort.png', aspectRatio: '1:1',
+    refs: [],
+    prompt: `Children's-book watercolor, soft brushstrokes, warm afternoon light. Square view of the most wonderful PLAY-FORT a kid could imagine — rope bridges and ladders, a slide that curls around twice, a sandpit, a swing that goes up high, buckets of toys, and a whole castle of soft cushions waiting to be knocked down. Inviting, cozy, full of promise — before anything goes wrong. NO characters.`,
+  },
+  'ch4-pip-freed': {
+    refDir: THUMBS, outDir: BOOK11, out: 'ch4-pip-freed.png', aspectRatio: '1:1',
+    refs: ['ivy.png', 'oliver.png'],
+    prompt: `Children's-book watercolor, soft brushstrokes, warm golden light returning. Square. A small round PORCUPINE (Pip) — soft dark eyes, a snub little nose, and quills lying FLAT and gentle and soft down her back (not sharp, not bristling) — sitting up with a small real smile. IVY (the white unicorn) and OLIVER (the emerald-green dragon) sit close on either side of her, right beside her, nobody pricked — all three cozy and warm together. Tender and happy. Exactly three characters — Pip the porcupine, Ivy, Oliver. Ivy taller than Oliver.` + STYLE11,
+  },
 };
 
 async function main() {
