@@ -320,6 +320,12 @@ export default function ChapterBook({ book, onExit }) {
         const nd = computeDims();
         const cur = dimsRef.current;
         if (nd.single === cur.single && Math.abs(nd.w - cur.w) < 4 && Math.abs(nd.h - cur.h) < 24) return;
+        // While reading aloud, ignore a same-orientation size change (e.g. a
+        // tablet's toolbar showing/hiding shifting the height) — repaginating
+        // remounts the flipbook and would interrupt the read. The audio + page
+        // sizes carry on at the current dimensions; an actual orientation flip
+        // still repaginates.
+        if (activeRef.current && nd.single === cur.single) return;
         const { built, idx } = layout(nd, false);
         dimsRef.current = nd;
         pageIdxRef.current = idx;
