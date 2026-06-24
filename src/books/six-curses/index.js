@@ -1211,12 +1211,284 @@ Two paths remained dark.
 The book was already opening in Ivy's hands.`,
 };
 const chapter5 = {
-  id: 'ch5', label: 'Chapter 5', title: 'The Ward of Always Right', sin: 'Pride',
-  fullImage: `${IMG}/ch5-full.png`, spots: [], text: '',
+  id: 'ch5',
+  label: 'Chapter 5',
+  title: 'The Ward of Right Now',
+  sin: 'Impatience',
+  fullImage: `${IMG}/ch5-frozen.png`,
+  spots: [`${IMG}/ch5-thaw.png`, `${IMG}/ch5-wren-freed.png`],
+  text: `The courtyard shimmered back around them. Four symbols glowed steadily on the book's cover now, and four fountains sang together. The sky was nearly its proper blue.
+
+The book fell open in Ivy's hands.
+
+This curse is called Meanness. It is the curse of the little poke, the funny mean name, the "you can't play" — it feels big for a second, but the big feeling never stays, so you get meaner to get it back, until you are all spikes and nobody can come close. You broke it, brave ones, when you stopped being mean to each other and told each other the true good things instead — when you found that making someone smile feels warmer, and lasts longer, than making them small. Say the kind thing. It comes back warm.
+
+The book closed softly.
+
+"Two paths left," Oliver said.
+
+"Two." Ivy looked at the fifth. It didn't howl or glow — it was just quiet, completely quiet, like a held breath. They took hands and stepped onto it.
+
+They stepped into a house, and the house was holding still. Not empty — full, a family in the middle of a busy evening — except everyone had stopped, frozen exactly where they were, like someone had pressed pause on the whole world.
+
+A mama stood at a high chair, a spoon of something orange held an inch from a baby's open mouth. The baby's face was scrunched mid-cry, one fat tear stopped halfway down its cheek. At the sink a papa stood with his hands in the dishwater, a soapy plate held still, suds hanging in the air. On a desk, papers sat half-sorted under a hand that wasn't moving.
+
+And there were things in the middle of becoming, too. On the stove, a pot of soup hung frozen mid-bubble. Through the oven window, a cake sat half-risen — stopped halfway up, never to finish. And on the windowsill, in a jar, a crystal that had clearly been growing for days — a little glittering tower of it — was frozen mid-sparkle.
+
+Everything in the whole house was caught partway to good. And none of it could finish. The clock had stopped with its second hand pointing straight up.
+
+"Hello?" Ivy said. Her voice sounded very loud. Nobody answered. Nobody could.
+
+Oliver found a pile of blocks — a half-built tower, knocked over. He sat and built. Three, four, five — it fell. "Aw." Again. Six — fell. By the third time the tight hot frustrated thing was back in his chest. "Someone FIX this," he said to the frozen room. "HELP me, I need help RIGHT NOW."
+
+A voice answered — soft, close, agreeable, the first voice in the silent house. "Then wake him up. Make him help you. You're more important than some plate. Just make it about you. Me first."
+
+Then Oliver's nose found the oven. "Is that CAKE?" He wanted it, immediately, entirely. "Take it," the voice purred. "Why wait for it to bake? Have it now." "It's not done," said Ivy. "It's all gooey in the middle. It needs to bake." "But I want it NOW," said Oliver — and even as he said it, he heard how it sounded.
+
+Ivy had wanted to dance — tried a turn she'd been working on, wobbled, fell, tried again, fell. "I just want to get it RIGHT." The voice came to her ear: "So make her help you. Forget the baby. The baby can wait. Your turn. Me first." And the crystal on the sill — she wanted it so badly. "Smash the jar, take it now." But half-grown, it would only ever be small and dull. Left to grow, it would become something you could keep your whole life.
+
+Ivy looked at the frozen mama, the spoon, the baby with its mouth open and its one stopped tear. And something about that stopped tear made her pause.
+
+"Oliver. Look. Everything here is stuck halfway. The baby half-fed. The cake half-baked. The crystal half-grown. Nothing can finish — because time stopped." She looked around at the bubble that never popped, the cake that never rose, the tear that never fell. "Somebody wanted everything now so badly they froze time to grab it all. But you can't grab a cake before it bakes, or a crystal before it grows, or a turn before it's your turn. Those things need time. And they froze the time. So now nothing can ever become good — not for them, not for anybody."
+
+"The voice wants us to do it too," Oliver said. "Have it all now."
+
+"Yeah. But the baby was first — the baby needs the food before I need the dance. And the cake's not ready, and the crystal's not ready, and yelling won't make them ready." She breathed. "Mom says it both ways, doesn't she. Be patient — I'll help you when I finish what I'm doing. And the other one. Some things just take time. The crystal won't grow any faster if you yell at it."
+
+"I always hated both of those," Oliver admitted.
+
+"Me too. But look where right now gets you." She gestured at the frozen, stuck, partway house. "Right now stops everything."
+
+So Ivy did the bravest, most patient thing. She turned away from the frozen mama — away from making it about her — and said out loud, to the quiet house: "It's okay. The baby can go first. And the cake can take its time. I'll wait."
+
+And something... ticked.
+
+The clock. The second hand moved — one tick — and kept going. The spoon slid the last inch to the baby's mouth; the baby ate, its face unscrunched, the stopped tear finished rolling and dropped, and the baby gave a wet, happy hiccup. The plate slid into the rack; the suds popped. And in the oven the cake rose the rest of the way and turned gold, and the warm smell of it filled the house; on the windowsill the crystal grew and grew and threw little rainbows across the wall; the soup bubbled over.
+
+Everything that had needed time finally got its time. The whole house came unstuck at once — warm and full and moving and alive — just because two kids had been willing not to have everything right now.
+
+[[SPOT 0]]
+
+"Whoa," Oliver breathed. And then, without anyone fixing it for him, he tried his tower once more — slower, while he waited his turn — five, six, seven, eight, and it stayed. He'd done it himself. "...Whoa," he said again, quieter.
+
+It was only then that they saw her — at the center of the room, where the freeze had been thickest, a small bird, bright feathers gone dull, beak open wide, wrapped in a last shell of frost, frozen mid-shout. But her eyes were awake, and watching, full of something like panic.
+
+"How did you DO that?" the bird said, the frost cracking as she spoke.
+
+"What happened to you?" Ivy asked gently, sitting nearby.
+
+The bird's beak trembled. "I couldn't wait for anything. Not my turn — and not anything that took time, either. I'd dig up the seeds to see if they'd grown. I'd pull the cake out before it baked, and it was always gooey and wrong. I'd shake the crystal jar to make it hurry, and it never grew at all." She drooped. "And my turn — I couldn't wait for that either. I was the littlest. I got fed first, helped first, everyone came when I called, and I thought that was what mattering felt like. Being first. Right now."
+
+"And then?"
+
+"Then there were other needs. Other people who needed things too. And I had to wait. And waiting felt like being forgotten — like if I wasn't first, I didn't matter at all. So I got louder. Me first. Me now. Right NOW. Until —" she looked at the house that had been frozen — "everyone stopped. And every growing thing stopped. And I got my wish. Everything, right now, all for me."
+
+Her voice went tiny. "And it was the loneliest thing in the world. Because nothing good comes the second you want it — good things need time — so when I stopped the time, nothing good could come at all. The cake never baked. The crystal never grew. My turn never came. And there was no one left to be first in front of, because they were all frozen, waiting on me, forever." She folded in. "I'd rather wait my turn in a warm house full of people than be first in a frozen empty one. But I didn't know how to let it go."
+
+"You just did the hardest part," Ivy said. "You said you'd rather wait."
+
+"It's scary, though," the bird whispered. "If I let the baby go first — if I let anything take its time — what if my turn never comes? What if they forget me?"
+
+"They won't," said Oliver, working it out. "Your turn comes. That's the deal. You be patient, and it comes. I thought Mom said it just to get rid of me, but —" he looked at his tower, tall, that he'd built himself while he waited — "she always did come. Every time. The waiting just felt long."
+
+"And while you wait," Ivy said, "you find out you can do more yourself than you thought. I fixed my own dance. Oliver built his own tower. And the cake baked, and the crystal grew, all on their own, the whole time we waited. Waiting isn't nothing happening. Waiting is when everything good actually happens."
+
+The bird looked at the warm, moving house — the fed baby, the golden cake, the sparkling crystal, the papa drying his hands and turning, ready now for a small bird who had waited.
+
+"Okay," the bird said, shaking. "Okay. I'll wait my turn. The baby first. Then me. I can wait."
+
+The last shell of frost cracked and fell away, and her dull feathers flushed bright again — every colour, warm and alive.
+
+[[SPOT 1]]
+
+She took a breath — her first un-frozen breath in a long, long time. "My name is Wren," she said, clear and bright. "My name is Wren. And I'm going to wait my turn. And it's going to come."
+
+Right on cue, the grown-up at the sink crouched down, smiling, and said — to Wren, whose turn it now was — "There you are. Sorry to keep you waiting, little one. What did you need?"
+
+Wren's whole face lit up. Her turn had come. It had been there all along, just on the other side of the waiting.
+
+Above them, the fifth symbol blazed bright gold, then settled into a warm, steady glow. Ivy held out her hand; Wren — patiently, happily — waited for Ivy to be ready, then took it, and between one breath and the next was gone, back into the warm and moving house, back into a turn that was finally, truly hers.
+
+"I built that myself," Oliver said, still not over it. "And I waited for it."
+
+"You did both," said Ivy.
+
+Oliver thought about it. "When we get home, Hazel's going to need Mom a lot. Babies do. I'm going to have to wait my turn a lot." He sighed — the sigh of someone facing something genuinely hard. "And Mom's making that cake that takes forever. The one you can't open the oven on." He brightened, slightly. "But it's really good when it's done."
+
+"Worth the wait," said Ivy, laughing.
+
+"I'm going to practice," Oliver said. "The waiting. The long kind and the short kind."
+
+"Me too."
+
+The courtyard shimmered back around them. Five symbols glowed steady on the book's cover. A fifth fountain rose and joined the others. The sky was almost, almost the truest blue.
+
+One path remained dark. And from it, far off, came a low and angry howl.
+
+The book was already opening in Ivy's hands.`,
 };
 const chapter6 = {
-  id: 'ch6', label: 'Chapter 6', title: 'The Ward of Screaming Tantrum', sin: 'Wrath',
-  fullImage: `${IMG}/ch6-full.png`, spots: [], text: '',
+  id: 'ch6',
+  label: 'Chapter 6',
+  title: 'The Ward of the Screaming Tantrum',
+  sin: 'Anger',
+  fullImage: `${IMG}/ch6-storm.png`,
+  spots: [`${IMG}/ch6-eye.png`, `${IMG}/ch6-felix-freed.png`],
+  text: `The courtyard had changed. Five symbols glowed steadily on the book's cover now, and five fountains sang together, loud and bright. The grey vines had loosened; the sky was almost its proper blue. Only one path stayed dark.
+
+The book fell open in Ivy's hands.
+
+This curse is called Impatience. It is the curse of right now — I want it now, do it for me now, me first. But the good things can't come right now: your turn, the baby's feeding, the cake, the crystal — they all need time to become good. Demand them right now and you only freeze them halfway, and nothing can ever finish. You broke this curse, brave ones, when you waited — when you let the baby go first, and let the cake take its time, and learned the secret: waiting isn't nothing happening. Waiting is when the good things become good. Wait your turn. It always comes.
+
+The book closed softly.
+
+"One path left," Oliver said quietly. Of all the paths, it was the only one that made a sound — a low, far-off howl, like wind that had been angry for a very long time.
+
+"The last one." Ivy didn't take his hoof right away. "Ready?"
+
+"No," said Oliver, honestly. Then he took her hoof anyway. "But together."
+
+"Together."
+
+They stepped onto the sixth path.
+
+The howl became a roar.
+
+The sixth ward was a storm — not a rain storm, a furious one, a tantrum of a storm, wind tearing every direction at once, leaves and toys and broken things flying past, the sky ripped into ragged grey and bruised purple. It was almost impossible to stand. It was completely impossible to think. And it did something the other wards hadn't: it reached straight inside them and went looking for the angry place.
+
+Ivy felt it first. There was a little stage just ahead, warm light on it like a spotlight — a perfect place to dance, and she loved to dance. She started toward it — and her ballet shoes, on her feet a second ago, were gone. Bare hooves. She looked up, and there on the stage was her favorite unicorn, the soft purple one she'd had forever — and as she reached for it the wind snatched it away into the grey.
+
+Something hot and tight rose up in Ivy's chest. "That's not FAIR. I just want to DANCE. Why won't anything just — WORK —" The wind tore another thing away, and a gust whipped up around her, her own little storm feeding the big one.
+
+Oliver was getting it too. A voice had started up by his ear — patient, repeating, the kind that asks you the same thing over and over. "Use your fork, Oliver. Oliver, use your fork. Your fork. Use your —"
+
+"I'm TRYING," Oliver said, and he was, his claws fumbling a fork that kept turning the wrong way. "I keep getting it wrong — stop TELLING me —"
+
+The voice changed, reasonable now. "You can have oatmeal, or you can have yogurt. Which one?"
+
+"I don't WANT oatmeal," Oliver said, climbing. "I don't WANT yogurt. I want — I —" his breath went short and hot, a puff of flame escaping. "I DON'T WANT EITHER ONE!"
+
+The words came out exactly the way they had in the kitchen, a hundred years ago, at the very beginning. And just like in the kitchen, they didn't help. The choices were still oatmeal or yogurt. Nothing changed — except the storm around him doubled.
+
+The two little storms, Ivy's and Oliver's, were being dragged toward the big one in the center, the way small whirlwinds get pulled into a hurricane. Ivy was shouting at the sky. Oliver was breathing fire at a fork. Neither could hear the other. Neither could think. They were being sucked, fast, toward the roaring grey heart of the ward.
+
+And it was Ivy — spinning past him toward the center — who grabbed Oliver's arm and shouted the one thing that made it through.
+
+"OLIVER. We have to CALM DOWN."
+
+"I CAN'T —"
+
+"You CAN. Mom's thing — calm down FIRST, then solve the problem! We can't fix anything in here!"
+
+Somewhere under the rage, Oliver heard it. Calm down first, then solve the problem. He'd heard Mom say it a hundred times. He had never once tried it in the actual middle of being mad.
+
+He tried it now. It was so hard — the angriest part of him did not want to calm down, it wanted to scream and throw the fork and win. But Ivy was holding his arm and saying it with him: "Breathe. Just breathe. Let it come down."
+
+So they stood in the screaming wind and they breathed. Ivy stopped shouting at the sky. Oliver stopped breathing fire and just — breathed. In. Out. The hot tight thing in his chest was still there, but it stopped getting bigger. And then, slowly, like a wave that's finished rising, it began, just a little, to come down. And as it came down — they could think again.
+
+"Okay," Ivy said, still breathing careful. "The problem. What's the actual problem."
+
+"You couldn't find your unicorn. Or your dance shoes."
+
+"And you didn't like your breakfast." Ivy almost laughed, even there. "Those are just... problems. We solve problems." She looked at the little stage. "I don't even need special shoes to dance. I can dance in bare hooves. I've done it a hundred times." And she did — a few steps, right there in the wind — and the storm around her dropped a little more.
+
+Oliver looked at the fork. The voice was still going, patient. Oatmeal or yogurt. And instead of screaming at it, he tried the thing. "Could I... have toast?" he asked. Calm. Out loud. "I don't want oatmeal or yogurt. But I'd have toast."
+
+A pause. "Toast is fine," said the voice.
+
+Oliver stared. "...That's it? I could just ASK?"
+
+Their two little storms had almost died now. And in the new quiet — the big storm still roaring ahead but no longer pulling at them — Ivy said the harder thing. The thing Mom always asked.
+
+"Oliver. The fork voice. What was it trying to do?"
+
+"Boss me. Make me feel bad for getting it wrong."
+
+"Was it, though?" Ivy said gently. "Or was it trying to help you eat? Help you learn the fork?"
+
+Oliver went very quiet. Because when he actually thought about it — when he wasn't inside the storm — the voice had never once sounded mean. It had sounded like Mom. Patient. Saying his name. Trying, five times, ten times, to help him with something hard, getting tired but never, ever going away. Use your fork, Oliver. It wasn't an attack. It had never been an attack. It was someone who loved him, helping him with a thing he kept getting wrong, and not giving up.
+
+"Oh," Oliver said, very softly. "She was trying to help me."
+
+And that was when the big storm screamed — the loudest, most heartbroken sound either of them had ever heard. And through the wind, for the first time, they could see into the eye of it, where something small was curled up, screaming and screaming, the storm pouring out of it without end.
+
+They made their way in, slow, leaning into the wind, holding onto each other, until they reached the quiet, terrible eye. In it was a creature so worn out from screaming that its voice had gone to rags.
+
+"Go AWAY," it shrieked. "Everyone always — nobody ever — it's not FAIR —"
+
+"Hey," Ivy said gently. "We're not going away."
+
+The scream cracked. "You don't understand. Nothing ever goes the way I want. Everyone's always telling me what to do. I HATE my choices. And every time, it gets so big and so hot I can't make it stop, so I just SCREAM —"
+
+"And then what happens?" Ivy asked.
+
+"...Nothing," it said, very small. "Nothing happens. The thing I wanted is still gone. The people are still gone. Nothing ever gets fixed — it just gets louder. And then I'm alone in here. And the storm never stops, because I never —" the ragged voice broke — "I never learned how to make it stop."
+
+It pulled in on itself. "I yelled at my mom. The last time. She was just trying to get my shoes on, and I got so mad I yelled that she didn't love me. And then the storm got so big I couldn't see her anymore. And I never got to take it back."
+
+Oliver's chest went tight — but not with anger this time. Because he had said that exact thing. In a kitchen. To a mom who was only trying to give him a snack. You don't love me. He knew precisely how this creature felt, all the way to the bottom.
+
+"Listen," Oliver said, and he crouched right down into the eye of the storm. "It's a storm. That's all it is. And here's the thing nobody tells you — it passes. If you stop feeding it. If you breathe and let it come down. It always passes. You've just never let it."
+
+"I can't," the creature wept. "It's too big."
+
+"We'll do it with you," said Ivy. "Breathe. In. Out. Let it come down."
+
+And the three of them, in the screaming eye of the worst storm in the kingdom, breathed. In. Out. The creature shaking, the wind howling — and then, for the first time in longer than it could remember, the storm slowed.
+
+[[SPOT 0]]
+
+"Now," Ivy said softly. "Your mom. When she asked you to put your shoes on. What was she trying to do?"
+
+"...Get me out the door. Get me to school." Its eyes went wide, and wet. "She wasn't being mean. She was trying to help me. She loved me. She was right there loving me the whole time, and I told her she didn't."
+
+"She still does," Oliver said. "I promise. The yelling doesn't use it up. Being mad doesn't make them stop loving you. It's still there when the storm passes. It's always still there."
+
+And the storm passed.
+
+Not slowly, at the end — all at once, like a held breath finally let go. The wind dropped, the grey tore open, warm light poured down, the roaring stopped, and there was, at last, quiet.
+
+[[SPOT 1]]
+
+Sitting in the sudden stillness, blinking, worn out, was a small fox. Russet-red, white-tipped tail, big dark eyes still wet, ears flat with how tired it was.
+
+"It's quiet," the fox said, like it could hardly believe it. "It actually — stopped."
+
+"It always could," said Ivy.
+
+The fox looked at its own paws, at the calm sky. "I forgot it passes. I thought if I was that mad, it meant something was really wrong and I had to make everyone see how wrong, RIGHT NOW — but it just passes. If you let it. And then you can actually fix the thing. And the people telling me stuff were mostly just... trying to help."
+
+"That's the whole thing," said Oliver.
+
+"It'll come back, though," the fox said. "The big mad. Tomorrow."
+
+"Yeah. Mine too," said Oliver. "It's not gone forever. You just — when it comes, you breathe, you let it pass, and then you solve the problem. And you ask what they were trying to do." He smiled a little. "I've got a lot of practicing to do, honestly."
+
+The fox almost laughed — a small, real, un-stormy sound, and sat up very straight. "My name is Felix," it said, clear and calm, no storm in it at all. "My name is Felix. And the first thing I'm going to do is go tell my mom I'm sorry. And that I know she loves me."
+
+Oliver's throat did something complicated. "Yeah," he said quietly. "Me too."
+
+Above them the sixth and last symbol blazed bright gold — and as it caught, all six flared together into a ring of warm light, and held.
+
+Ivy held out her hand. Felix took it — calm, and sure — and between one breath and the next he was gone, back to a mom who was, this very second, still loving him, exactly as Oliver had promised.
+
+And then the kingdom changed. It started in the courtyard and rushed outward — the grey vines bursting into green and flower, all six fountains leaping up clear and singing together, the sky finishing its turn, edge to edge, the truest blue. One by one the six wrong gardens came right. The Lost Kingdom wasn't lost anymore.
+
+The book went warm in Ivy's hands. She turned it over. Where the old hard letters had said All six must be freed before you may go home, the words had changed. Now they said, simply:
+
+Well done. Go home.
+
+A door of warm light opened where the sixth path had been.
+
+Oliver looked at it. Then at Ivy. He was thinking, she could tell, about a kitchen, and a snack, and a thing he'd said.
+
+"When we get home," Oliver said, "I have to say sorry to Mom. For real. She was just trying to give me a snack, and I told her she didn't love me. And she was right there. Loving me."
+
+"She was," Ivy said softly. "She still is. She's probably downstairs right now."
+
+Oliver took a breath — the good kind, the kind that lets something come down. "Okay," he said. "Let's go home."
+
+And hoof in hand, the unicorn and the dragon stepped together into the warm and waiting light.`,
 };
 const epilogue = {
   id: 'epilogue', label: 'Epilogue', title: 'Home',

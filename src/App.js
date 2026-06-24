@@ -27,7 +27,7 @@ const BookSelection = ({ books, onSelectBook }) => {
                 {books.map(book => (
                     <div key={book.id} className="cursor-pointer group" onClick={() => onSelectBook(book.id)}>
                         <div className="rounded-lg overflow-hidden shadow-lg group-hover:shadow-2xl transition-shadow duration-300">
-                            <img src={book.coverImage} alt={book.title} className="w-full h-auto object-cover" />
+                            <img src={book.coverImage} alt={book.title} className="w-full aspect-square object-cover" />
                         </div>
                         <h2 className="mt-4 text-center text-lg font-semibold text-slate-700 group-hover:text-purple-600">{book.title}</h2>
                     </div>

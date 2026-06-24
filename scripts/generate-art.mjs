@@ -359,6 +359,40 @@ const SCENES11 = {
     refs: ['ivy.png', 'oliver.png'],
     prompt: `Children's-book watercolor, soft brushstrokes, warm golden light returning. Square. A small round PORCUPINE (Pip) — soft dark eyes, a snub little nose, and quills lying FLAT and gentle and soft down her back (not sharp, not bristling) — sitting up with a small real smile. IVY (the white unicorn) and OLIVER (the emerald-green dragon) sit close on either side of her, right beside her, nobody pricked — all three cozy and warm together. Tender and happy. Exactly three characters — Pip the porcupine, Ivy, Oliver. Ivy taller than Oliver.` + STYLE11,
   },
+
+  // ---- Chapter 5: The Ward of Right Now (Impatience / Frozen house / Wren) ----
+  'ch5-frozen': {
+    refDir: THUMBS, outDir: BOOK11, out: 'ch5-frozen.png', aspectRatio: '3:4',
+    refs: ['ivy.png', 'oliver.png'],
+    prompt: `Vertical 3:4 portrait, cool pale-blue FROZEN palette with a faint frost shimmer, eerie-still but not scary. A cozy family home kitchen, but TIME HAS STOPPED — everything frozen mid-motion. A gentle adult animal (a soft mama figure) is frozen leaning toward a baby in a high chair, a spoon held an inch from the baby's open mouth, the baby's face scrunched mid-cry with one tear stopped halfway down its cheek. Behind, a pot of soup on the stove frozen mid-bubble, and through an oven window a cake half-risen, and on the windowsill a jar with a half-grown sparkling crystal — all caught partway, frozen. IVY (the white unicorn) and OLIVER (the emerald-green dragon) stand among it all, looking around in amazement, the only two who can move. At the very centre of the room, on the floor, a small BIRD with bright feathers gone dull-grey, beak open mid-shout, wrapped in a shell of frost. Frost glints on everything. NO HUMANS. Ivy taller than Oliver. Still, hushed, a little uncanny — not frightening.` + STYLE11,
+  },
+  'ch5-thaw': {
+    refDir: THUMBS, outDir: BOOK11, out: 'ch5-thaw.png', aspectRatio: '1:1',
+    refs: [],
+    prompt: `Children's-book watercolor, soft brushstrokes, WARM golden light, cozy and full of life. Square. The same family kitchen, now UN-frozen and MOVING again: a gentle adult animal happily spooning food to a smiling fed baby in a high chair, a golden finished cake just out of the oven steaming on the counter, and on the windowsill a beautiful fully-grown sparkling CRYSTAL throwing little rainbows across the wall. Everything warm, alive, in motion. Cozy and tender. NO main characters needed — just the warm living home, the fed baby, the cake, the rainbow crystal.`,
+  },
+  'ch5-wren-freed': {
+    refDir: THUMBS, outDir: BOOK11, out: 'ch5-wren-freed.png', aspectRatio: '1:1',
+    refs: [],
+    prompt: `Children's-book watercolor, soft brushstrokes, warm light. Square. A small cheerful BIRD (Wren) — a little songbird with bright, vivid, freshly-returned colours (warm reds, gold, a hopeful blue), no frost, no grey — sitting up with a happy open-beaked smile, taking a deep happy breath, looking calm and content. Warm glow all around. NO other characters — just the bright little bird.`,
+  },
+
+  // ---- Chapter 6: The Ward of the Screaming Tantrum (Anger / Banshee / Felix) ----
+  'ch6-storm': {
+    refDir: THUMBS, outDir: BOOK11, out: 'ch6-storm.png', aspectRatio: '3:4',
+    refs: ['ivy.png', 'oliver.png'],
+    prompt: `Vertical 3:4 portrait, stormy palette of ragged grey and bruised purple torn with streaks of warm light, dramatic but not frightening. A FURIOUS magical STORM — wind tearing in every direction, leaves and toys and broken things flying past, the sky ripped ragged. IVY (the white unicorn) and OLIVER (the emerald-green dragon) lean hard into the wind in the foreground, upset and overwhelmed, each with their own little whirlwind whipping up around them (Ivy mid-shout, small agitated orange flame-puffs escaping Oliver's mouth). Ahead of them looms an ENORMOUS swirling BANSHEE storm-creature made of howling grey wind and faint red light, and deep in the calm EYE at its centre, a tiny shape is curled up screaming (a cursed kid hidden in the storm). NO HUMANS. Ivy taller than Oliver. Wild and loud, but storybook, not horror.` + STYLE11,
+  },
+  'ch6-eye': {
+    refDir: THUMBS, outDir: BOOK11, out: 'ch6-eye.png', aspectRatio: '1:1',
+    refs: ['ivy.png', 'oliver.png'],
+    prompt: `Children's-book watercolor, soft brushstrokes. Square. The strange CALM in the very EYE of a storm — the howling grey wind walls swirling all around the edges of the picture, but a pocket of stillness and soft light in the centre. IVY (the white unicorn) and OLIVER (the emerald-green dragon) crouch close together with a small shaking storm-creature (a tiny grey wind-wrapped shape with two frightened eyes), and all three are BREATHING together, calm and gentle, the storm beginning to slow around them. A tender, quiet, turning-point moment inside the chaos. Exactly three: Ivy, Oliver, and the small storm-creature. Ivy taller than Oliver. Calm, not scary.` + STYLE11,
+  },
+  'ch6-felix-freed': {
+    refDir: THUMBS, outDir: BOOK11, out: 'ch6-felix-freed.png', aspectRatio: '1:1',
+    refs: [],
+    prompt: `Children's-book watercolor, soft brushstrokes, warm calm light, clear blue sky returning. Square. A small RED FOX (Felix) — russet-red fur, white-tipped tail, white cheeks, big dark gentle eyes (a little tired but calm and relieved), ears up — sitting quietly in sudden peaceful stillness after a storm, taking a calm breath, a small soft smile. Soft warm light all around, the storm completely gone. NO other characters — just the calm little fox.`,
+  },
 };
 
 async function main() {
