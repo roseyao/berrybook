@@ -393,6 +393,23 @@ const SCENES11 = {
     refs: [],
     prompt: `Children's-book watercolor, soft brushstrokes, warm calm light, clear blue sky returning. Square. A small RED FOX (Felix) — russet-red fur, white-tipped tail, white cheeks, big dark gentle eyes (a little tired but calm and relieved), ears up — sitting quietly in sudden peaceful stillness after a storm, taking a calm breath, a small soft smile. Soft warm light all around, the storm completely gone. NO other characters — just the calm little fox.`,
   },
+
+  // ---- Epilogue: Home ----
+  'epilogue-home': {
+    refDir: THUMBS, outDir: BOOK11, out: 'epilogue-home.png', aspectRatio: '3:4',
+    refs: ['ivy.png', 'oliver.png', 'mom.png', 'dad.png', 'baby-sister.png'],
+    prompt: `Vertical 3:4 portrait, warm golden lamplight, cozy and full of love — a happy family dinner at home. Around a round wooden dinner table sit the whole family, EXACTLY FIVE characters, each appearing once: (1) MOM — an adult golden-honey four-legged UNICORN, lavender mane, gold heart necklace, horse muzzle/hooves, never humanoid. CRITICAL: Mom has NO WINGS — she is a wingless unicorn. (2) DAD — a LARGE GROWN-UP green DRAGON, big and tall, soft friendly build, deeper bronzed-green scales with silver patches, no wings spread. (3) IVY — a white UNICORN CHILD, lavender mane, pearlescent spiral horn, small star birthmark, and soft white feathered WINGS (Ivy is the ONLY one with wings). (4) OLIVER — a SMALL emerald-green DRAGON CHILD, orange round patches, orange heart chest-patch, two little horns; clearly a CHILD, much smaller than Dad but a big kid (only a little shorter than Ivy), NOT a baby. (5) baby HAZEL — a TINY PINK baby UNICORN, rose coat, rose mane, little gold-glowing horn-nub, in a high chair. There are TWO green dragons (big Dad and small child Oliver) and they must look clearly different in size — both present. ONLY Ivy has wings; Mom, Dad, Oliver and Hazel have NO wings. Everyone warm and smiling, plates of food on the table. NO HUMANS. No duplicates, no extra characters. Adults clearly taller than the children; Hazel tiny.` + STYLE11,
+  },
+  'epilogue-hug': {
+    refDir: THUMBS, outDir: BOOK11, out: 'epilogue-hug.png', aspectRatio: '1:1',
+    refs: ['oliver.png', 'mom.png'],
+    prompt: `Children's-book watercolor, soft brushstrokes, warm tender light. Square. A cozy kitchen. OLIVER (the emerald-green dragon child — orange patches, orange heart chest-patch, two little horns, a big kid) has run up and wrapped his arms around MOM (an adult golden-honey four-legged UNICORN — lavender mane, gold heart necklace, horse muzzle/hooves, never humanoid) in a big heartfelt hug; Mom has crouched down low to hug him back warmly, the way you hug someone who has come home. CRITICAL: Mom has NO WINGS — she is a wingless unicorn (do not give her wings). Tender, loving, a reconciliation. Exactly TWO characters — Oliver and Mom — no others, no duplicates. Mom clearly bigger than the child.` + STYLE11,
+  },
+  'epilogue-note': {
+    refDir: THUMBS, outDir: BOOK11, out: 'epilogue-note.png', aspectRatio: '1:1',
+    refs: [],
+    prompt: `Children's-book watercolor, soft brushstrokes, hushed and magical. Square. A dusty wooden ATTIC floor at night, a single soft beam of MOONLIGHT coming from above. On the floorboards, where a loose board has been lifted, the ancient heavy book is GONE — and in its place lies a single folded square of pale, old paper, glowing very faintly, waiting. Dust motes drift in the moonbeam. NO characters at all — just the empty spot where the book was, and the little folded note. Quiet, gentle, full of wonder.`,
+  },
 };
 
 async function main() {

@@ -1491,8 +1491,88 @@ Oliver took a breath — the good kind, the kind that lets something come down. 
 And hoof in hand, the unicorn and the dragon stepped together into the warm and waiting light.`,
 };
 const epilogue = {
-  id: 'epilogue', label: 'Epilogue', title: 'Home',
-  fullImage: `${IMG}/epilogue-full.png`, spots: [], text: '',
+  id: 'epilogue',
+  label: 'Epilogue',
+  title: 'Home',
+  fullImage: `${IMG}/epilogue-home.png`,
+  spots: [`${IMG}/epilogue-hug.png`, `${IMG}/epilogue-note.png`],
+  text: `And just like that, they were back in the attic.
+
+No falling, no wind, no bright light — one blink they were stepping into the warm and waiting door, and the next they were sitting on the dusty attic floor, exactly where they'd started, the rain still tapping the little window.
+
+The book lay open in Ivy's lap. All six symbols glowed on its cover now, steady and gold, a full ring of them. Complete.
+
+"We did it," Oliver whispered.
+
+"We did," said Ivy.
+
+And then, through the floorboards, came a voice they knew better than any voice in any kingdom. "IVY! OLIVER! Dinner!"
+
+They looked at each other. And — for once — they did not argue about who got down the stairs first. They set the book gently on the floor, and they ran.
+
+Oliver got to the kitchen first after all, but only because he had something to do. He ran straight to Mom — standing at the counter, exactly where she'd been a hundred years and about twenty minutes ago — and wrapped his arms around her and held on.
+
+"I'm sorry," he said into her side. "About the snack. And about the thing I said. I didn't mean it. I was just so mad, and the mad made everything look wrong — but it wasn't true. You were trying to help me. You always are."
+
+Mom went very still. Then she crouched and hugged him properly, the way you hug someone who's come back from somewhere far away, even if they were only upstairs. "Oh, bug," she said. "Thank you for that. I love you. The mad never changes that. Not even a little."
+
+[[SPOT 0]]
+
+Dinner was the ordinary kind. The good kind. Dad was there, and baby Hazel in her high chair banging a spoon. Halfway through, Mom looked around the table. "So. How's everyone feeling tonight?"
+
+Ivy and Oliver looked at each other. And then, almost at once, in a rush, it came out: "Good. Really good. We love you, Mom. We love you, Dad. Thank you for making dinner. And for hugs. And for — all of it. All the love."
+
+There was a small silence. Mom and Dad looked at each other — amused, a little startled, a little misty if you watched closely.
+
+"...Well," said Dad. "We love you too. Always. Obviously." He smiled. "What did they put in the water up there?"
+
+But over the rest of the evening, the grown-ups noticed things.
+
+At dessert there were two slices of cake, and one was bigger, and nobody fought about it — Oliver took the smaller one and said it was plenty. He held his actual fork, and tried, and dropped it, and tried again, tongue between his teeth, working the hard slow thing without being asked five times. Ivy said thank you for her milk like she meant it, and noticed out loud that the kitchen smelled nice and her cup was her favorite color. And when Oliver wanted more milk and Dad's hands were full with the baby, Dad said, "One minute, bug — let me finish with Hazel," and Oliver — Oliver — said, "Okay. I can wait." And he did.
+
+Mom and Dad kept catching each other's eye across the table, with a look that said: are you seeing this?
+
+Later — washed, brushed, and in their pajamas — they lay in their beds in the soft dark, sleepy, the rain finally easing. And then Oliver sat straight up.
+
+"Ivy. We left the book. Upstairs. In the attic."
+
+So they snuck — quiet as anything, in their pajamas, past the grown-ups' murmur downstairs — back up the attic ladder. The loose board was right where they'd left it, a beam of moonlight now instead of rain.
+
+But the book was gone.
+
+Where it had been lay only a folded square of paper, pale and old and waiting. Ivy picked it up. The same ancient, difficult lettering they knew — easy to read now, somehow, as if it had decided to be kind.
+
+[[SPOT 1]]
+
+Brave Ivy and Oliver,
+
+You broke all six curses. You learned that enough is enough, and to see the good you already have. You learned to get up and do the hard thing yourself, and to be kind and say the good thing out loud. You learned to wait — that your turn always comes — and to let the storm pass, and that love stays put even when you're mad.
+
+You won't be perfect. You'll forget, and want too much, and yell, and have to learn it all again tomorrow. That's all right. Everybody does.
+
+Because here's the secret the kingdom was really keeping: you were never cursed. You were just learning. And now you know the most important thing of all —
+
+You are brave. And you can learn anything.
+
+Go to bed. Your mom and dad love you. They always have.
+
+The note grew warm in Ivy's hands, just for a moment, like a small hand squeezing hers. And then it was only paper.
+
+"Huh," Oliver said softly.
+
+"Yeah," said Ivy.
+
+They climbed back down, and down the hall, and into their beds. Outside, the rain stopped, and the clouds slid off the moon — and somewhere, in some other attic, behind some other loose board, six symbols began, very faintly, to glow.
+
+Ivy was nearly asleep when she heard Oliver's voice, small in the dark. "Ivy?"
+
+"Mmm?"
+
+"I'm glad we did it together."
+
+"Me too," said Ivy. "Always together."
+
+And they slept.`,
 };
 
 const book = {
