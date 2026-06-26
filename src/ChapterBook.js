@@ -261,6 +261,74 @@ function SpotImg({ src, innerW }) {
   );
 }
 
+// --- Diagnostics -------------------------------------------------------------
+// The "blank white page" bug is a hard repro that only shows up on a real
+// device after a while. We keep a rolling log of reader events (page turns,
+// repaginations, play/stop, audio errors) in memory + localStorage, and the
+// moment read-along lands somewhere it shouldn't (a blank / cover / end page),
+// we email the captured state via the report-bug function. The localStorage
+// copy means the log survives a reload or a renderer crash and gets sent on the
+// next open. Inspect the live log in any console with `__cbDiag()`.
+const DIAG_KEY = 'berrybook:chapterdiag';
+const DIAG_MAX = 80;
+const BAD_KINDS = new Set(['blank', 'cover', 'end']);
+const diagLog = [];
+let diagReportedAt = 0;     // last email send (ms) — throttle
+let diagReportCount = 0;    // hard cap per page-load
+
+function diagPush(type, info) {
+  try {
+    diagLog.push({ ts: new Date().toISOString(), type, ...info });
+    if (diagLog.length > DIAG_MAX) diagLog.splice(0, diagLog.length - DIAG_MAX);
+    localStorage.setItem(DIAG_KEY, JSON.stringify(diagLog));
+  } catch { /* storage blocked / non-serializable — non-fatal */ }
+}
+
+function diagReport(reason, snapshot) {
+  const now = Date.now();
+  if (diagReportCount >= 5 || now - diagReportedAt < 60000) return;  // throttle
+  diagReportedAt = now; diagReportCount++;
+  const payload = {
+    reason, snapshot,
+    ts: new Date().toISOString(),
+    url: typeof window !== 'undefined' ? window.location.href : '',
+    ua: typeof navigator !== 'undefined' ? navigator.userAgent : '',
+    viewport: { w: window.innerWidth, h: window.innerHeight },
+    log: diagLog.slice(),
+  };
+  try {
+    fetch('/.netlify/functions/report-bug', {
+      method: 'POST', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload), keepalive: true,
+    }).catch(() => {});
+  } catch { /* offline / blocked — the log stays in localStorage for next time */ }
+}
+if (typeof window !== 'undefined') window.__cbDiag = () => diagLog;
+
+// On open, look at the log left by the PREVIOUS session. If it ends abnormally
+// — a repagination/turn that happened mid-read with nothing after it (the shape
+// of a crash), or a landing on a non-content page — email it once. A marker
+// (the tail entry's timestamp) stops us re-sending the same stale log.
+function diagFlushStale() {
+  let prev;
+  try { prev = JSON.parse(localStorage.getItem(DIAG_KEY) || '[]'); } catch { return; }
+  if (!Array.isArray(prev) || !prev.length) return;
+  const tail = prev[prev.length - 1];
+  const already = localStorage.getItem(DIAG_KEY + ':sent');
+  if (!tail || already === tail.ts) return;
+  const abnormal = BAD_KINDS.has(tail.kind)
+    || (tail.type === 'repaginate' && tail.reading)
+    || (tail.type === 'flip' && tail.reading && tail.mode !== 'manual');
+  if (!abnormal) return;
+  try { localStorage.setItem(DIAG_KEY + ':sent', tail.ts); } catch {}
+  diagLog.push(...prev);   // so the report carries the prior session's log…
+  diagReport(`stale log from previous session (last: ${tail.type}/${tail.kind || '—'}, possible crash)`, { tail });
+  diagLog.length = 0;      // …then start this session clean
+}
+// Run at module load — BEFORE the component mounts and writes its first event,
+// so this session's log can't clobber the previous session's before we read it.
+if (typeof window !== 'undefined') diagFlushStale();
+
 // --- Main component ----------------------------------------------------------
 
 export default function ChapterBook({ book, onExit }) {
@@ -327,6 +395,16 @@ export default function ChapterBook({ book, onExit }) {
         // still repaginates.
         if (activeRef.current && nd.single === cur.single) return;
         const { built, idx } = layout(nd, false);
+        const landed = built[idx]?.kind;
+        diagPush('repaginate', {
+          trigger: 'resize', oldDims: cur, newDims: nd, singleChanged: nd.single !== cur.single,
+          reading: activeRef.current, anchor: anchorRef.current, idx, builtLen: built.length, kind: landed,
+        });
+        if (landed && BAD_KINDS.has(landed)) {
+          diagReport(`repagination landed on '${landed}' page`, {
+            idx, kind: landed, anchor: anchorRef.current, oldDims: cur, newDims: nd, builtLen: built.length,
+          });
+        }
         dimsRef.current = nd;
         pageIdxRef.current = idx;
         setDims(nd);
@@ -352,12 +430,26 @@ export default function ChapterBook({ book, onExit }) {
     prevBookRef.current = book.id;
     if (bookChanged) anchorRef.current = null;
     const { built, idx } = layout(dimsRef.current, bookChanged);
+    const landed0 = built[idx]?.kind;
+    diagPush('layout', { trigger: bookChanged ? 'book' : 'deps', idx, builtLen: built.length, kind: landed0, reading: activeRef.current });
+    // Cover on a fresh book is expected; landing on a non-content page WITHOUT a
+    // book change (a deps-driven relayout) is not.
+    if (!bookChanged && landed0 && BAD_KINDS.has(landed0)) {
+      diagReport(`relayout landed on '${landed0}' page`, { idx, kind: landed0, anchor: anchorRef.current, builtLen: built.length });
+    }
     setPages(built);
     setPageIdx(idx);
     pageIdxRef.current = idx;
     setStartPageIdx(idx);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [book, layout]);
+
+  // On open, email any abnormal log left by the previous session (e.g. a crash
+  // mid-read), then mark this session's start so the log has a boundary.
+  useEffect(() => {
+    diagPush('mount', { bookId: book.id, dims: dimsRef.current });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const goNext = useCallback(() => flipRef.current?.pageFlip()?.flipNext(), []);
   const goPrev = useCallback(() => flipRef.current?.pageFlip()?.flipPrev(), []);
@@ -478,6 +570,7 @@ export default function ChapterBook({ book, onExit }) {
   const finishPage = useCallback((primaryIndex) => {
     resumeRef.current.delete(primaryIndex);
     const finishedSection = playingUnitRef.current?.sectionId ?? null;
+    diagPush('finishPage', { primaryIndex, finishedSection, pageIdx: pageIdxRef.current });
     stopPlayback();
     autoAdvanceRef.current = finishedSection;
     flipRef.current?.pageFlip()?.flipNext();
@@ -506,6 +599,7 @@ export default function ChapterBook({ book, onExit }) {
     if (tgt < 0) return;
     const lastVisible = pageIdxRef.current + (singleRef.current ? 0 : 1);
     if (tgt > lastVisible) {
+      diagPush('follow-flip', { from: pageIdxRef.current, tgt, word: globalWord, sectionId });
       programmaticFlipRef.current = true;
       flipAnimatingRef.current = true;
       flipRef.current?.pageFlip()?.flipNext();
@@ -554,7 +648,10 @@ export default function ChapterBook({ book, onExit }) {
     // Continuous chapter playback ends at the chapter's natural end → just stop.
     // Page-scoped (live TTS) playback advances to the next page on end.
     audio.onended = () => { if (follow) stopPlayback(); else finishPage(primaryIndex); };
-    audio.onerror = () => { if (!userStopped.current) stopPlayback(); };
+    audio.onerror = () => {
+      diagPush('audio-error', { code: audio.error?.code ?? null, src: (audio.currentSrc || '').slice(-40), follow, primaryIndex });
+      if (!userStopped.current) stopPlayback();
+    };
   };
 
   // Start reading a specific read unit from its resume point (or its start).
@@ -569,6 +666,7 @@ export default function ChapterBook({ book, onExit }) {
     playingUnitRef.current = { ...unit, fromWord };
     setPlayingSectionId(unit.sectionId);
     setIsLoading(true);
+    diagPush('play', { sectionId: unit.sectionId, primaryIndex: unit.primaryIndex, fromWord, pageIdx: pageIdxRef.current });
 
     // FAST PATH: pre-recorded SECTION recording — seek to this page's first word
     // and play the chapter STRAIGHT THROUGH to its natural end. The page follows
@@ -627,6 +725,22 @@ export default function ChapterBook({ book, onExit }) {
     pageIdxRef.current = e.data;
     setShowBookmarks(false);
     setShowContents(false);
+    // --- diag: log every page turn; flag landing on a non-content page when it
+    // wasn't a deliberate manual turn (i.e. during/because of read-along).
+    const dp = pagesRef.current?.[e.data];
+    const dmode = programmaticFlipRef.current ? 'follow'
+      : autoAdvanceRef.current != null ? 'autoadvance' : 'manual';
+    diagPush('flip', {
+      idx: e.data, kind: dp?.kind, mode: dmode, reading: activeRef.current,
+      sectionId: playingUnitRef.current?.sectionId ?? null, activeWord: activeWordRef.current,
+    });
+    if (dp && BAD_KINDS.has(dp.kind) && (dmode !== 'manual' || activeRef.current)) {
+      diagReport(`landed on '${dp.kind}' page via ${dmode}${activeRef.current ? ' while reading' : ''}`, {
+        idx: e.data, kind: dp.kind, mode: dmode, builtLen: pagesRef.current?.length,
+        dims: dimsRef.current, playingSectionId: playingUnitRef.current?.sectionId ?? null,
+        anchor: anchorRef.current,
+      });
+    }
     const a = pageAnchor(pagesRef.current?.[e.data]);
     if (a) anchorRef.current = a;
 
